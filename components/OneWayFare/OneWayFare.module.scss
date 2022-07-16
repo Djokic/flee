@@ -1,0 +1,16 @@
+.OneWayFare {
+  display: flex;
+  justify-content: space-between;
+  padding: .5rem 1rem;
+  border: 1px solid var(--border-color);
+  border-top: none;
+  font-size: .75rem;
+
+  time {
+    color: var(--color-text-light);
+  }
+
+  span {
+    //font-weight: bold;
+  }
+}

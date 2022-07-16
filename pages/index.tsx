@@ -1,20 +1,22 @@
-import {Fare} from "service/clients/ryanair/flights";
+import {useAirports} from "components/hooks/useAirports";
+import OriginsList from "components/OriginsList/OriginsList";
+import React from 'react';
+
+import {useFlightsData} from "components/hooks/useFlightsData";
 import type { NextPage } from 'next'
 import Head from 'next/head'
-import Image from 'next/image'
-import {useEffect, useState} from "react";
 import styles from '../styles/Home.module.css'
 
 const Home: NextPage = () => {
-  const [data, setData] = useState([]);
-  useEffect(() => {
-    fetch('http://localhost:3000/api/allFares?origin=INI&fromDate=2022-07-01&toDate=2023-10-01')
-      .then(async (res) => {
-        const { data } = await res.json();
-        setData(data);
-      })
-    return undefined;
-  }, [])
+  const { airportsMap, loading } = useAirports();
+  const {flights } = useFlightsData({
+    origins: ['INI', 'BEG'],
+    oneWay: false,
+    maxPrice: 80,
+    daysBetweenFrom: 2,
+    daysBetweenTo: 14
+  });
+
   return (
     <div className={styles.container}>
       <Head>
@@ -24,31 +26,12 @@ const Home: NextPage = () => {
       </Head>
 
       <main className={styles.main}>
-        <p className={styles.description}>
-          01.07.2022. - 01.10.2022.
-        </p>
-
-        <div className={styles.grid}>
-          {data.map((fareGroup: any) => (
-            <div className={styles.card} key={fareGroup.origin + fareGroup.destination}>
-              <h3>{fareGroup.origin} -> {fareGroup.destination}</h3>
-              <table>
-                <tbody>
-                  {fareGroup.fares.map((fare: Fare) =>(
-                    <tr key={fare.sellKey}>
-                      <td>{fare.day}</td>
-                      <td>{fare.price?.value} {fare.price?.currencySymbol}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          ))}
-        </div>
+        {!loading && (
+          <OriginsList data={flights} airportsMap={airportsMap}/>
+        )}
       </main>
-
     </div>
   )
 }
 
-export default Home
+export default React.memo(Home);

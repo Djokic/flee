@@ -7,13 +7,17 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "lint-fix": "eslint --quiet --fix --ext=jsx,ts,tsx .",
     "start:service": "npx ts-node service/service.ts"
   },
   "dependencies": {
+    "mongodb": "^4.7.0",
     "next": "12.2.0",
     "node-fetch": "^3.2.6",
     "react": "18.2.0",
     "react-dom": "18.2.0",
+    "react-icons": "^4.4.0",
+    "sass": "^1.53.0",
     "set-cookie-parser": "^2.5.0"
   },
   "devDependencies": {

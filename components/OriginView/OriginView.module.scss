@@ -1,0 +1,7 @@
+.OriginView {
+  display: inline-block;
+  min-width: 26rem;
+  padding: 2rem;
+  border-right: 1px solid var(--border-color);
+  scroll-snap-align: start;
+}

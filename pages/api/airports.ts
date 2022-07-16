@@ -1,6 +1,6 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
-import {getAirports, getFlightsData} from "service/clients/ryanair";
 import type { NextApiRequest, NextApiResponse } from 'next'
+import {getWholeCollectionFromDb} from "../../lib/mongo";
 
 type Data = {
   name: string
@@ -10,6 +10,9 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>
 ) {
-  const data = await getAirports();
-  res.status(200).json({ data })
+  if (req.method !== 'GET') {
+    res.status(404).end();
+  }
+
+  res.status(200).json(await getWholeCollectionFromDb('airports'))
 }

@@ -1,6 +1,7 @@
-import {wait} from "service/clients/helpers";
-import {Airport, Operator} from "service/clients/types";
-import {transformQueryToQueryString} from "service/clients/ryanair/helpers";
+import {wait} from "../helpers";
+import {Airport, Operator} from "../types";
+
+import {transformQueryToQueryString} from "./helpers";
 
 type AirportResponse = {
   code: string,
@@ -61,11 +62,13 @@ async function getRoutesForAirport(departureAirportCode: string): Promise<RouteR
 }
 
 export async function getAirportsWithRoutes(codes?: string[]): Promise<Airport[]> {
+  console.log(`Getting Airports [RyanAir]`);
   const airports: Airport[] = [];
   const airportsResponse = await getAirports();
 
   const addAirport = async (airport: AirportResponse) => {
     await wait(1000);
+    console.log(`Getting Connections[RyanAir] -> ${airport.code}`);
     const routesResponse = await getRoutesForAirport(airport.code);
     airports.push({
       code: airport.code,

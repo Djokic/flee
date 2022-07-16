@@ -1,7 +1,9 @@
-import {wait} from "service/clients/helpers";
-import {getNewSession, logout } from "service/clients/wizzair/auth";
-import {formatDate} from "service/helpers/date";
-import {Fare, Flight, Operator} from "service/clients/types";
+import {getNewSession, logout } from "./auth";
+import {wait} from "../helpers";
+
+import {Fare, Flight, Operator} from "../types";
+import {formatDate} from "../../helpers/date";
+import {convertCurrency} from "../../helpers/currency";
 
 type GetFlightsParams = {
   origin: string;
@@ -70,6 +72,7 @@ function getStartDate(date: string, delay: number) {
 }
 
 export async function getFlights(params: GetFlightsParams): Promise<Flight> {
+  console.log(`Getting Flights [WizzAir] -> ${params.origin} - ${params.destination}`);
   let headers = await getNewSession();
   const maxInterval = 7;
   const batchesCount = Math.ceil(params.lookupDays / ((maxInterval * 2) + 1));
@@ -78,37 +81,44 @@ export async function getFlights(params: GetFlightsParams): Promise<Flight> {
   await logout(headers)
   const fares: Fare[] = [];
 
-  for (let i = 0; i < batchesCount; i++) {
-    await wait(1000);
-    headers = await getNewSession();
+  if (dates.flightDates.length > 0) {
+    for (let i = 0; i < batchesCount; i++) {
+      await wait(1000);
+      headers = await getNewSession();
 
-    const startDate = fares.length > 0
-      ? getStartDate(fares[fares.length - 1].date, maxInterval)
-      : getStartDate(parseDate(dates.flightDates[0]), maxInterval);
+      const startDate = fares.length > 0
+        ? getStartDate(fares[fares.length - 1].date, maxInterval)
+        : getStartDate(parseDate(dates.flightDates?.[0]), maxInterval);
 
-    const newParams = {
-      origin: params.origin,
-      destination: params.destination,
-      startDate: startDate,
-      lookupDays: maxInterval
+      const newParams = {
+        origin: params.origin,
+        destination: params.destination,
+        startDate: startDate,
+        lookupDays: maxInterval
+      }
+
+      const data = await getFlightsPart(newParams, headers);
+
+      let flights = data.outboundFlights?.filter((flight) => flight.price?.amount > 0) || [];
+      if (fares.length > 0 && flights.length > 0) {
+        flights.shift();
+      }
+
+      const targetCurrency = process.env.TARGET_CURRENCY || 'EUR';
+      for (const flight of flights) {
+        fares.push({
+          operator: Operator.WIZZAIR,
+          date: parseDate(flight.date),
+          currency: targetCurrency,
+          price: await convertCurrency({
+            from: flight.price.currencyCode,
+            to: targetCurrency,
+            amount: flight.price.amount || 0
+          })
+        })
+      }
+      await logout(headers);
     }
-
-    const data = await getFlightsPart(newParams, headers);
-
-    let flights = data.outboundFlights?.filter((flight) => flight.price?.amount > 0) || [];
-    if (fares.length > 0 && flights.length > 0) {
-      flights.shift();
-    }
-
-    flights.forEach((flight) => {
-      fares.push({
-        date: parseDate(flight.date),
-        price: flight.price.amount,
-        currency: flight.price.currencyCode,
-        operator: Operator.WIZZAIR
-      })
-    })
-    await logout(headers);
   }
 
   return {

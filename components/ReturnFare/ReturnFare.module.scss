@@ -1,0 +1,76 @@
+.ReturnFare {
+  &__content {
+    display: flex;
+    padding: .5rem 1rem;
+    border: 1px solid var(--border-color);
+    border-top: none;
+    font-size: .75rem;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  &__details {
+    display: flex;
+    align-items: center;
+
+    div {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.25rem;
+
+      time {
+        font-weight: bold;
+      }
+
+      span {
+        font-size: .625rem;
+        color: var(--color-text-light);
+      }
+
+      &:first-child {
+        text-align: right;
+      }
+    }
+
+    img {
+      height: 1.5rem !important;
+      width: 1.5rem !important;
+      border-radius: .25rem;
+      border: 1px solid var(--border-color);
+
+      &:first-child {
+        margin-right: 1rem;
+      }
+
+      &:last-child {
+        margin-left: 1rem;
+      }
+    }
+
+  }
+
+  &__separator {
+    color: var(--color-text-light);
+    display: block;
+    transform: translateY(1.5rem);
+    background: white;
+    padding: .25rem;
+    border-radius: 100%;
+    border: .25rem solid var(--border-color);
+
+    svg {
+      display: block;
+      width: 1rem;
+      height: 1rem;
+    }
+  }
+
+  footer {
+    display: flex;
+    justify-content: space-between;
+    font-size: .75rem;
+    font-weight: bold;
+    padding: .25rem 1rem;
+    background: var(--border-color);
+  }
+}

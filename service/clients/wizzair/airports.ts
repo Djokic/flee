@@ -1,6 +1,6 @@
-import {getNewSession, logout} from "service/clients/wizzair/auth";
+import {getNewSession, logout} from "./auth";
 
-import {Airport, Operator} from "service/clients/types";
+import {Airport, Operator} from "../types";
 
 type Connection = {
   iata: string,
@@ -39,6 +39,7 @@ async function getAirports(): Promise<GetAirportsResponse> {
 
 
 export async function getAirportsWithRoutes(codes?: string[]): Promise<Airport[]> {
+  console.log(`Getting Airports [WizzAir]`);
   const airports: Airport[] = [];
   const airportsResponse = await getAirports();
 

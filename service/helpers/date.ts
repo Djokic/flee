@@ -9,3 +9,10 @@ export function addDaysToDate(date: Date, daysToAdd: number) {
   date.setUTCDate(date.getUTCDate() + daysToAdd);
   return date;
 }
+
+export function getDifferenceInDays(date1: string, date2: string) {
+  const dayDurationInMs = 86400_000;
+  const d1 = new Date(date1);
+  const d2 = new Date(date2);
+  return (d1.getTime() - d2.getTime()) / dayDurationInMs;
+}

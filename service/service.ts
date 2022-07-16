@@ -1,31 +1,72 @@
-import {Flight} from "./clients";
+require('dotenv').config();
+const { MongoClient, ServerApiVersion } = require('mongodb');
+
+import {Airport, Flight, Operator} from "./clients";
 import * as RyanAir from "./clients/ryanair";
 import * as WizzAir from "./clients/wizzair";
 
-import { formatDate } from "./helpers/date";
+import {formatDate} from "./helpers/date";
 
-async function run() {
-  const rAirports = await RyanAir.getAirportsWithRoutes(['INI', 'BEG']);
-  const wAirports = await WizzAir.getAirportsWithRoutes(['INI', 'BEG']);
+const mergeAirports = (airportsArrays: Airport[][]): Airport[] => {
+  const airportsMap: Record<string, Airport> = {};
+  airportsArrays.reduce((acc, curr) => [...acc, ...curr], []).forEach((airport) => {
+    if (!airportsMap[airport.code]) {
+      airportsMap[airport.code] = airport;
+    } else {
+      airportsMap[airport.code] = {
+        ...airportsMap[airport.code],
+        connections: [...airportsMap[airport.code].connections, ...airport.connections]
+      }
+    }
+  });
+
+  return Object.values(airportsMap);
+}
+
+const mergeFlights = (flightsArrays: Flight[][]): Flight[] => {
+  const flightsMap: Record<string, Flight> = {};
+  flightsArrays
+    .reduce((acc, curr) => [...acc, ...curr], [])
+    .forEach((flight) => {
+      const key = `${flight.origin}-${flight.destination}`;
+      if (!flightsMap[key]) {
+        flightsMap[key] = flight;
+      } else {
+        flightsMap[key] = {
+          ...flightsMap[key],
+          fares: [...flightsMap[key].fares, ...flight.fares]
+            .sort((fare1, fare2) => {
+              return Number(new Date(fare1.date)) - Number(new Date(fare2.date));
+            })
+        }
+      }
+  });
+
+  return Object.values(flightsMap);
+}
+
+async function getDataForOperator(client: any) {
+  const airportCodes = process.env.AIRPORTS?.split(',');
+  const lookupDays = parseInt(process.env.LOOKUP_DAYS || '30');
+
+  const airports: Airport[] = await client.getAirportsWithRoutes();
+  const filteredAirports = airports.filter(({ code }) => airportCodes?.includes(code));
 
   const flights: Flight[] = [];
-
-  for (const airport of rAirports) {
+  for (const airport of filteredAirports) {
     for (const connection of airport.connections) {
-      console.log(`Getting RyanAir - ${airport.code} -> ${connection.code}`)
-      const dataOut = await RyanAir.getFlights({
+      const dataOut = await client.getFlights({
         origin: airport.code,
         destination: connection.code,
         startDate: formatDate(new Date()),
-        lookupDays: 30
+        lookupDays
       });
 
-      console.log(`Getting RyanAir - ${connection.code} -> ${airport.code}`)
-      const dataIn = await RyanAir.getFlights({
+      const dataIn = await client.getFlights({
         origin: connection.code,
         destination: airport.code,
         startDate: formatDate(new Date()),
-        lookupDays: 30
+        lookupDays
       });
 
       flights.push(dataOut);
@@ -33,30 +74,46 @@ async function run() {
     }
   }
 
-  for (const airport of wAirports) {
-    for (const connection of airport.connections) {
-      console.log(`Getting WizzAir - ${airport.code} -> ${connection.code}`)
-      const dataOut = await WizzAir.getFlights({
-        origin: airport.code,
-        destination: connection.code,
-        startDate: formatDate(new Date()),
-        lookupDays: 30
-      });
+  return {airports, flights};
+}
 
-      console.log(`Getting WizzAir - ${connection.code} -> ${airport.code}`)
-      const dataIn = await WizzAir.getFlights({
-        origin: connection.code,
-        destination: airport.code,
-        startDate: formatDate(new Date()),
-        lookupDays: 30
-      });
+async function run() {
+  const data = await Promise.all([
+    getDataForOperator(RyanAir),
+    getDataForOperator(WizzAir)
+  ]);
 
-      flights.push(dataOut);
-      flights.push(dataIn);
+  const airports = mergeAirports(data.map((item) => item.airports));
+  const flights: Flight[] = mergeFlights(data.map((item) => item.flights));
+
+  const client = new MongoClient(process.env.MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    serverApi: ServerApiVersion.v1
+  });
+
+  try {
+    await client.connect();
+    const db = client.db('fle');
+
+    const airportsCollection = db.collection('airports');
+    if (await airportsCollection.countDocuments() > 0) {
+      await airportsCollection.drop();
     }
+    await airportsCollection.insertMany(airports);
+
+    const flightsCollection = db.collection('flights');
+    if (await flightsCollection.countDocuments() > 0) {
+      await flightsCollection.drop();
+    }
+    await flightsCollection.insertMany(flights);
+  } catch (e) {
+    console.log("MongoError ->", e);
+  } finally {
+    await client.close();
   }
 
-  console.log(flights);
+  console.log('Saved to DB!');
 }
 
 run();
