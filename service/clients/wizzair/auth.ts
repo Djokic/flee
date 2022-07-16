@@ -1,21 +1,28 @@
-import {RequestListener} from "http";
+const Browser = require('zombie');
 
 var https = require('https');
 var setCookie = require('set-cookie-parser');
 
 export async function getApiUrl(): Promise<string> {
+  const browser = new Browser();
+  await browser.visit('https://wizzair.com/static_fe/metadata.json');
+  return JSON.parse(browser.resources[0].response.body).apiUrl;
   // console.log('Op');
   // const res:any = await new Promise((resolve) => https.get(`https://wizzair.com`, (res) =>resolve(res.headers)));
   // console.log('hh', res.headers);
-  const res = await fetch('https://wizzair.com/');
-  const data = await res.headers;
-  console.log(data);
+  // const res = await fetch('https://crossorigin.me/https://wizzair.com/static_fe/metadata.json', {
+  //   headers: {
+  //     Origin: 'https://wizzair.com/'
+  //   }
+  // });
+  // const data = await res.json();
+  // console.log(data);
   // const backendUrl =  data
   //   .split(' ')
   //   .find((part) => part.startsWith('https'));
   //
   // return backendUrl + '/Api';
-  return '';
+  // return '';
 }
 
 export async function getNewSession(apiUrl: string) {
