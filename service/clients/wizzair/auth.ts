@@ -1,20 +1,14 @@
 var https = require('https');
 var setCookie = require('set-cookie-parser');
 
-export async function getApiUrl() {
-  return "https://be.wizzair.com/12.12.0/Api";
-  // try {
-  //   let headers = new Headers({
-  //     "Accept"       : "application/json",
-  //     "Content-Type" : "application/json",
-  //     "User-Agent"   : "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36"
-  //   })
-  //   const res = await fetch('https://wizzair.com/static_fe/metadata.json', { headers, credentials: "include" });
-  //   const data = await res.json();
-  //   return data.apiUrl;
-  // } catch (e) {
-  //   console.log('Error getting apiUrl', e)
-  // }
+export async function getApiUrl(): Promise<string> {
+  const res = await fetch('https://wizzair.com/buildnumber');
+  const data = await res.text();
+  const backendUrl =  data
+    .split(' ')
+    .find((part) => part.startsWith('https'));
+
+  return backendUrl + '/Api';
 }
 
 export async function getNewSession(apiUrl: string) {
