@@ -1,14 +1,21 @@
+import {RequestListener} from "http";
+
 var https = require('https');
 var setCookie = require('set-cookie-parser');
 
 export async function getApiUrl(): Promise<string> {
-  const res = await fetch('https://wizzair.com/buildnumber');
-  const data = await res.text();
-  const backendUrl =  data
-    .split(' ')
-    .find((part) => part.startsWith('https'));
-
-  return backendUrl + '/Api';
+  // console.log('Op');
+  // const res:any = await new Promise((resolve) => https.get(`https://wizzair.com`, (res) =>resolve(res.headers)));
+  // console.log('hh', res.headers);
+  const res = await fetch('https://wizzair.com/');
+  const data = await res.headers;
+  console.log(data);
+  // const backendUrl =  data
+  //   .split(' ')
+  //   .find((part) => part.startsWith('https'));
+  //
+  // return backendUrl + '/Api';
+  return '';
 }
 
 export async function getNewSession(apiUrl: string) {
