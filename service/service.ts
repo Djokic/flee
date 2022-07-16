@@ -9,16 +9,18 @@ async function run() {
   const airportCodes = process.env.AIRPORTS?.split(',');
   const lookupDays = parseInt(process.env.LOOKUP_DAYS || '30');
 
-  const ryanAirClient = new RyanAirClient({ airportCodes, lookupDays });
+  // const ryanAirClient = new RyanAirClient({ airportCodes, lookupDays });
   const wizzAirClient = new WizzAirClient({ airportCodes, lookupDays });
 
-  await Promise.all([
-    ryanAirClient.getData(),
-    wizzAirClient.getData()
-  ]);
-
-  const airports = mergeAirports([ryanAirClient.airports, wizzAirClient.airports]);
-  const flights: Flight[] = mergeFlights([ryanAirClient.flights, wizzAirClient.flights]);
+  // await Promise.all([
+  //   ryanAirClient.getData(),
+  //   wizzAirClient.getData()
+  // ]);
+  //
+  // const airports = mergeAirports([ryanAirClient.airports, wizzAirClient.airports]);
+  // const flights: Flight[] = mergeFlights([ryanAirClient.flights, wizzAirClient.flights]);
+  await wizzAirClient.getData();
+  const { airports, flights } = wizzAirClient;
 
   const client = new MongoClient(process.env.MONGO_URI, {
     useNewUrlParser: true,

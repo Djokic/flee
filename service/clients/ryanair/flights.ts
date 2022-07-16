@@ -34,7 +34,7 @@ type GetFaresResponse = {
 }
 
 export async function getFlights(params: GetFlightsParams): Promise<Flight> {
-  console.log(`Getting Flights [RyanAir] -> ${params.origin} - ${params.destination}`);
+  console.log(`[RyanAir] Getting Flights -> ${params.origin} - ${params.destination}`);
   await wait(500);
   const endDate = new Date(params.startDate);
   endDate.setDate(endDate.getDate() + params.lookupDays);
