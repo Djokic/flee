@@ -81,6 +81,7 @@ export async function getFlights(apiUrl: string, params: GetFlightsParams): Prom
   await logout(apiUrl,headers)
   const fares: Fare[] = [];
 
+
   if (dates.flightDates.length > 0) {
     for (let i = 0; i < batchesCount; i++) {
       await wait(500);
