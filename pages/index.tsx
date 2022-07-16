@@ -12,7 +12,7 @@ const Home: NextPage = () => {
   const {flights } = useFlightsData({
     origins: ['INI', 'BEG'],
     oneWay: false,
-    maxPrice: 80,
+    maxPrice: 100,
     daysBetweenFrom: 2,
     daysBetweenTo: 14
   });
