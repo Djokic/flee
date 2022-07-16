@@ -73,19 +73,27 @@ function getStartDate(date: string, delay: number) {
 
 export async function getFlights(apiUrl: string, params: GetFlightsParams): Promise<Flight> {
   console.log(`[WizzAir] Getting Flights -> ${params.origin} - ${params.destination}`);
-  let headers = await getNewSession(apiUrl);
   const maxInterval = 7;
   const batchesCount = Math.ceil(params.lookupDays / ((maxInterval * 2) + 1));
 
-  const dates = await getFlightDates(apiUrl, params, headers);
-  await logout(apiUrl,headers)
+  const reqLimit = 5;
+  let reqCounter = 0;
+
+  let headers = await getNewSession(apiUrl);
+
   const fares: Fare[] = [];
+
+  const dates = await getFlightDates(apiUrl, params, headers);
+  reqCounter++;
 
 
   if (dates.flightDates.length > 0) {
     for (let i = 0; i < batchesCount; i++) {
-      await wait(500);
-      headers = await getNewSession(apiUrl);
+      await wait(300);
+
+      if (reqCounter === 0) {
+        headers = await getNewSession(apiUrl);
+      }
 
       const startDate = fares.length > 0
         ? getStartDate(fares[fares.length - 1].date, maxInterval)
@@ -99,6 +107,7 @@ export async function getFlights(apiUrl: string, params: GetFlightsParams): Prom
       }
 
       const data = await getFlightsPart(apiUrl, newParams, headers);
+      reqCounter++;
 
       let flights = data.outboundFlights?.filter((flight) => flight.price?.amount > 0) || [];
       if (fares.length > 0 && flights.length > 0) {
@@ -118,8 +127,17 @@ export async function getFlights(apiUrl: string, params: GetFlightsParams): Prom
           })
         })
       }
-      await logout(apiUrl, headers);
+
+      if (reqCounter >= reqLimit) {
+        await logout(apiUrl, headers);
+        reqCounter = 0;
+      }
+
     }
+  }
+
+  if (reqCounter > 0) {
+    await logout(apiUrl, headers);
   }
 
   return {
