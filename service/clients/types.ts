@@ -1,3 +1,14 @@
+export type AirlineClientParams = {
+  airportCodes?: string[];
+  lookupDays: number
+}
+
+export interface AirlineClient {
+  airports: Airport[];
+  flights: Flight[];
+  getData: () => Promise<void>;
+}
+
 export enum Operator {
   RYANAIR = 'RYANAIR',
   WIZZAIR = 'WIZZAIR'

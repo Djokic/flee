@@ -62,13 +62,13 @@ async function getRoutesForAirport(departureAirportCode: string): Promise<RouteR
 }
 
 export async function getAirportsWithRoutes(codes?: string[]): Promise<Airport[]> {
-  console.log(`Getting Airports [RyanAir]`);
+  console.log(`[RyanAir] Getting Airports`);
   const airports: Airport[] = [];
   const airportsResponse = await getAirports();
 
   const addAirport = async (airport: AirportResponse) => {
-    await wait(1000);
-    console.log(`Getting Connections[RyanAir] -> ${airport.code}`);
+    await wait(500);
+    console.log(`[RyanAir] Getting Connections -> ${airport.code}`);
     const routesResponse = await getRoutesForAirport(airport.code);
     airports.push({
       code: airport.code,

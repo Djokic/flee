@@ -1,2 +1,1 @@
-export * from './airports';
-export * from './flights';
+export * from './client';

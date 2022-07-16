@@ -30,18 +30,18 @@ type GetAirportsResponse = {
   cities: AirportResponse[]
 }
 
-async function getAirports(): Promise<GetAirportsResponse> {
-  const headers = await getNewSession();
-  const res = await fetch("https://be.wizzair.com/12.11.2/Api/asset/map?languageCode=en-gb", {headers});
-  await logout(headers);
+async function getAirports(apiUrl: string): Promise<GetAirportsResponse> {
+  const headers = await getNewSession(apiUrl);
+  const res = await fetch(`${apiUrl}/asset/map?languageCode=en-gb`, {headers});
+  await logout(apiUrl, headers);
   return await res.json() as GetAirportsResponse;
 }
 
 
-export async function getAirportsWithRoutes(codes?: string[]): Promise<Airport[]> {
-  console.log(`Getting Airports [WizzAir]`);
+export async function getAirportsWithRoutes(apiUrl: string, codes?: string[]): Promise<Airport[]> {
+  console.log(`[WizzAir] Getting Airports`);
   const airports: Airport[] = [];
-  const airportsResponse = await getAirports();
+  const airportsResponse = await getAirports(apiUrl);
 
   const addAirport = (airport: AirportResponse) => {
     airports.push({

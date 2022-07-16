@@ -1,9 +1,19 @@
 var https = require('https');
 var setCookie = require('set-cookie-parser');
 
-export async function getNewSession() {
+export async function getApiUrl() {
+  try {
+    const res = await fetch('https://wizzair.com/static_fe/metadata.json');
+    const data = await res.json();
+    return data.apiUrl;
+  } catch (e) {
+    console.log('Error getting apiUrl', e)
+  }
+}
+
+export async function getNewSession(apiUrl: string) {
   const res = await new Promise((resolve) => {
-    https.get(' https://be.wizzair.com/12.11.2/Api/userSession/new', resolve)
+    https.get(`${apiUrl}/userSession/new`, resolve)
   });
   const cookies = setCookie.parse(res, { decodeValues: true });
   const sessionId = cookies.find((cookie: any) => cookie.name === 'ASP.NET_SessionId')?.value;
@@ -16,9 +26,9 @@ export async function getNewSession() {
   }
 }
 
-export async function logout(headers: Record<string, string>) {
+export async function logout(apiUrl: string, headers: Record<string, string>) {
   try {
-    await fetch("https://be.wizzair.com/12.11.2/Api/customer/logout", {
+    await fetch(`${apiUrl}/customer/logout`, {
       headers,
       "method": "POST",
       "mode": "cors",

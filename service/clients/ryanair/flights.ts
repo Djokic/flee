@@ -35,7 +35,7 @@ type GetFaresResponse = {
 
 export async function getFlights(params: GetFlightsParams): Promise<Flight> {
   console.log(`Getting Flights [RyanAir] -> ${params.origin} - ${params.destination}`);
-  await wait(1000);
+  await wait(500);
   const endDate = new Date(params.startDate);
   endDate.setDate(endDate.getDate() + params.lookupDays);
   const res = await fetch(`https://www.ryanair.com/api/farfnd/3/oneWayFares/${params.origin}/${params.destination}/cheapestPerDay?outboundDateFrom=${params.startDate}&outboundDateTo=${formatDate(endDate)}`);

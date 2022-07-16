@@ -24,11 +24,11 @@ type GetFlightDatesResponse = {
   flightDates: string[]
 }
 
-async function getFlightDates(params: GetFlightsParams, headers: Record<string, string>): Promise<GetFlightDatesResponse> {
+async function getFlightDates(apiUrl: string, params: GetFlightsParams, headers: Record<string, string>): Promise<GetFlightDatesResponse> {
   const endDate = new Date(params.startDate);
   endDate.setDate(endDate.getDate() + params.lookupDays);
 
-  const res = await fetch(`https://be.wizzair.com/12.11.2/Api/search/flightDates?departureStation=${params.origin}&arrivalStation=${params.destination}&from=${params.startDate}&to=${formatDate(endDate)}`, {
+  const res = await fetch(`${apiUrl}/search/flightDates?departureStation=${params.origin}&arrivalStation=${params.destination}&from=${params.startDate}&to=${formatDate(endDate)}`, {
     headers,
     "mode": "cors",
     "credentials": "include"
@@ -41,8 +41,8 @@ type GetFlightsPartResponse = {
   outboundFlights: FlightResponse[]
 }
 
-async function getFlightsPart(params: GetFlightsParams, headers: Record<string, string>): Promise<GetFlightsPartResponse> {
-  const res = await fetch("https://be.wizzair.com/12.11.2/Api/asset/farechart", {
+async function getFlightsPart(apiUrl: string, params: GetFlightsParams, headers: Record<string, string>): Promise<GetFlightsPartResponse> {
+  const res = await fetch(`${apiUrl}/asset/farechart`, {
     headers,
     "body": JSON.stringify({
       isRescueFare: false,
@@ -71,20 +71,20 @@ function getStartDate(date: string, delay: number) {
   return formatDate(d);
 }
 
-export async function getFlights(params: GetFlightsParams): Promise<Flight> {
-  console.log(`Getting Flights [WizzAir] -> ${params.origin} - ${params.destination}`);
-  let headers = await getNewSession();
+export async function getFlights(apiUrl: string, params: GetFlightsParams): Promise<Flight> {
+  console.log(`[WizzAir] Getting Flights -> ${params.origin} - ${params.destination}`);
+  let headers = await getNewSession(apiUrl);
   const maxInterval = 7;
   const batchesCount = Math.ceil(params.lookupDays / ((maxInterval * 2) + 1));
 
-  const dates = await getFlightDates(params, headers);
-  await logout(headers)
+  const dates = await getFlightDates(apiUrl, params, headers);
+  await logout(apiUrl,headers)
   const fares: Fare[] = [];
 
   if (dates.flightDates.length > 0) {
     for (let i = 0; i < batchesCount; i++) {
-      await wait(1000);
-      headers = await getNewSession();
+      await wait(500);
+      headers = await getNewSession(apiUrl);
 
       const startDate = fares.length > 0
         ? getStartDate(fares[fares.length - 1].date, maxInterval)
@@ -97,7 +97,7 @@ export async function getFlights(params: GetFlightsParams): Promise<Flight> {
         lookupDays: maxInterval
       }
 
-      const data = await getFlightsPart(newParams, headers);
+      const data = await getFlightsPart(apiUrl, newParams, headers);
 
       let flights = data.outboundFlights?.filter((flight) => flight.price?.amount > 0) || [];
       if (fares.length > 0 && flights.length > 0) {
@@ -117,7 +117,7 @@ export async function getFlights(params: GetFlightsParams): Promise<Flight> {
           })
         })
       }
-      await logout(headers);
+      await logout(apiUrl, headers);
     }
   }
 
