@@ -21,7 +21,9 @@ function DestinationView(props: DestinationViewProps) {
       <header onClick={() => setIsOpen(!isOpen)}>
         <h4>{props.airportsMap[props.data.destination].name} <span>{props.data.destination}</span></h4>
         <div className={styles.DestinationView__planeAnimation}/>
-        <span>{props.data.price} <span>{props.data.currency}</span></span>
+        {props.data.price !== Infinity && (
+          <span>{props.data.price.toFixed(2)} <span>{props.data.currency}</span></span>
+        )}
       </header>
       <div className={styles.DestinationView__content}>
         {props.data.oneWayFares.map((data) => <OneWayFare key={data.date} data={data}/>)}

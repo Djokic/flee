@@ -15,7 +15,6 @@ export default function OriginView(props: OriginViewProps) {
   return (
     <div className={styles.OriginView}>
       <h2>{props.airportsMap[props.data.origin].name} ({props.data.origin})</h2>
-      <span>✈️</span>
       {props.data.destinations.map((data) => (
         <DestinationView
           key={data.destination}
