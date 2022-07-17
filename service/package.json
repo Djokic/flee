@@ -3,7 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "start": "npx ts-node ./service.ts"
+    "start": "npx ts-node ./service.ts",
+    "test-script": "npx ts-node ./testScript.ts"
   },
   "engines": {
     "node": ">= 18.0.0"

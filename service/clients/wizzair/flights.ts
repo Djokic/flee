@@ -1,4 +1,4 @@
-import {getNewSession, logout } from "./auth";
+import {getApiUrl, getNewSession, logout} from "./auth";
 import {wait} from "../helpers";
 
 import {Fare, Flight, Operator} from "../types";
@@ -145,4 +145,37 @@ export async function getFlights(apiUrl: string, params: GetFlightsParams): Prom
     destination: params.destination,
     fares
   }
+}
+
+export async function getFares() {
+  const apiUrl = await getApiUrl();
+  const headers = await getNewSession(apiUrl);
+  const res = await fetch(`${apiUrl}/search/timetable`, {
+    headers,
+    "body": JSON.stringify({
+      adultCount: 1,
+      childCount: 0,
+      infantCount: 0,
+      priceType: 'regular',
+      flightList: [
+        {
+          departureStation: 'INI',
+          arrivalStation: 'VIE',
+          from: '2022-08-17',
+          to: '2022-09-17'
+        },
+        {
+          departureStation: 'INI',
+          arrivalStation: 'MLH',
+          from: '2022-08-17',
+          to: '2022-09-17'
+        }
+      ]
+    }),
+    "mode": "cors",
+    "credentials": "include",
+    "method": "POST"
+  });
+
+  return await res.json();
 }

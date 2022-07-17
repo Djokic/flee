@@ -29,6 +29,8 @@ export type Airport  = {
 }
 
 export type Fare = {
+  origin: string;
+  destination: string;
   date: string;
   price: number;
   currency: string;
