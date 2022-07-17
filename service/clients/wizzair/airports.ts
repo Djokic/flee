@@ -1,6 +1,5 @@
-import {getApiUrl, getNewSession, logout} from "./auth";
-
-import {Airport, Operator} from "../types";
+import { Airport, Operator } from '../types';
+import { getApiUrl, getNewSession, logout } from './auth';
 
 type Connection = {
   iata: string,
@@ -30,16 +29,15 @@ type GetAirportsResponse = {
   cities: AirportResponse[]
 }
 
-async function getAirports(apiUrl: string): Promise<GetAirportsResponse> {
+async function getAirports (apiUrl: string): Promise<GetAirportsResponse> {
   const headers = await getNewSession(apiUrl);
-  const res = await fetch(`${apiUrl}/asset/map?languageCode=en-gb`, {headers});
+  const res = await fetch(`${apiUrl}/asset/map?languageCode=en-gb`, { headers });
   await logout(apiUrl, headers);
   return await res.json() as GetAirportsResponse;
 }
 
-
-export async function getAirportsWithRoutes(): Promise<Airport[]> {
-  console.log(`[WizzAir] Getting Airports`);
+export async function getAirportsWithRoutes (): Promise<Airport[]> {
+  console.log('[WizzAir] Getting Airports');
   const apiUrl = await getApiUrl();
   const airports: Airport[] = [];
   const airportsResponse = await getAirports(apiUrl);
@@ -55,7 +53,7 @@ export async function getAirportsWithRoutes(): Promise<Airport[]> {
         code: connection.iata,
         operator: Operator.WIZZAIR
       }))
-    })
+    });
   };
 
   for (const airport of airportsResponse.cities) {

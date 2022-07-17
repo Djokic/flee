@@ -1,8 +1,8 @@
-import {addDaysToDate, formatDate} from "helpers/date";
-import {convertCurrency} from "../../helpers/currency";
-import {Fare, Operator} from '../types';
+import { addDaysToDate, formatDate } from 'helpers/date';
+import { convertCurrency } from 'helpers/currency';
+import { Fare, Operator } from '../types';
 
-import {getApiUrl, getNewSession} from "./auth";
+import { getApiUrl, getNewSession } from './auth';
 
 type GetFaresParams = {
   origin: string;
@@ -30,7 +30,7 @@ type GetFaresResponse = {
   returnFlights: FlightResponse[]
 }
 
-export async function getFares(params: GetFaresParams): Promise<Fare[]> {
+export async function getFares (params: GetFaresParams): Promise<Fare[]> {
   console.log(`[WizzAir] Getting Flights -> ${params.origin} <--> ${params.destination}`);
   const maxDays = 30;
   const batchesCount = Math.ceil(params.lookupDays / maxDays);
@@ -55,7 +55,7 @@ export async function getFares(params: GetFaresParams): Promise<Fare[]> {
 
     const res = await fetch(`${apiUrl}/search/timetable`, {
       headers,
-      "body": JSON.stringify({
+      body: JSON.stringify({
         adultCount: 1,
         childCount: 0,
         infantCount: 0,
@@ -75,9 +75,9 @@ export async function getFares(params: GetFaresParams): Promise<Fare[]> {
           }
         ]
       }),
-      "mode": "cors",
-      "credentials": "include",
-      "method": "POST"
+      mode: 'cors',
+      credentials: 'include',
+      method: 'POST'
     });
 
     const data: GetFaresResponse = await res.json();
@@ -97,7 +97,7 @@ export async function getFares(params: GetFaresParams): Promise<Fare[]> {
           to: targetCurrency,
           amount: flight.price.amount
         })
-      })
+      });
     }
   }
 

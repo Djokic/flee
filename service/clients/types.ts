@@ -1,14 +1,3 @@
-export type AirlineClientParams = {
-  lookupDays: number
-}
-
-export interface AirlineClient {
-  airports: Airport[];
-  fares: Fare[];
-  getAirports: () => Promise<Airport[]>;
-  getFares: (airports: Airport[]) => Promise<Fare[]>;
-}
-
 export enum Operator {
   RYANAIR = 'RYANAIR',
   WIZZAIR = 'WIZZAIR'
@@ -19,7 +8,7 @@ export type Connection = {
   operator: Operator;
 }
 
-export type Airport  = {
+export type Airport = {
   code: string;
   name: string;
   country: string;
@@ -35,4 +24,15 @@ export type Fare = {
   price: number;
   currency: string;
   operator: Operator;
+}
+
+export interface AirlineClient {
+  airports: Airport[];
+  fares: Fare[];
+  getAirports: () => Promise<Airport[]>;
+  getFares: (airports: Airport[]) => Promise<Fare[]>;
+}
+
+export type AirlineClientParams = {
+  lookupDays: number
 }

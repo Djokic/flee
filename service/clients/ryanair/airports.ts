@@ -1,7 +1,7 @@
-import {wait} from "../helpers";
-import {Airport, Operator} from "../types";
+import { wait } from '../helpers';
+import { Airport, Operator } from '../types';
 
-import {transformQueryToQueryString} from "./helpers";
+import { transformQueryToQueryString } from './helpers';
 
 type AirportResponse = {
   code: string,
@@ -49,20 +49,20 @@ const RouteQuery = `
       code
     }
   }
-`
+`;
 
-async function getAirports(): Promise<AirportResponse[]> {
+async function getAirports (): Promise<AirportResponse[]> {
   const res = await fetch(`https://www.ryanair.com/api/locate/v5/airports?${transformQueryToQueryString(AirportsQuery)}`);
   return await res.json() as AirportResponse[];
 }
 
-async function getRoutesForAirport(departureAirportCode: string): Promise<RouteResponse[]> {
+async function getRoutesForAirport (departureAirportCode: string): Promise<RouteResponse[]> {
   const res = await fetch(`https://www.ryanair.com/api/locate/v5/routes?departureAirportCode=${departureAirportCode}&${transformQueryToQueryString(RouteQuery)}`);
   return await res.json() as RouteResponse[];
 }
 
-export async function getAirportsWithRoutes(): Promise<Airport[]> {
-  console.log(`[RyanAir] Getting Airports`);
+export async function getAirportsWithRoutes (): Promise<Airport[]> {
+  console.log('[RyanAir] Getting Airports');
   const airports: Airport[] = [];
   const airportsResponse = await getAirports();
 
@@ -80,8 +80,8 @@ export async function getAirportsWithRoutes(): Promise<Airport[]> {
         code: route.arrivalAirport.code,
         operator: Operator.RYANAIR
       }))
-    })
-  }
+    });
+  };
 
   for (const airport of airportsResponse) {
     await addAirport(airport);

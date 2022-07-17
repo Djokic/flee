@@ -1,8 +1,8 @@
-import {wait} from "../helpers";
-import {Fare, Flight, Operator} from "../types";
+import { convertCurrency } from 'helpers/currency';
 
-import {addDaysToDate, formatDate} from "../../helpers/date";
-import {convertCurrency} from "../../helpers/currency";
+import { addDaysToDate, formatDate } from 'helpers/date';
+import { wait } from '../helpers';
+import { Fare, Operator } from '../types';
 
 type GetFaresParams = {
   origin: string;
@@ -33,7 +33,7 @@ type GetFaresResponse = {
   }
 }
 
-export async function getFares(params: GetFaresParams): Promise<Fare[]> {
+export async function getFares (params: GetFaresParams): Promise<Fare[]> {
   console.log(`[RyanAir] Getting Flights -> ${params.origin} -> ${params.destination}`);
   await wait(500);
   const endDate = formatDate(addDaysToDate(new Date(params.startDate), params.lookupDays));
@@ -53,9 +53,9 @@ export async function getFares(params: GetFaresParams): Promise<Fare[]> {
       price: await convertCurrency({
         from: f.price?.currencyCode || '',
         to: targetCurrency,
-        amount: f.price?.value || 0,
+        amount: f.price?.value || 0
       })
-    })
+    });
   }
 
   return fares;

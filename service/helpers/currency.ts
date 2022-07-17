@@ -1,4 +1,4 @@
-const CC = require('currency-converter-lt')
+const CC = require('currency-converter-lt');
 
 type ConvertCurrencyParams = {
   from: string;
@@ -6,7 +6,7 @@ type ConvertCurrencyParams = {
   amount: number
 }
 
-export async function convertCurrency(params: ConvertCurrencyParams) {
-  let currencyConverter = new CC(params);
+export async function convertCurrency (params: ConvertCurrencyParams) {
+  const currencyConverter = new CC(params);
   return await currencyConverter.convert();
 }

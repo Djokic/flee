@@ -1,6 +1,6 @@
 type ParamValue = string | boolean | number | (string | boolean | number)[];
 
-export function formatQueryParams(params: Record<string, ParamValue>) {
+export function formatQueryParams (params: Record<string, ParamValue>) {
   const paramsArray: [string, string | boolean | number][] = [];
 
   Object.entries(params).forEach(([key, value]) => {

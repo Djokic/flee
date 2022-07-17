@@ -1,22 +1,23 @@
-import {getConnectionsForOperator} from "clients/helpers";
-import {formatDate} from "../../helpers/date";
+import { getConnectionsForOperator } from 'clients/helpers';
+import { formatDate } from 'helpers/date';
 
-import {getApiUrl} from "./auth";
-
-import {AirlineClient, AirlineClientParams, Airport, Fare, Operator} from "../types";
-import { getAirportsWithRoutes } from "./airports";
-import { getFares } from "./fares";
+import { AirlineClient, AirlineClientParams, Airport, Fare, Operator } from '../types';
+import { getAirportsWithRoutes } from './airports';
+import { getFares } from './fares';
 
 export class WizzAirClient implements AirlineClient {
+  private params: AirlineClientParams;
   public airports: Airport[] = [];
   public fares: Fare[] = [];
 
-  constructor(private params: AirlineClientParams) {}
+  constructor (params: AirlineClientParams) {
+    this.params = params;
+  }
 
   public getAirports = async () => {
     this.airports = await getAirportsWithRoutes();
     return this.airports;
-  }
+  };
 
   public getFares = async (airports: Airport[]) => {
     for (const airport of airports) {
@@ -26,10 +27,10 @@ export class WizzAirClient implements AirlineClient {
           origin: airport.code,
           destination: connection.code,
           startDate: formatDate(new Date()),
-          lookupDays: this.params.lookupDays,
+          lookupDays: this.params.lookupDays
         });
       }
     }
     return this.fares;
-  }
+  };
 }

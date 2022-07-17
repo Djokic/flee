@@ -1,16 +1,18 @@
 require('dotenv').config();
 
-import {saveAirports, saveFares} from "./helpers/db";
-import {Airport, mergeAirports } from "./clients";
-import { RyanAirClient } from "./clients/ryanair";
-import { WizzAirClient } from "./clients/wizzair";
+import { Airport, mergeAirports } from 'clients';
+import { RyanAirClient } from 'clients/ryanair';
+import { WizzAirClient } from 'clients/wizzair';
+import { saveAirports, saveFares } from 'helpers/db';
 
-async function run() {
+
+
+async function run () {
   const airportCodes: string[] = process.env.AIRPORTS?.split(',') || [];
   const lookupDays = parseInt(process.env.LOOKUP_DAYS || '30');
 
   const ryanAirClient = new RyanAirClient({ lookupDays });
-  const wizzAirClient = new WizzAirClient( {lookupDays });
+  const wizzAirClient = new WizzAirClient({ lookupDays });
 
   await Promise.all([
     ryanAirClient.getAirports(),
@@ -33,4 +35,3 @@ async function run() {
 }
 
 run();
-
