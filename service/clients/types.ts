@@ -1,12 +1,12 @@
 export type AirlineClientParams = {
-  airportCodes?: string[];
   lookupDays: number
 }
 
 export interface AirlineClient {
   airports: Airport[];
-  flights: Flight[];
-  getData: () => Promise<void>;
+  fares: Fare[];
+  getAirports: () => Promise<Airport[]>;
+  getFares: (airports: Airport[]) => Promise<Fare[]>;
 }
 
 export enum Operator {
@@ -35,10 +35,4 @@ export type Fare = {
   price: number;
   currency: string;
   operator: Operator;
-}
-
-export type Flight = {
-  origin: string;
-  destination: string;
-  fares: Fare[];
 }

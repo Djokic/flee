@@ -1,39 +1,42 @@
+import {getConnectionsForOperator} from "clients/helpers";
 import {formatDate} from "../../helpers/date";
 
-import {AirlineClient, AirlineClientParams, Airport, Flight} from "../types";
-import { getAirportsWithRoutes } from "./airports";
-import { getFlights } from "./flights";
+import {AirlineClient, AirlineClientParams, Airport, Operator, Fare} from "../types";
+import {getAirportsWithRoutes} from "./airports";
+import {getFares} from "./fares";
 
 export class RyanAirClient implements AirlineClient {
   public airports: Airport[] = [];
-  public flights: Flight[] = [];
+  public fares: Fare[] = [];
 
   constructor(private params: AirlineClientParams) {}
 
-  public getData = async () => {
-    const { airportCodes, lookupDays } = this.params;
+  public getAirports = async () => {
     this.airports = await getAirportsWithRoutes();
-    const filteredAirports = this.airports.filter(({ code }) => airportCodes?.includes(code));
+    return this.airports;
+  }
 
-    for (const airport of filteredAirports) {
-      for (const connection of airport.connections) {
-        const dataOut = await getFlights({
+  public getFares = async (airports: Airport[]) => {
+    for (const airport of airports) {
+      const connections = getConnectionsForOperator(airport, Operator.RYANAIR);
+      for (const connection of connections) {
+        const outboundFares = await getFares({
           origin: airport.code,
           destination: connection.code,
           startDate: formatDate(new Date()),
-          lookupDays
+          lookupDays: this.params.lookupDays,
         });
 
-        const dataIn = await getFlights({
+        const returnFares = await getFares({
           origin: connection.code,
           destination: airport.code,
           startDate: formatDate(new Date()),
-          lookupDays
+          lookupDays: this.params.lookupDays
         });
 
-        this.flights.push(dataOut);
-        this.flights.push(dataIn);
+        this.fares = [...outboundFares, ...returnFares];
       }
     }
+    return this.fares;
   }
 }

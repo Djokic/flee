@@ -1,53 +1,35 @@
 require('dotenv').config();
-const { MongoClient, ServerApiVersion } = require('mongodb');
 
-import {Flight, mergeAirports, mergeFlights } from "./clients";
+import {saveAirports, saveFares} from "./helpers/db";
+import {Airport, mergeAirports } from "./clients";
 import { RyanAirClient } from "./clients/ryanair";
 import { WizzAirClient } from "./clients/wizzair";
 
 async function run() {
-  const airportCodes = process.env.AIRPORTS?.split(',');
+  const airportCodes: string[] = process.env.AIRPORTS?.split(',') || [];
   const lookupDays = parseInt(process.env.LOOKUP_DAYS || '30');
 
-  const ryanAirClient = new RyanAirClient({ airportCodes, lookupDays });
-  const wizzAirClient = new WizzAirClient({ airportCodes, lookupDays });
+  const ryanAirClient = new RyanAirClient({ lookupDays });
+  const wizzAirClient = new WizzAirClient( {lookupDays });
 
   await Promise.all([
-    ryanAirClient.getData(),
-    wizzAirClient.getData()
+    ryanAirClient.getAirports(),
+    wizzAirClient.getAirports()
   ]);
 
-  const airports = mergeAirports([ryanAirClient.airports, wizzAirClient.airports]);
-  const flights: Flight[] = mergeFlights([ryanAirClient.flights, wizzAirClient.flights]);
+  const airports: Airport[] = mergeAirports([ryanAirClient.airports, wizzAirClient.airports]);
+  const filteredAirports = airports.filter(({ code }) => airportCodes.includes(code));
 
-  const client = new MongoClient(process.env.MONGO_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    serverApi: ServerApiVersion.v1
-  });
+  await saveAirports(airports);
+  console.log('Saved Airports to DB!');
 
-  try {
-    await client.connect();
-    const db = client.db('fle');
+  await Promise.all([
+    ryanAirClient.getFares(filteredAirports),
+    wizzAirClient.getFares(filteredAirports)
+  ]);
 
-    const airportsCollection = db.collection('airports');
-    if (await airportsCollection.countDocuments() > 0) {
-      await airportsCollection.drop();
-    }
-    await airportsCollection.insertMany(airports);
-
-    const flightsCollection = db.collection('flights');
-    if (await flightsCollection.countDocuments() > 0) {
-      await flightsCollection.drop();
-    }
-    await flightsCollection.insertMany(flights);
-  } catch (e) {
-    console.log("MongoError ->", e);
-  } finally {
-    await client.close();
-  }
-
-  console.log('Saved to DB!');
+  await saveFares([...ryanAirClient.fares, ...wizzAirClient.fares]);
+  console.log('Saved Fares to DB!');
 }
 
 run();

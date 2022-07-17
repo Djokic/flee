@@ -1,42 +1,35 @@
+import {getConnectionsForOperator} from "clients/helpers";
 import {formatDate} from "../../helpers/date";
 
 import {getApiUrl} from "./auth";
 
-import {AirlineClient, AirlineClientParams, Airport, Flight} from "../types";
+import {AirlineClient, AirlineClientParams, Airport, Fare, Operator} from "../types";
 import { getAirportsWithRoutes } from "./airports";
-import { getFlights } from "./flights";
+import { getFares } from "./fares";
 
 export class WizzAirClient implements AirlineClient {
   public airports: Airport[] = [];
-  public flights: Flight[] = [];
+  public fares: Fare[] = [];
 
   constructor(private params: AirlineClientParams) {}
 
-  public getData = async () => {
-    const apiUrl = await getApiUrl();
-    const { airportCodes, lookupDays } = this.params;
-    this.airports = await getAirportsWithRoutes(apiUrl);
-    const filteredAirports = this.airports.filter(({ code }) => airportCodes?.includes(code));
+  public getAirports = async () => {
+    this.airports = await getAirportsWithRoutes();
+    return this.airports;
+  }
 
-    for (const airport of filteredAirports) {
-      for (const connection of airport.connections) {
-        const dataOut = await getFlights(apiUrl, {
+  public getFares = async (airports: Airport[]) => {
+    for (const airport of airports) {
+      const connections = getConnectionsForOperator(airport, Operator.WIZZAIR);
+      for (const connection of connections) {
+        this.fares = await getFares({
           origin: airport.code,
           destination: connection.code,
           startDate: formatDate(new Date()),
-          lookupDays
+          lookupDays: this.params.lookupDays,
         });
-
-        const dataIn = await getFlights(apiUrl, {
-          origin: connection.code,
-          destination: airport.code,
-          startDate: formatDate(new Date()),
-          lookupDays
-        });
-
-        this.flights.push(dataOut);
-        this.flights.push(dataIn);
       }
     }
+    return this.fares;
   }
 }

@@ -61,7 +61,7 @@ async function getRoutesForAirport(departureAirportCode: string): Promise<RouteR
   return await res.json() as RouteResponse[];
 }
 
-export async function getAirportsWithRoutes(codes?: string[]): Promise<Airport[]> {
+export async function getAirportsWithRoutes(): Promise<Airport[]> {
   console.log(`[RyanAir] Getting Airports`);
   const airports: Airport[] = [];
   const airportsResponse = await getAirports();
@@ -84,11 +84,7 @@ export async function getAirportsWithRoutes(codes?: string[]): Promise<Airport[]
   }
 
   for (const airport of airportsResponse) {
-    if (!codes) {
-      await addAirport(airport);
-    } else if (codes?.includes(airport.code)) {
-      await addAirport(airport);
-    }
+    await addAirport(airport);
   }
   return airports;
 }

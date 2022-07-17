@@ -4,7 +4,7 @@ import {Fare, Flight, Operator} from "../types";
 import {addDaysToDate, formatDate} from "../../helpers/date";
 import {convertCurrency} from "../../helpers/currency";
 
-type GetFlightsParams = {
+type GetFaresParams = {
   origin: string;
   destination: string;
   startDate: string;
@@ -33,7 +33,7 @@ type GetFaresResponse = {
   }
 }
 
-export async function getFlights(params: GetFlightsParams): Promise<Fare[]> {
+export async function getFares(params: GetFaresParams): Promise<Fare[]> {
   console.log(`[RyanAir] Getting Flights -> ${params.origin} -> ${params.destination}`);
   await wait(500);
   const endDate = formatDate(addDaysToDate(new Date(params.startDate), params.lookupDays));

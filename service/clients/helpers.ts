@@ -1,9 +1,13 @@
-import {Airport, Flight} from "./types";
+import {Airport, Operator} from "./types";
 
 export async function wait(milliseconds: number) {
   return await new Promise((resolve) => {
     setTimeout(resolve, milliseconds);
   })
+}
+
+export const getConnectionsForOperator = (airport: Airport, operator: Operator) => {
+  return airport.connections.filter((connection) => operator === connection.operator);
 }
 
 export const mergeAirports = (airportsArrays: Airport[][]): Airport[] => {
@@ -20,26 +24,4 @@ export const mergeAirports = (airportsArrays: Airport[][]): Airport[] => {
   });
 
   return Object.values(airportsMap);
-}
-
-export const mergeFlights = (flightsArrays: Flight[][]): Flight[] => {
-  const flightsMap: Record<string, Flight> = {};
-  flightsArrays
-    .reduce((acc, curr) => [...acc, ...curr], [])
-    .forEach((flight) => {
-      const key = `${flight.origin}-${flight.destination}`;
-      if (!flightsMap[key]) {
-        flightsMap[key] = flight;
-      } else {
-        flightsMap[key] = {
-          ...flightsMap[key],
-          fares: [...flightsMap[key].fares, ...flight.fares]
-            .sort((fare1, fare2) => {
-              return Number(new Date(fare1.date)) - Number(new Date(fare2.date));
-            })
-        }
-      }
-    });
-
-  return Object.values(flightsMap);
 }

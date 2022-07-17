@@ -1,4 +1,4 @@
-import {getNewSession, logout} from "./auth";
+import {getApiUrl, getNewSession, logout} from "./auth";
 
 import {Airport, Operator} from "../types";
 
@@ -38,8 +38,9 @@ async function getAirports(apiUrl: string): Promise<GetAirportsResponse> {
 }
 
 
-export async function getAirportsWithRoutes(apiUrl: string, codes?: string[]): Promise<Airport[]> {
+export async function getAirportsWithRoutes(): Promise<Airport[]> {
   console.log(`[WizzAir] Getting Airports`);
+  const apiUrl = await getApiUrl();
   const airports: Airport[] = [];
   const airportsResponse = await getAirports(apiUrl);
 
@@ -58,11 +59,8 @@ export async function getAirportsWithRoutes(apiUrl: string, codes?: string[]): P
   };
 
   for (const airport of airportsResponse.cities) {
-    if (!codes) {
-      addAirport(airport);
-    } else if (codes?.includes(airport.iata)) {
-      addAirport(airport)
-    }
+    addAirport(airport);
   }
+
   return airports;
 }
