@@ -1,5 +1,5 @@
 import { Airport, Operator } from '../types';
-import { getApiUrl, getNewSession, logout } from './auth';
+import { createHeaders, getApiUrl, getNewSession, logout } from './auth';
 
 type Connection = {
   iata: string,
@@ -30,15 +30,15 @@ type GetAirportsResponse = {
 }
 
 async function getAirports (apiUrl: string): Promise<GetAirportsResponse> {
-  const headers = await getNewSession(apiUrl);
+  const { sessionId, verificationToken } = await getNewSession(apiUrl);
+  const headers = createHeaders(sessionId, verificationToken);
   const res = await fetch(`${apiUrl}/asset/map?languageCode=en-gb`, { headers });
   await logout(apiUrl, headers);
   return await res.json() as GetAirportsResponse;
 }
 
-export async function getAirportsWithRoutes (): Promise<Airport[]> {
+export async function getAirportsWithRoutes (apiUrl: string): Promise<Airport[]> {
   console.log('[WizzAir] Getting Airports');
-  const apiUrl = await getApiUrl();
   const airports: Airport[] = [];
   const airportsResponse = await getAirports(apiUrl);
 

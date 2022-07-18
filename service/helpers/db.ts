@@ -12,20 +12,22 @@ const client = new MongoClient(process.env.MONGO_URI, {
   serverApi: ServerApiVersion.v1
 });
 
-async function runDbAction (action: (db: typeof Db) => Promise<void>) {
+async function runDbAction (action: (db: typeof Db) => Promise<any>) {
+  let result;
   try {
     await client.connect();
     const db = client.db('fle');
-    await action(db);
+    result = await action(db);
   } catch (e) {
     console.log('MongoError ->', e);
   } finally {
     await client.close();
   }
+  return result;
 }
 
 export async function saveAirports (airports: Airport[]) {
-  await runDbAction(async (db) => {
+  return await runDbAction(async (db) => {
     const airportsCollection = db.collection('airports');
     if (await airportsCollection.countDocuments() > 0) {
       await airportsCollection.drop();
@@ -34,8 +36,17 @@ export async function saveAirports (airports: Airport[]) {
   });
 }
 
+export async function loadAirports (): Promise<Airport[]> {
+  return await runDbAction(async (db) => {
+    const airportsCollection = db.collection('airports');
+    const cursor = airportsCollection.find();
+    const airports: Airport[] = await cursor.toArray();
+    return airports;
+  });
+}
+
 export async function saveFares (fares: Fare[]) {
-  await runDbAction(async (db) => {
+  return await runDbAction(async (db) => {
     const airportsCollection = db.collection('fares');
     if (await airportsCollection.countDocuments() > 0) {
       await airportsCollection.drop();

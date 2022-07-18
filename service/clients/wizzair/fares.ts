@@ -1,8 +1,9 @@
+import { wait } from 'clients/helpers';
 import { addDaysToDate, formatDate } from 'helpers/date';
 import { convertCurrency } from 'helpers/currency';
 import { Fare, Operator } from '../types';
 
-import { getApiUrl, getNewSession } from './auth';
+import { createHeaders, getNewSession, getVerificationTokenFromHeaders } from './auth';
 
 type GetFaresParams = {
   origin: string;
@@ -15,7 +16,7 @@ type FlightResponse = {
   departureStation: string,
   arrivalStation: string,
   departureDate: string,
-  priceType: 'price',
+  priceType: 'price' | 'checkPrice',
   departureDates: [string],
   classOfService: string,
   hasMacFlight: boolean,
@@ -30,31 +31,32 @@ type GetFaresResponse = {
   returnFlights: FlightResponse[]
 }
 
-export async function getFares (params: GetFaresParams): Promise<Fare[]> {
+export async function getFares (apiUrl: string, params: GetFaresParams): Promise<Fare[]> {
   console.log(`[WizzAir] Getting Flights -> ${params.origin} <--> ${params.destination}`);
+  await wait(300);
   const maxDays = 30;
   const batchesCount = Math.ceil(params.lookupDays / maxDays);
-  const maxReqPerSession = 5;
-
-  const apiUrl = await getApiUrl();
+  const maxReqPerSession = 4;
 
   const fares: Fare[] = [];
-
-  let headers;
+  let sessionId;
+  let verificationToken;
   for (let i = 0; i < batchesCount; i++) {
     /**
      * If max requests per session limit is reached
      * create new session (it will create new session at the beginning also)
      */
     if (i % maxReqPerSession === 0) {
-      headers = await getNewSession(apiUrl);
+      const data = await getNewSession(apiUrl);
+      sessionId = data.sessionId;
+      verificationToken = data.verificationToken;
     }
 
-    const from = formatDate(addDaysToDate(new Date(params.startDate), i * maxDays));
-    const to = formatDate(addDaysToDate(new Date(params.startDate), (i + 1) * maxDays));
+    const from = formatDate(addDaysToDate(new Date(params.startDate), (i * maxDays) + 1));
+    const to = formatDate(addDaysToDate(new Date(params.startDate), ((i + 1) * maxDays) + 1));
 
-    const res = await fetch(`${apiUrl}/search/timetable`, {
-      headers,
+    const res: any = await fetch(`${apiUrl}/search/timetable`, {
+      headers: createHeaders(sessionId, verificationToken),
       body: JSON.stringify({
         adultCount: 1,
         childCount: 0,
@@ -81,9 +83,10 @@ export async function getFares (params: GetFaresParams): Promise<Fare[]> {
     });
 
     const data: GetFaresResponse = await res.json();
+    verificationToken = getVerificationTokenFromHeaders(res.headers) || verificationToken;
 
     const targetCurrency = process.env.TARGET_CURRENCY || 'EUR';
-    const joinFlights = [...data.outboundFlights, ...data.outboundFlights];
+    const joinFlights = [...data?.outboundFlights, ...data?.returnFlights].filter((flight) => flight.price.amount > 0);
 
     for (const flight of joinFlights) {
       fares.push({

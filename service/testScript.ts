@@ -1,3 +1,5 @@
+import { getApiUrl } from 'clients/wizzair/auth';
+import { getFares } from 'clients/wizzair/fares';
 
 const getRate = async (source: string, target: string) => {
   // const res = await fetch(
@@ -39,8 +41,14 @@ const getRate = async (source: string, target: string) => {
 };
 
 async function run () {
-  // const data = await getFares();
-  // console.log('D', data.outboundFlights[0].price);
+  const apiUrl = await getApiUrl();
+  const data = await getFares(apiUrl, {
+    origin: 'INI',
+    destination: 'DTM',
+    startDate: '2022-08-18',
+    lookupDays: 30
+  });
+  console.log('D', data);
 }
 
 run();
