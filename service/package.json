@@ -5,6 +5,7 @@
   "scripts": {
     "start": "npx ts-node -r tsconfig-paths/register ./service.ts",
     "start:getFares": "npx ts-node -r tsconfig-paths/register ./getFares.ts",
+    "start:getAirports": "npx ts-node -r tsconfig-paths/register ./getAirports.ts",
     "test-script": "npx ts-node -r tsconfig-paths/register ./testScript.ts",
     "lint-fix": "eslint --fix --ext .ts"
   },
