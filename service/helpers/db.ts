@@ -1,4 +1,4 @@
-import { Airport, Fare } from 'clients';
+import { Airport, Fare, Operator } from 'clients';
 
 const { MongoClient, ServerApiVersion, Db } = require('mongodb');
 
@@ -45,12 +45,10 @@ export async function loadAirports (): Promise<Airport[]> {
   });
 }
 
-export async function saveFares (fares: Fare[]) {
+export async function saveFares (fares: Fare[], operator: Operator) {
   return await runDbAction(async (db) => {
     const airportsCollection = db.collection('fares');
-    if (await airportsCollection.countDocuments() > 0) {
-      await airportsCollection.drop();
-    }
+    await airportsCollection.deleteMany({ operator });
     await airportsCollection.insertMany(fares);
   });
 }
