@@ -15,7 +15,7 @@ export class WizzAirClient implements AirlineClient {
   public fares: Fare[] = [];
 
   public cookies: Record<string, string> = {};
-  private axiosClient: Axios = axios.create({ withCredentials: true });
+  private axiosClient: Axios = axios.create({ withCredentials: true, timeout: 60_000 });
 
   constructor (params: AirlineClientParams) {
     this.params = params;
