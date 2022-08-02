@@ -3,7 +3,7 @@ import { addDaysToDate, formatDate } from 'helpers/date';
 import { convertCurrency } from 'helpers/currency';
 import { Fare, Operator } from '../types';
 
-import { createHeaders, getNewSession, getVerificationTokenFromHeaders } from './auth';
+import { createHeaders, getNewSession, getVerificationTokenFromHeaders, logout } from './auth';
 
 type GetFaresParams = {
   origin: string;
@@ -33,7 +33,6 @@ type GetFaresResponse = {
 
 export async function getFares (apiUrl: string, params: GetFaresParams): Promise<Fare[]> {
   console.log(`[WizzAir] Getting Flights -> ${params.origin} <--> ${params.destination}`);
-  await wait(300);
   const maxDays = 30;
   const batchesCount = Math.ceil(params.lookupDays / maxDays);
   const maxReqPerSession = 4;
@@ -47,6 +46,9 @@ export async function getFares (apiUrl: string, params: GetFaresParams): Promise
      * create new session (it will create new session at the beginning also)
      */
     if (i % maxReqPerSession === 0) {
+      if (sessionId && verificationToken) {
+        await logout(apiUrl, createHeaders(sessionId, verificationToken));
+      }
       const data = await getNewSession(apiUrl);
       sessionId = data.sessionId;
       verificationToken = data.verificationToken;
@@ -54,6 +56,14 @@ export async function getFares (apiUrl: string, params: GetFaresParams): Promise
 
     const from = formatDate(addDaysToDate(new Date(params.startDate), (i * maxDays) + 1));
     const to = formatDate(addDaysToDate(new Date(params.startDate), ((i + 1) * maxDays) + 1));
+
+    await wait(3000);
+    // const tamperRequest: any = await fetch(`${apiUrl}/search/flightDates?departureStation=${params.origin}&arrivalStation=${params.destination}&from=${from}&to=${to}`, {
+    //   headers: createHeaders(sessionId, verificationToken),
+    //   mode: 'cors',
+    //   credentials: 'include'
+    // });
+    // verificationToken = getVerificationTokenFromHeaders(tamperRequest.headers) || verificationToken;
 
     const res: any = await fetch(`${apiUrl}/search/timetable`, {
       headers: createHeaders(sessionId, verificationToken),

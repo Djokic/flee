@@ -37,7 +37,7 @@ export class RyanAirClient implements AirlineClient {
           lookupDays: this.params.lookupDays
         });
 
-        this.fares = [...outboundFares, ...returnFares];
+        this.fares = [...this.fares, ...outboundFares, ...returnFares];
       }
     }
     return this.fares;

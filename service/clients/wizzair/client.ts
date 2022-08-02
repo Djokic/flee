@@ -1,4 +1,4 @@
-import { getConnectionsForOperator } from 'clients/helpers';
+import { getConnectionsForOperator, wait } from 'clients/helpers';
 import { getApiUrl } from 'clients/wizzair/auth';
 import { formatDate } from 'helpers/date';
 
@@ -28,12 +28,13 @@ export class WizzAirClient implements AirlineClient {
     for (const airport of airports) {
       const connections = getConnectionsForOperator(airport, Operator.WIZZAIR);
       for (const connection of connections) {
-        this.fares = await getFares(apiUrl, {
+        const fares = await getFares(apiUrl, {
           origin: airport.code,
           destination: connection.code,
           startDate: formatDate(new Date()),
           lookupDays: this.params.lookupDays
         });
+        this.fares = [...this.fares, ...fares];
       }
     }
     return this.fares;

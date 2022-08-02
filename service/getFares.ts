@@ -17,7 +17,7 @@ async function run () {
   const filteredAirports = airports.filter(({ code }) => airportCodes.includes(code));
 
   await Promise.all([
-    ryanAirClient.getFares(filteredAirports),
+    // ryanAirClient.getFares(filteredAirports),
     wizzAirClient.getFares(filteredAirports)
   ]);
 
