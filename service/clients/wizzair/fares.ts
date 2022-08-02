@@ -1,9 +1,8 @@
+import { Axios } from 'axios';
 import { wait } from 'clients/helpers';
 import { addDaysToDate, formatDate } from 'helpers/date';
 import { convertCurrency } from 'helpers/currency';
 import { Fare, Operator } from '../types';
-
-import { createHeaders, getNewSession, getVerificationTokenFromHeaders, logout } from './auth';
 
 type GetFaresParams = {
   origin: string;
@@ -31,43 +30,22 @@ type GetFaresResponse = {
   returnFlights: FlightResponse[]
 }
 
-export async function getFares (apiUrl: string, params: GetFaresParams): Promise<Fare[]> {
+export async function getFares (axios: Axios, params: GetFaresParams): Promise<Fare[]> {
   console.log(`[WizzAir] Getting Flights -> ${params.origin} <--> ${params.destination}`);
   const maxDays = 30;
   const batchesCount = Math.ceil(params.lookupDays / maxDays);
-  const maxReqPerSession = 4;
 
   const fares: Fare[] = [];
-  let sessionId;
-  let verificationToken;
   for (let i = 0; i < batchesCount; i++) {
-    /**
-     * If max requests per session limit is reached
-     * create new session (it will create new session at the beginning also)
-     */
-    if (i % maxReqPerSession === 0) {
-      if (sessionId && verificationToken) {
-        await logout(apiUrl, createHeaders(sessionId, verificationToken));
-      }
-      const data = await getNewSession(apiUrl);
-      sessionId = data.sessionId;
-      verificationToken = data.verificationToken;
-    }
-
     const from = formatDate(addDaysToDate(new Date(params.startDate), (i * maxDays) + 1));
     const to = formatDate(addDaysToDate(new Date(params.startDate), ((i + 1) * maxDays) + 1));
 
-    await wait(3000);
-    // const tamperRequest: any = await fetch(`${apiUrl}/search/flightDates?departureStation=${params.origin}&arrivalStation=${params.destination}&from=${from}&to=${to}`, {
-    //   headers: createHeaders(sessionId, verificationToken),
-    //   mode: 'cors',
-    //   credentials: 'include'
-    // });
-    // verificationToken = getVerificationTokenFromHeaders(tamperRequest.headers) || verificationToken;
+    await wait(1000);
 
-    const res: any = await fetch(`${apiUrl}/search/timetable`, {
-      headers: createHeaders(sessionId, verificationToken),
-      body: JSON.stringify({
+    const res: any = await axios.request({
+      url: '/search/timetable',
+      method: 'POST',
+      data: {
         adultCount: 1,
         childCount: 0,
         infantCount: 0,
@@ -86,14 +64,10 @@ export async function getFares (apiUrl: string, params: GetFaresParams): Promise
             to
           }
         ]
-      }),
-      mode: 'cors',
-      credentials: 'include',
-      method: 'POST'
+      }
     });
 
-    const data: GetFaresResponse = await res.json();
-    verificationToken = getVerificationTokenFromHeaders(res.headers) || verificationToken;
+    const data: GetFaresResponse = res.data;
 
     const targetCurrency = process.env.TARGET_CURRENCY || 'EUR';
     const joinFlights = [...data?.outboundFlights, ...data?.returnFlights].filter((flight) => flight.price.amount > 0);

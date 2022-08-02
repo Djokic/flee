@@ -1,5 +1,5 @@
+import { Axios } from 'axios';
 import { Airport, Operator } from '../types';
-import { createHeaders, getApiUrl, getNewSession, logout } from './auth';
 
 type Connection = {
   iata: string,
@@ -29,18 +29,15 @@ type GetAirportsResponse = {
   cities: AirportResponse[]
 }
 
-async function getAirports (apiUrl: string): Promise<GetAirportsResponse> {
-  const { sessionId, verificationToken } = await getNewSession(apiUrl);
-  const headers = createHeaders(sessionId, verificationToken);
-  const res = await fetch(`${apiUrl}/asset/map?languageCode=en-gb`, { headers });
-  await logout(apiUrl, headers);
-  return await res.json() as GetAirportsResponse;
+async function getAirports (axios: Axios): Promise<GetAirportsResponse> {
+  const { data } = await axios.get('/asset/map?languageCode=en-gb');
+  return data as GetAirportsResponse;
 }
 
-export async function getAirportsWithRoutes (apiUrl: string): Promise<Airport[]> {
+export async function getAirportsWithRoutes (axios: Axios): Promise<Airport[]> {
   console.log('[WizzAir] Getting Airports');
   const airports: Airport[] = [];
-  const airportsResponse = await getAirports(apiUrl);
+  const airportsResponse = await getAirports(axios);
 
   const addAirport = (airport: AirportResponse) => {
     airports.push({
