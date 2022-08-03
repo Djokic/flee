@@ -3,6 +3,7 @@ import { convertCurrency } from 'helpers/currency';
 import { addDaysToDate, formatDate } from 'helpers/date';
 import { wait } from '../helpers';
 import { Fare, Operator } from '../types';
+import Exchange from '../../../lib/exchange';
 
 type GetFaresParams = {
   origin: string;
@@ -50,11 +51,13 @@ export async function getFares (params: GetFaresParams): Promise<Fare[]> {
       operator: Operator.RYANAIR,
       date: f.departureDate,
       currency: targetCurrency,
-      price: await convertCurrency({
-        from: f.price?.currencyCode || '',
-        to: targetCurrency,
-        amount: f.price?.value || 0
-      })
+      price: f.price?.currencyCode.toUpperCase() === targetCurrency
+        ? f.price.value
+        : await Exchange.convert({
+          source: f.price?.currencyCode || '',
+          target: targetCurrency,
+          amount: f.price?.value || 0
+        })
     });
   }
 

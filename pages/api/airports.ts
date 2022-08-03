@@ -8,7 +8,7 @@ const KEY = 'airports';
 async function getAirports() {
   return await getWholeCollectionFromDb(KEY);
 }
-CacheStore.addField({
+CacheStore.setField({
   key: KEY,
   getter: getAirports,
   ttl: 600_000

@@ -2,7 +2,7 @@ import OriginView from "components/OriginView/OriginView";
 import React from 'react';
 import {Airport} from "service/clients";
 
-import {OriginData} from "../hooks/useFlightsData";
+import {OriginData} from "../hooks/useFlights";
 
 import styles from './OriginsList.module.scss';
 

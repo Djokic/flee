@@ -20,7 +20,7 @@ export default function ReturnFare(props: ReturnFareProps) {
           <img src={Logos[outbound.operator].src} alt={outbound.operator}/>
           <div>
             <time>{new Date(outbound.date).toDateString()}</time>
-            <span>{outbound.price} {outbound.currency}</span>
+            <span>{outbound.price.toFixed(2)} {outbound.currency}</span>
           </div>
         </div>
 
@@ -33,7 +33,7 @@ export default function ReturnFare(props: ReturnFareProps) {
         <div className={styles.ReturnFare__details}>
           <div>
             <time>{new Date(inbound.date).toDateString()}</time>
-            <span>{inbound.price} {inbound.currency}</span>
+            <span>{inbound.price.toFixed(2)} {inbound.currency}</span>
           </div>
           <img src={Logos[inbound.operator].src} alt={inbound.operator}/>
         </div>

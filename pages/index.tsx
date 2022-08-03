@@ -2,14 +2,14 @@ import {useAirports} from "components/hooks/useAirports";
 import OriginsList from "components/OriginsList/OriginsList";
 import React from 'react';
 
-import {useFlightsData} from "components/hooks/useFlightsData";
+import {useFlights } from "components/hooks/useFlights";
 import type { NextPage } from 'next'
 import Head from 'next/head'
 import styles from '../styles/Home.module.css'
 
 const Home: NextPage = () => {
   const { airportsMap, loading } = useAirports();
-  const {flights } = useFlightsData({
+  const { data } = useFlights({
     origins: ['INI', 'BEG'],
     oneWay: false,
     maxPrice: 100,
@@ -27,7 +27,7 @@ const Home: NextPage = () => {
 
       <main className={styles.main}>
         {!loading && (
-          <OriginsList data={flights} airportsMap={airportsMap}/>
+          <OriginsList data={data} airportsMap={airportsMap}/>
         )}
       </main>
     </div>

@@ -14,5 +14,5 @@ export function getDifferenceInDays (date1: string, date2: string) {
   const dayDurationInMs = 86400_000;
   const d1 = new Date(date1);
   const d2 = new Date(date2);
-  return (d1.getTime() - d2.getTime()) / dayDurationInMs;
+  return Math.ceil((d1.getTime() - d2.getTime()) / dayDurationInMs);
 }

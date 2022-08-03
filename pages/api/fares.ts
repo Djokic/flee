@@ -4,21 +4,14 @@ import {getWholeCollectionFromDb} from "../../lib/mongo";
 
 import CacheStore from "lib/cacheStore";
 
-const KEY = 'flights';
+const KEY = 'fares';
 async function getFlights() {
-  const flights = await getWholeCollectionFromDb(KEY);
+  const fares = await getWholeCollectionFromDb(KEY);
   const now = Date.now();
-  const filteredFlights = flights.map((flight: { fares: any[]; }) => {
-    return {
-      ...flight,
-      fares: flight.fares.filter((fare) => {
-        return now < new Date(fare.date).getTime();
-      })
-    }
-  });
-  return filteredFlights;
+  const filteredFares = fares.filter((fare: { date: string | number | Date; }) => now < new Date(fare.date).getTime())
+  return filteredFares;
 }
-CacheStore.addField({
+CacheStore.setField({
   key: KEY,
   getter: getFlights,
   ttl: 600_000
