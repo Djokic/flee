@@ -3,11 +3,11 @@
 }
 
 .flex-row {
-  flex-direction: row;
+  flex-direction: row !important;
 }
 
 .flex-align-start {
-  align-items: flex-start;
+  align-items: flex-start !important;
 }
 
 .phi-m > * {

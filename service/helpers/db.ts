@@ -64,7 +64,7 @@ export async function saveStatus (status: ServiceStatus) {
       .sort({ endAt: 1 })
       .toArray();
 
-    const ids = items.slice(10).map(({ _id }: ServiceStatus) => _id);
+    const ids = items.slice(5).map(({ _id }: ServiceStatus) => _id);
 
     if (ids.length > 0) {
       await statusCollection.deleteMany({ _id: { $in: ids } });
