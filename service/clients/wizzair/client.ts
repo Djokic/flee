@@ -21,6 +21,7 @@ export class WizzAirClient implements AirlineClient {
     this.params = params;
 
     this.axiosClient.interceptors.request.use(async (config) => {
+      console.log(`[WizzAir] Sending request to ${config.url}`);
       return {
         ...config,
         headers: this.headers
@@ -33,8 +34,6 @@ export class WizzAirClient implements AirlineClient {
       });
       return response;
     });
-
-    this.axiosClient.get('https://wizzair.com');
   }
 
   private get headers () {
