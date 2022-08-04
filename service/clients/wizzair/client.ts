@@ -1,8 +1,8 @@
 import axios, { Axios } from 'axios';
 
-import { getConnectionsForOperator } from 'clients/helpers';
-import { getApiUrl } from 'clients/wizzair/helpers';
-import { formatDate } from 'helpers/date';
+import { getConnectionsForOperator } from '../helpers';
+import { getApiUrl } from './helpers';
+import { formatDate } from '../../helpers/date';
 import setCookie from 'set-cookie-parser';
 
 import { AirlineClient, AirlineClientParams, Airport, Fare, Operator } from '../types';

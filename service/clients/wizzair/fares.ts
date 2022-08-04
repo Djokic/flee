@@ -1,6 +1,6 @@
 import { Axios } from 'axios';
-import { getUniqueFares, wait } from 'clients/helpers';
-import { addDaysToDate, formatDate } from 'helpers/date';
+import { getUniqueFares, wait } from '../helpers';
+import { addDaysToDate, formatDate } from '../../helpers/date';
 import Exchange from '../../../lib/exchange';
 import { Fare, Operator } from '../types';
 

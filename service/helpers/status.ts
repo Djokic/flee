@@ -1,5 +1,5 @@
-import { Operator } from 'clients';
-import { saveStatus } from 'helpers/db';
+import { Operator } from '../clients';
+import { saveStatus } from '../helpers/db';
 
 export enum ServiceStatusCode {
   IN_PROGRESS = 'IN_PROGRESS',

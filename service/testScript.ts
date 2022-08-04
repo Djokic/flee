@@ -1,5 +1,4 @@
-import { TransaviaClient } from 'clients/transavia';
-import { getArguments } from 'helpers/arguments';
+import { getArguments } from './helpers/arguments';
 
 // const client = new TransaviaClient({ lookupDays: 30 });
 

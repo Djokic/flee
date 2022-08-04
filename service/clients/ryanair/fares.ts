@@ -1,6 +1,4 @@
-import { convertCurrency } from 'helpers/currency';
-
-import { addDaysToDate, formatDate } from 'helpers/date';
+import { addDaysToDate, formatDate } from '../../helpers/date';
 import { getUniqueFares, wait } from '../helpers';
 import { Fare, Operator } from '../types';
 import Exchange from '../../../lib/exchange';

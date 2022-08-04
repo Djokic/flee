@@ -1,12 +1,12 @@
 /* eslint-disable import/first */
 require('dotenv').config();
 
-import { Airport, Operator } from 'clients';
-import { RyanAirClient } from 'clients/ryanair';
-import { WizzAirClient } from 'clients/wizzair';
-import { getArguments } from 'helpers/arguments';
-import { loadAirports, saveFares } from 'helpers/db';
-import { ServiceStatusCode, setStatus } from 'helpers/status';
+import { Airport, Operator } from './clients';
+import { RyanAirClient } from './clients/ryanair';
+import { WizzAirClient } from './clients/wizzair';
+import { getArguments } from './helpers/arguments';
+import { loadAirports, saveFares } from './helpers/db';
+import { ServiceStatusCode, setStatus } from './helpers/status';
 
 async function run () {
   const startAt = Date.now();

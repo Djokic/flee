@@ -1,5 +1,5 @@
-import { Airport, Fare, Operator } from 'clients';
-import { ServiceStatus } from 'helpers/status';
+import { Airport, Fare, Operator } from '../clients';
+import { ServiceStatus } from '../helpers/status';
 
 const { MongoClient, ServerApiVersion, Db } = require('mongodb');
 

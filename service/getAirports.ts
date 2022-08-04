@@ -1,10 +1,10 @@
 /* eslint-disable import/first */
 require('dotenv').config();
 
-import { Airport, mergeAirports } from 'clients';
-import { RyanAirClient } from 'clients/ryanair';
-import { WizzAirClient } from 'clients/wizzair';
-import { saveAirports } from 'helpers/db';
+import { Airport, mergeAirports } from './clients';
+import { RyanAirClient } from './clients/ryanair';
+import { WizzAirClient } from './clients/wizzair';
+import { saveAirports } from './helpers/db';
 
 async function run () {
   const lookupDays = parseInt(process.env.LOOKUP_DAYS || '30');
