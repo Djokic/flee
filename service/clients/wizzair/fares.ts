@@ -1,5 +1,5 @@
 import { Axios } from 'axios';
-import { wait } from 'clients/helpers';
+import { getUniqueFares, wait } from 'clients/helpers';
 import { addDaysToDate, formatDate } from 'helpers/date';
 import Exchange from '../../../lib/exchange';
 import { Fare, Operator } from '../types';
@@ -91,5 +91,5 @@ export async function getFares (axios: Axios, params: GetFaresParams): Promise<F
     }
   }
 
-  return fares;
+  return getUniqueFares(fares);
 }

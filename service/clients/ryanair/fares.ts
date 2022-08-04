@@ -1,7 +1,7 @@
 import { convertCurrency } from 'helpers/currency';
 
 import { addDaysToDate, formatDate } from 'helpers/date';
-import { wait } from '../helpers';
+import { getUniqueFares, wait } from '../helpers';
 import { Fare, Operator } from '../types';
 import Exchange from '../../../lib/exchange';
 
@@ -61,5 +61,5 @@ export async function getFares (params: GetFaresParams): Promise<Fare[]> {
     });
   }
 
-  return fares;
+  return getUniqueFares(fares);
 }

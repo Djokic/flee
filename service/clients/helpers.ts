@@ -1,4 +1,4 @@
-import { Airport, Operator } from './types';
+import { Airport, Fare, Operator } from './types';
 
 export async function wait (milliseconds: number) {
   return await new Promise((resolve) => {
@@ -24,4 +24,15 @@ export const mergeAirports = (airportsArrays: Airport[][]): Airport[] => {
   });
 
   return Object.values(airportsMap);
+};
+
+export const getUniqueFares = (fares: Fare[]): Fare[] => {
+  const faresMap: Record<string, Fare> = {};
+  fares.forEach((fare) => {
+    if (!faresMap[fare.origin + fare.destination + fare.date]) {
+      faresMap[fare.origin + fare.destination + fare.date] = fare;
+    }
+  });
+
+  return Object.values(faresMap);
 };

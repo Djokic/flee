@@ -1,15 +1,14 @@
 import axios, { Axios } from 'axios';
+import setCookie from 'set-cookie-parser';
 
 import { getConnectionsForOperator } from 'clients/helpers';
-import { getApiUrl } from 'clients/wizzair/helpers';
 import { formatDate } from 'helpers/date';
-import setCookie from 'set-cookie-parser';
 
 import { AirlineClient, AirlineClientParams, Airport, Fare, Operator } from '../types';
 import { getAirportsWithRoutes } from './airports';
 import { getFares } from './fares';
 
-export class WizzAirClient implements AirlineClient {
+export class TransaviaClient implements AirlineClient {
   private params: AirlineClientParams;
   public airports: Airport[] = [];
   public fares: Fare[] = [];
@@ -21,62 +20,56 @@ export class WizzAirClient implements AirlineClient {
     this.params = params;
 
     this.axiosClient.interceptors.request.use(async (config) => {
-      return {
-        ...config,
-        headers: this.headers
-      };
+      if (config?.url?.includes('/Api/')) {
+        console.log({
+          ...config.headers,
+          ...this.headers
+        });
+
+        return {
+          ...config,
+          headers: {
+            ...config.headers,
+            ...this.headers
+          }
+        };
+      }
+      return config;
     });
     this.axiosClient.interceptors.response.use((response) => {
       const cookieStore = setCookie.parse(response?.headers?.['set-cookie'] as string[]);
       cookieStore.forEach((cookie) => {
         this.cookies[cookie.name] = cookie.value;
       });
+      console.log(cookieStore);
       return response;
     });
 
-    this.axiosClient.get('https://wizzair.com');
+    this.axiosClient.get('https://www.transavia.com/en-EU/book-a-flight/flights/search/');
   }
 
   private get headers () {
     return {
-      'Content-Type': 'application/json; charset=utf-8',
-      'Access-Control-Allow-Origin': 'https://wizzair.com',
-      'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.0 Safari/605.1.15',
-      'Accept-Encoding': 'gzip, deflate, br',
-      'Accept-Language': 'en-gb',
-      Accept: 'application/json, text/plain, */*',
-      Host: 'be.wizzair.com',
-      Origin: 'https://wizzair.com',
-      Connection: 'keep-alive',
-      Referer: 'https://wizzair.com/en-gb/flights/fare-finder',
-      Cookie: Object.entries(this.cookies).map(([key, value]) => `${key}=${value}`).join('; '),
-
-      ...this.cookies.RequestVerificationToken
-        ? { 'X-RequestVerificationToken': this.cookies?.RequestVerificationToken }
-        : {}
+      accept: '*/*',
+      'accept-language': 'en-US,en;q=0.9',
+      'request-id': '|287e5489c1c044e0b33a00662fbf474c.ce7b9023dc8a4158',
+      'sec-ch-ua': '".Not/A)Brand";v="99", "Google Chrome";v="103", "Chromium";v="103"',
+      'sec-ch-ua-mobile': '?0',
+      'sec-ch-ua-platform': '"macOS"',
+      'sec-fetch-dest': 'empty',
+      'sec-fetch-mode': 'cors',
+      'sec-fetch-site': 'same-origin',
+      traceparent: '00-287e5489c1c044e0b33a00662fbf474c-ce7b9023dc8a4158-01',
+      Cookie: Object.entries(this.cookies).map(([key, value]) => `${key}=${value}`).join('; ')
     };
   }
 
-  private initializeAxiosClient = async () => {
-    if (!this.axiosClient.defaults.baseURL) {
-      this.axiosClient.defaults.baseURL = await getApiUrl();
-    }
-  };
-
-  private login = async () => {
-    await this.axiosClient.get('/userSession/new');
-  };
-
   public getAirports = async () => {
-    await this.initializeAxiosClient();
-    await this.login();
     this.airports = await getAirportsWithRoutes(this.axiosClient);
     return this.airports;
   };
 
   public getFares = async (airports: Airport[]) => {
-    await this.initializeAxiosClient();
-    await this.login();
     for (const airport of airports) {
       const connections = getConnectionsForOperator(airport, Operator.WIZZAIR);
       for (const connection of connections) {

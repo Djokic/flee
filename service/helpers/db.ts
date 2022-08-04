@@ -1,4 +1,5 @@
 import { Airport, Fare, Operator } from 'clients';
+import { ServiceStatus } from 'helpers/status';
 
 const { MongoClient, ServerApiVersion, Db } = require('mongodb');
 
@@ -50,5 +51,27 @@ export async function saveFares (fares: Fare[], operator: Operator) {
     const airportsCollection = db.collection('fares');
     await airportsCollection.deleteMany({ operator });
     await airportsCollection.insertMany(fares);
+  });
+}
+
+export async function saveStatus (status: ServiceStatus) {
+  const { _id, ...rest } = status;
+  const { operator } = rest;
+  return await runDbAction(async (db) => {
+    const statusCollection = db.collection('status');
+    const items = await statusCollection
+      .find({ operator })
+      .sort({ endAt: 1 })
+      .toArray();
+
+    const ids = items.slice(10).map(({ _id }: ServiceStatus) => _id);
+
+    if (ids.length > 0) {
+      await statusCollection.deleteMany({ _id: { $in: ids } });
+    }
+
+    return _id
+      ? await statusCollection.replaceOne({ _id }, rest, { upsert: true })
+      : await statusCollection.insertOne(rest);
   });
 }

@@ -1,0 +1,20 @@
+[class^="flex"] {
+  display: flex;
+}
+
+.flex-row {
+  flex-direction: row;
+}
+
+.flex-align-start {
+  align-items: flex-start;
+}
+
+.phi-m > * {
+  margin-left: 1rem;
+  margin-right: 1rem;
+}
+
+.mr-s {
+  margin-right: 0.5rem;
+}

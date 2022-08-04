@@ -1,6 +1,7 @@
 export enum Operator {
   RYANAIR = 'RYANAIR',
-  WIZZAIR = 'WIZZAIR'
+  WIZZAIR = 'WIZZAIR',
+  TRANSAVIA = 'TRANSAVIA'
 }
 
 export type Connection = {

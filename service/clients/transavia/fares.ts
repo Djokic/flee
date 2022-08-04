@@ -1,7 +1,7 @@
 import { Axios } from 'axios';
 import { wait } from 'clients/helpers';
 import { addDaysToDate, formatDate } from 'helpers/date';
-import { convertCurrency } from 'helpers/currency';
+import Exchange from '../../../lib/exchange';
 import { Fare, Operator } from '../types';
 
 type GetFaresParams = {
@@ -14,9 +14,8 @@ type GetFaresParams = {
 type FlightResponse = {
   departureStation: string,
   arrivalStation: string,
-  departureDate: string,
-  priceType: 'price' | 'checkPrice',
-  departureDates: [string],
+  date: string,
+  priceType: 'price' | 'checkPrice' | 'noData',
   classOfService: string,
   hasMacFlight: boolean,
   price: {
@@ -32,36 +31,36 @@ type GetFaresResponse = {
 
 export async function getFares (axios: Axios, params: GetFaresParams): Promise<Fare[]> {
   console.log(`[WizzAir] Getting Flights -> ${params.origin} <--> ${params.destination}`);
-  const maxDays = 30;
+  const maxDays = 21;
   const batchesCount = Math.ceil(params.lookupDays / maxDays);
 
   const fares: Fare[] = [];
   for (let i = 0; i < batchesCount; i++) {
-    const from = formatDate(addDaysToDate(new Date(params.startDate), (i * maxDays) + 1));
-    const to = formatDate(addDaysToDate(new Date(params.startDate), ((i + 1) * maxDays) + 1));
+    const date = formatDate(addDaysToDate(new Date(params.startDate), (i * maxDays) + 11));
 
     await wait(1000);
 
     const res: any = await axios.request({
-      url: '/search/timetable',
+      url: '/asset/farechart',
       method: 'POST',
       data: {
         adultCount: 1,
         childCount: 0,
         infantCount: 0,
-        priceType: 'regular',
+        dayInterval: 10,
+        wdc: true,
+        isRescueFare: false,
+        isFlightChange: false,
         flightList: [
           {
             departureStation: params.origin,
             arrivalStation: params.destination,
-            from,
-            to
+            date
           },
           {
             departureStation: params.destination,
             arrivalStation: params.origin,
-            from,
-            to
+            date
           }
         ]
       }
@@ -73,18 +72,22 @@ export async function getFares (axios: Axios, params: GetFaresParams): Promise<F
     const joinFlights = [...data?.outboundFlights, ...data?.returnFlights].filter((flight) => flight.price.amount > 0);
 
     for (const flight of joinFlights) {
-      fares.push({
-        origin: flight.departureStation,
-        destination: flight.arrivalStation,
-        date: flight.departureDates[0] ?? '',
-        operator: Operator.WIZZAIR,
-        currency: flight.price.currencyCode,
-        price: await convertCurrency({
-          from: flight.price.currencyCode,
-          to: targetCurrency,
-          amount: flight.price.amount
-        })
-      });
+      if (flight.priceType === 'price' && flight.date) {
+        fares.push({
+          origin: flight.departureStation,
+          destination: flight.arrivalStation,
+          date: formatDate(new Date(flight.date)),
+          operator: Operator.WIZZAIR,
+          currency: targetCurrency,
+          price: flight.price.currencyCode.toUpperCase() === targetCurrency
+            ? flight.price.amount
+            : await Exchange.convert({
+              source: flight.price.currencyCode,
+              target: targetCurrency,
+              amount: flight.price.amount
+            })
+        });
+      }
     }
   }
 
