@@ -59,5 +59,5 @@ export async function getFares (params: GetFaresParams): Promise<Fare[]> {
     });
   }
 
-  return getUniqueFares(fares);
+  return getUniqueFares(fares).filter((fare) => fare.price);
 }

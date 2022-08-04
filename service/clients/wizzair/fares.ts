@@ -91,5 +91,5 @@ export async function getFares (axios: Axios, params: GetFaresParams): Promise<F
     }
   }
 
-  return getUniqueFares(fares);
+  return getUniqueFares(fares).filter((fare) => fare.price);
 }
