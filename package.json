@@ -18,7 +18,13 @@
     "react-dom": "18.2.0",
     "react-icons": "^4.4.0",
     "sass": "^1.53.0",
-    "set-cookie-parser": "^2.5.0"
+    "set-cookie-parser": "^2.5.0",
+
+    "@types/set-cookie-parser": "^2.4.2",
+    "axios": "^0.27.2",
+    "dotenv": "^16.0.1",
+    "tsconfig-paths": "^4.0.0",
+    "zombie": "^6.1.4"
   },
   "devDependencies": {
     "@types/node": "18.0.0",
