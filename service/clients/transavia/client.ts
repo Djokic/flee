@@ -1,10 +1,10 @@
 import axios, { Axios } from 'axios';
 import setCookie from 'set-cookie-parser';
 
-import { getConnectionsForOperator } from '../helpers';
-import { formatDate } from '../../helpers/date';
+import { getConnectionsForOperator } from 'helpers/common';
+import { formatDate } from '@common/date';
 
-import { AirlineClient, AirlineClientParams, Airport, Fare, Operator } from '../types';
+import { AirlineClient, AirlineClientParams, Airport, Fare, Operator } from '@common/types';
 import { getAirportsWithRoutes } from './airports';
 import { getFares } from './fares';
 

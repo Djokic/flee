@@ -1,5 +1,5 @@
 import { Axios } from 'axios';
-import { Airport, Operator } from '../types';
+import { Airport, Operator } from '@common/types';
 
 type Connection = {
   iata: string,

@@ -1,12 +1,11 @@
 /* eslint-disable import/first */
 require('dotenv').config();
 
-import { Airport, Operator } from './clients';
-import { RyanAirClient } from './clients/ryanair';
-import { WizzAirClient } from './clients/wizzair';
-import { getArguments } from './helpers/arguments';
-import { loadAirports, saveFares } from './helpers/db';
-import { ServiceStatusCode, setStatus } from './helpers/status';
+import { Airport, Operator, ServiceStatusCode } from './clients';
+import { RyanAirClient } from 'clients/ryanair';
+import { WizzAirClient } from 'clients/wizzair';
+import { getArguments } from 'helpers/arguments';
+import { loadAirports, saveFares, saveStatus } from 'helpers/db';
 
 async function run () {
   const startAt = Date.now();
@@ -17,7 +16,7 @@ async function run () {
   const airportCodes: string[] = process.env.AIRPORTS?.split(',') || [];
   const lookupDays = parseInt(process.env.LOOKUP_DAYS || '30');
 
-  const { insertedId } = await setStatus({
+  const { insertedId } = await saveStatus({
     code: ServiceStatusCode.IN_PROGRESS,
     operator,
     startAt,
@@ -45,7 +44,7 @@ async function run () {
     await client.getFares(filteredAirports);
 
     await saveFares(client.fares, operator);
-    await setStatus({
+    await saveStatus({
       _id: insertedId,
       code: ServiceStatusCode.SUCCESS,
       operator,
@@ -55,7 +54,7 @@ async function run () {
     });
     console.log('Saved Fares to DB!');
   } catch (error: any) {
-    await setStatus({
+    await saveStatus({
       _id: insertedId,
       code: ServiceStatusCode.ERROR,
       operator,

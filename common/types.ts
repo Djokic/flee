@@ -37,3 +37,19 @@ export interface AirlineClient {
 export type AirlineClientParams = {
   lookupDays: number
 }
+
+export enum ServiceStatusCode {
+  IN_PROGRESS = 'IN_PROGRESS',
+  SUCCESS = 'SUCCESS',
+  ERROR = 'ERROR'
+}
+
+export type ServiceStatus = {
+  _id?: string;
+  code: ServiceStatusCode;
+  startAt: number;
+  endAt?: number;
+  operator: Operator;
+  error?: string;
+  details?: string;
+}

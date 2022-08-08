@@ -1,2 +1,2 @@
-export * from './types';
-export * from './helpers';
+export * from '@common/types';
+export * from 'helpers/common';

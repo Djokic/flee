@@ -1,5 +1,5 @@
-import { wait } from '../helpers';
-import { Airport, Operator } from '../types';
+import { wait } from 'helpers/wait';
+import { Airport, Operator } from '@common/types';
 
 import { transformQueryToQueryString } from './helpers';
 

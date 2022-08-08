@@ -1,8 +1,9 @@
 import { Axios } from 'axios';
-import { getUniqueFares, wait } from '../helpers';
-import { addDaysToDate, formatDate } from '../../helpers/date';
-import Exchange from '../../../lib/exchange';
-import { Fare, Operator } from '../types';
+import { wait } from 'helpers/wait';
+import { getUniqueFares } from 'helpers/common';
+import { addDaysToDate, formatDate } from '@common/date';
+import Exchange from '@common/exchange';
+import { Fare, Operator } from '@common/types';
 
 type GetFaresParams = {
   origin: string;

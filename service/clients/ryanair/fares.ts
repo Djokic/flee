@@ -1,7 +1,8 @@
-import { addDaysToDate, formatDate } from '../../helpers/date';
-import { getUniqueFares, wait } from '../helpers';
-import { Fare, Operator } from '../types';
-import Exchange from '../../../lib/exchange';
+import { addDaysToDate, formatDate } from '@common/date';
+import { wait } from 'helpers/wait';
+import { getUniqueFares } from 'helpers/common';
+import { Fare, Operator } from '@common//types';
+import Exchange from '@common/exchange';
 
 type GetFaresParams = {
   origin: string;

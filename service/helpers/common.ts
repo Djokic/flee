@@ -1,10 +1,4 @@
-import { Airport, Fare, Operator } from './types';
-
-export async function wait (milliseconds: number) {
-  return await new Promise((resolve) => {
-    setTimeout(resolve, milliseconds);
-  });
-}
+import { Airport, Fare, Operator } from '@common/types';
 
 export const getConnectionsForOperator = (airport: Airport, operator: Operator) => {
   return airport.connections.filter((connection) => operator === connection.operator);
