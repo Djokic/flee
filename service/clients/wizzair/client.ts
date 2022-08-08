@@ -76,16 +76,27 @@ export class WizzAirClient implements AirlineClient {
   public getFares = async (airports: Airport[]) => {
     await this.initializeAxiosClient();
     await this.login();
+    const doneConnections: Record<string, boolean> = {};
+
     for (const airport of airports) {
       const connections = getConnectionsForOperator(airport, Operator.WIZZAIR);
       for (const connection of connections) {
-        const fares = await getFares(this.axiosClient, {
-          origin: airport.code,
-          destination: connection.code,
-          startDate: formatDate(new Date()),
-          lookupDays: this.params.lookupDays
-        });
-        this.fares = [...this.fares, ...fares];
+        const notAlreadyFetched =
+          !doneConnections[`${airport.code}-${connection.code}`] ||
+          !doneConnections[`${connection.code}-${airport.code}`];
+
+        if (notAlreadyFetched) {
+          const fares = await getFares(this.axiosClient, {
+            origin: airport.code,
+            destination: connection.code,
+            startDate: formatDate(new Date()),
+            lookupDays: this.params.lookupDays
+          });
+          this.fares = [...this.fares, ...fares];
+
+          doneConnections[`${airport.code}-${connection.code}`] = true;
+          doneConnections[`${connection.code}-${airport.code}`] = true;
+        }
       }
     }
     return this.fares;
