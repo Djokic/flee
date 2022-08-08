@@ -1,7 +1,7 @@
 /* eslint-disable import/first */
 require('dotenv').config();
 
-import { Airport, Operator, ServiceStatusCode } from './clients';
+import { Airport, Operator, ServiceStatusCode } from '@common/types';
 import { RyanAirClient } from 'clients/ryanair';
 import { WizzAirClient } from 'clients/wizzair';
 import { getArguments } from 'helpers/arguments';
