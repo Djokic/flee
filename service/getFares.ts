@@ -63,6 +63,7 @@ async function run () {
       error: error?.message,
       details: allAirports ? 'all' : airportCodes.join(',')
     });
+    throw error;
   }
 }
 

@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "start:getFares": "ts-node -r tsconfig-paths/register ./getFares.ts",
-    "start:getAirports": "ts-node -r tsconfig-paths/register ./getAirports.ts",
+    "getFares": "npx ts-node -r tsconfig-paths/register ./getFares.ts",
+    "getAirports": "npx ts-node -r tsconfig-paths/register ./getAirports.ts",
     "test-script": "npx ts-node -r tsconfig-paths/register ./testScript.ts",
     "lint-fix": "eslint --fix --ext .ts"
   },
