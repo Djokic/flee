@@ -1,7 +1,7 @@
 import {Operator} from "@common/types";
 
-import WizzAirLogo from '../../public/logos/wizzair.svg';
-import RyanAirLogo from '../../public/logos/ryanair.png';
+import WizzAirLogo from '/public/logos/wizzair.svg';
+import RyanAirLogo from '/public/logos/ryanair.png';
 
 const Logos = {
   [Operator.WIZZAIR]: WizzAirLogo,

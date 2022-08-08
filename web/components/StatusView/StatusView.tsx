@@ -20,7 +20,7 @@ export default function StatusView(props: React.PropsWithChildren<StatusViewProp
     <div className={styles.StatusView}>
       <header>
         <div>
-          <img src={Logos[props.operator].src} alt={props.operator}/>
+          <img src={Logos[props.operator]?.src} alt={props.operator}/>
           <h4>{props.operator}</h4>
         </div>
         <Semaphore code={props.data[0]?.code}/>
