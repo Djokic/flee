@@ -1,4 +1,4 @@
-import { Airport, Fare, Operator, ServiceStatus } from '../clients';
+import { Airport, Fare, Operator, ServiceStatus } from '@common/types';
 
 const { MongoClient, ServerApiVersion, Db } = require('mongodb');
 
