@@ -3,5 +3,11 @@
   "private": true,
   "engines": {
     "node": ">= 18.0.0"
+  },
+  "devDependencies": {
+    "prisma": "^4.16.2"
+  },
+  "dependencies": {
+    "@prisma/client": "^4.16.2"
   }
 }

@@ -6,7 +6,7 @@ import { mergeAirports } from 'helpers/common';
 
 import { RyanAirClient } from 'clients/ryanair';
 import { WizzAirClient } from 'clients/wizzair';
-import { saveAirports } from 'helpers/db';
+import { prisma } from './helpers/prisma';
 
 async function run () {
   const lookupDays = parseInt(process.env.LOOKUP_DAYS || '30');
@@ -21,7 +21,14 @@ async function run () {
 
   const airports: Airport[] = mergeAirports([ryanAirClient.airports, wizzAirClient.airports]);
 
-  await saveAirports(airports);
+  // Delete all airports and save new ones
+  await prisma.$transaction([
+    prisma.airport.deleteMany(),
+    prisma.airport.createMany({
+      data: airports
+    })
+  ]);
+
   console.log('Saved Airports to DB!');
 }
 
