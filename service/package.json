@@ -18,8 +18,7 @@
     "mongodb": "^4.7.0",
     "set-cookie-parser": "^2.5.0",
     "ts-node": "^10.9.1",
-    "tsconfig-paths": "^4.0.0",
-    "zombie": "^6.1.4"
+    "tsconfig-paths": "^4.0.0"
   },
   "devDependencies": {
     "@types/node": "18.0.0",

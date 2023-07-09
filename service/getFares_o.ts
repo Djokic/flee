@@ -4,10 +4,15 @@ require('dotenv').config();
 import { Airport, Operator, ServiceStatusCode } from '@common/types';
 import { RyanAirClient } from 'clients/ryanair';
 import { WizzAirClient } from 'clients/wizzair';
+import { getArguments } from 'helpers/arguments';
 import { loadAirports, saveFares, saveStatus } from 'helpers/db';
 
-async function run (operator: Operator, allAirports: boolean) {
+async function run () {
   const startAt = Date.now();
+  const {
+    operator,
+    allAirports
+  } = getArguments() as { operator: Operator, allAirports: boolean };
 
   const airportCodes: string[] = process.env.AIRPORTS?.split(',') || [];
   const lookupDays = parseInt(process.env.LOOKUP_DAYS || '30');
@@ -64,11 +69,4 @@ async function run (operator: Operator, allAirports: boolean) {
   }
 }
 
-async function runAll () {
-  await Promise.all([
-    run(Operator.RYANAIR, true),
-    run(Operator.WIZZAIR, true)
-  ]);
-}
-
-runAll();
+run();
