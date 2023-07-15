@@ -4,7 +4,7 @@ require('dotenv').config();
 import { Airport, Operator, ServiceStatusCode } from '@common/types';
 import { RyanAirClient } from 'clients/ryanair';
 import { WizzAirClient } from 'clients/wizzair';
-import { loadAirports, saveFares, saveStatus } from 'helpers/db';
+import { prisma } from './helpers/prisma';
 
 async function run (operator: Operator, allAirports: boolean) {
   const startAt = Date.now();
@@ -12,11 +12,13 @@ async function run (operator: Operator, allAirports: boolean) {
   const airportCodes: string[] = process.env.AIRPORTS?.split(',') || [];
   const lookupDays = parseInt(process.env.LOOKUP_DAYS || '30');
 
-  const { insertedId } = await saveStatus({
-    code: ServiceStatusCode.IN_PROGRESS,
-    operator,
-    startAt,
-    details: allAirports ? 'all' : airportCodes.join(',')
+  const { id } = await prisma.serviceStatus.create({
+    data: {
+      code: ServiceStatusCode.IN_PROGRESS,
+      operator,
+      startAt,
+      details: allAirports ? 'all' : airportCodes.join(',')
+    }
   });
 
   try {
@@ -26,13 +28,12 @@ async function run (operator: Operator, allAirports: boolean) {
     }[operator as Operator.WIZZAIR | Operator.RYANAIR];
 
     if (!OperatorClient) {
-      console.log('Missing operator', operator);
       throw new Error('Missing operator');
     }
 
     const client = new OperatorClient({ lookupDays });
 
-    const airports: Airport[] = await loadAirports();
+    const airports: Airport[] = await prisma.airport.findMany() as Airport[];
     const filteredAirports =
       allAirports
         ? airports
@@ -40,26 +41,32 @@ async function run (operator: Operator, allAirports: boolean) {
 
     await client.getFares(filteredAirports);
 
-    await saveFares(client.fares, operator);
-    await saveStatus({
-      _id: insertedId,
-      code: ServiceStatusCode.SUCCESS,
-      operator,
-      startAt,
-      endAt: Date.now(),
-      details: allAirports ? 'all' : airportCodes.join(',')
+    await prisma.$transaction([
+      prisma.fare.deleteMany({ where: { operator } }),
+      prisma.fare.createMany({
+        data: client.fares
+      })
+    ]);
+
+    await prisma.serviceStatus.update({
+      where: { id },
+      data: {
+        endAt: Date.now(),
+        code: ServiceStatusCode.SUCCESS
+      }
     });
+
     console.log('Saved Fares to DB!');
   } catch (error: any) {
-    await saveStatus({
-      _id: insertedId,
-      code: ServiceStatusCode.ERROR,
-      operator,
-      startAt,
-      endAt: Date.now(),
-      error: error?.message,
-      details: allAirports ? 'all' : airportCodes.join(',')
+    await prisma.serviceStatus.update({
+      where: { id },
+      data: {
+        endAt: Date.now(),
+        code: ServiceStatusCode.ERROR,
+        error: error?.message
+      }
     });
+
     throw error;
   }
 }

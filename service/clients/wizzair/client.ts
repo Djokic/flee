@@ -10,6 +10,7 @@ import { getAirportsWithRoutes } from './airports';
 import { getFares } from './fares';
 
 export class WizzAirClient implements AirlineClient {
+  private static readonly MAX_REQUESTS_PER_SESSION = 5;
   private params: AirlineClientParams;
   public airports: Airport[] = [];
   public fares: Fare[] = [];
@@ -75,7 +76,7 @@ export class WizzAirClient implements AirlineClient {
 
   public getFares = async (airports: Airport[]) => {
     await this.initializeAxiosClient();
-    await this.login();
+    let requestsCount = 0;
     const doneConnections: Record<string, boolean> = {};
 
     for (const airport of airports) {
@@ -86,6 +87,10 @@ export class WizzAirClient implements AirlineClient {
           !doneConnections[`${connection.code}-${airport.code}`];
 
         if (notAlreadyFetched) {
+          if (requestsCount % WizzAirClient.MAX_REQUESTS_PER_SESSION === 0) {
+            await this.login();
+          }
+          requestsCount++;
           const fares = await getFares(this.axiosClient, {
             origin: airport.code,
             destination: connection.code,
