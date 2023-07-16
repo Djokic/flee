@@ -1,10 +1,23 @@
 /* eslint-disable import/first */
 require('dotenv').config();
 
-import { Airport, Operator, ServiceStatusCode } from '@common/types';
+import { Operator, Airport, ServiceStatusCode } from '@prisma/client';
+
 import { RyanAirClient } from 'clients/ryanair';
 import { WizzAirClient } from 'clients/wizzair';
 import { prisma } from './helpers/prisma';
+
+function getOperatorClient (operator: Operator) {
+  if (operator === Operator.RYANAIR) {
+    return RyanAirClient;
+  }
+
+  if (operator === Operator.WIZZAIR) {
+    return WizzAirClient;
+  }
+
+  return undefined
+}
 
 async function run (operator: Operator, allAirports: boolean) {
   const startAt = Date.now();
@@ -22,10 +35,7 @@ async function run (operator: Operator, allAirports: boolean) {
   });
 
   try {
-    const OperatorClient = {
-      [Operator.WIZZAIR]: WizzAirClient,
-      [Operator.RYANAIR]: RyanAirClient
-    }[operator as Operator.WIZZAIR | Operator.RYANAIR];
+    const OperatorClient = getOperatorClient(operator);
 
     if (!OperatorClient) {
       throw new Error('Missing operator');
@@ -44,7 +54,7 @@ async function run (operator: Operator, allAirports: boolean) {
     await prisma.$transaction([
       prisma.fare.deleteMany({ where: { operator } }),
       prisma.fare.createMany({
-        data: client.fares
+        data: client.faresData
       })
     ]);
 
@@ -73,8 +83,8 @@ async function run (operator: Operator, allAirports: boolean) {
 
 async function runAll () {
   await Promise.all([
-    run(Operator.RYANAIR, true),
-    run(Operator.WIZZAIR, true)
+    // run(Operator.RYANAIR, false),
+    run(Operator.WIZZAIR, false)
   ]);
 }
 

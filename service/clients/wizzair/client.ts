@@ -1,19 +1,20 @@
 import axios, { Axios } from 'axios';
+import { Prisma, Operator, Airport } from '@prisma/client';
 
 import { getConnectionsForOperator } from 'helpers/common';
 import { getApiUrl } from './helpers';
 import { formatDate } from '@common/date';
 import setCookie from 'set-cookie-parser';
 
-import { AirlineClient, AirlineClientParams, Airport, Fare, Operator } from '@common/types';
+import { AirlineClient, AirlineClientParams } from '@common/types';
 import { getAirportsWithRoutes } from './airports';
 import { getFares } from './fares';
 
 export class WizzAirClient implements AirlineClient {
   private static readonly MAX_REQUESTS_PER_SESSION = 5;
   private params: AirlineClientParams;
-  public airports: Airport[] = [];
-  public fares: Fare[] = [];
+  public airportsData: Prisma.AirportCreateInput[] = [];
+  public faresData: Prisma.FareCreateInput[] = [];
 
   public cookies: Record<string, string> = {};
   private axiosClient: Axios = axios.create({ withCredentials: true, timeout: 60_000 });
@@ -70,8 +71,8 @@ export class WizzAirClient implements AirlineClient {
   public getAirports = async () => {
     await this.initializeAxiosClient();
     await this.login();
-    this.airports = await getAirportsWithRoutes(this.axiosClient);
-    return this.airports;
+    this.airportsData = await getAirportsWithRoutes(this.axiosClient);
+    return this.airportsData;
   };
 
   public getFares = async (airports: Airport[]) => {
@@ -97,13 +98,13 @@ export class WizzAirClient implements AirlineClient {
             startDate: formatDate(new Date()),
             lookupDays: this.params.lookupDays
           });
-          this.fares = [...this.fares, ...fares];
+          this.faresData = [...this.faresData, ...fares];
 
           doneConnections[`${airport.code}-${connection.code}`] = true;
           doneConnections[`${connection.code}-${airport.code}`] = true;
         }
       }
     }
-    return this.fares;
+    return this.faresData;
   };
 }

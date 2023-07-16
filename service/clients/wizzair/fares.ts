@@ -3,7 +3,7 @@ import { wait } from 'helpers/wait';
 import { getUniqueFares } from 'helpers/common';
 import { addDaysToDate, formatDate } from '@common/date';
 import Exchange from '@common/exchange';
-import { Fare, Operator } from '@common/types';
+import { Prisma, Operator } from '@prisma/client';
 
 type GetFaresParams = {
   origin: string;
@@ -30,12 +30,12 @@ type GetFaresResponse = {
   returnFlights: FlightResponse[]
 }
 
-export async function getFares (axios: Axios, params: GetFaresParams): Promise<Fare[]> {
+export async function getFares (axios: Axios, params: GetFaresParams): Promise<Prisma.FareCreateInput[]> {
   console.log(`[WizzAir] Getting Flights -> ${params.origin} <--> ${params.destination}`);
   const maxDays = 21;
   const batchesCount = Math.ceil(params.lookupDays / maxDays);
 
-  const fares: Fare[] = [];
+  const fares: Prisma.FareCreateInput[] = [];
   for (let i = 0; i < batchesCount; i++) {
     const date = formatDate(addDaysToDate(new Date(params.startDate), (i * maxDays) + 11));
 
@@ -77,7 +77,7 @@ export async function getFares (axios: Axios, params: GetFaresParams): Promise<F
         fares.push({
           origin: flight.departureStation,
           destination: flight.arrivalStation,
-          date: formatDate(new Date(flight.date)),
+          date: new Date(flight.date),
           operator: Operator.WIZZAIR,
           currency: targetCurrency,
           price: flight.price.currencyCode.toUpperCase() === targetCurrency

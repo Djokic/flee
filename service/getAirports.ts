@@ -1,7 +1,7 @@
 /* eslint-disable import/first */
 require('dotenv').config();
+import { Prisma } from '@prisma/client';
 
-import { Airport } from '@common/types';
 import { mergeAirports } from 'helpers/common';
 
 import { RyanAirClient } from 'clients/ryanair';
@@ -19,7 +19,7 @@ async function run () {
     wizzAirClient.getAirports()
   ]);
 
-  const airports: Airport[] = mergeAirports([ryanAirClient.airports, wizzAirClient.airports]);
+  const airports: Prisma.AirportCreateInput[] = mergeAirports([ryanAirClient.airportsData, wizzAirClient.airportsData]);
 
   // Delete all airports and save new ones
   await prisma.$transaction([

@@ -1,7 +1,8 @@
+import { Prisma, Operator } from '@prisma/client';
+
 import { addDaysToDate, formatDate } from '@common/date';
 import { wait } from 'helpers/wait';
 import { getUniqueFares } from 'helpers/common';
-import { Fare, Operator } from '@common//types';
 import Exchange from '@common/exchange';
 
 type GetFaresParams = {
@@ -33,14 +34,14 @@ type GetFaresResponse = {
   }
 }
 
-export async function getFares (params: GetFaresParams): Promise<Fare[]> {
+export async function getFares (params: GetFaresParams): Promise<Prisma.FareCreateInput[]> {
   console.log(`[RyanAir] Getting Flights -> ${params.origin} -> ${params.destination}`);
   await wait(500);
   const endDate = formatDate(addDaysToDate(new Date(params.startDate), params.lookupDays));
   const res = await fetch(`https://www.ryanair.com/api/farfnd/3/oneWayFares/${params.origin}/${params.destination}/cheapestPerDay?outboundDateFrom=${params.startDate}&outboundDateTo=${endDate}`);
   const data: GetFaresResponse = await res.json();
 
-  const fares: Fare[] = [];
+  const fares: Prisma.FareCreateInput[] = [];
   const targetCurrency = process.env.TARGET_CURRENCY || 'EUR';
 
   for (const f of data.outbound?.fares.filter((fare) => !fare.unavailable && !fare.soldOut)) {
@@ -48,7 +49,7 @@ export async function getFares (params: GetFaresParams): Promise<Fare[]> {
       origin: params.origin,
       destination: params.destination,
       operator: Operator.RYANAIR,
-      date: f.departureDate,
+      date: new Date(f.departureDate),
       currency: targetCurrency,
       price: f.price?.currencyCode.toUpperCase() === targetCurrency
         ? f.price.value

@@ -1,22 +1,24 @@
+import{ Prisma, Operator, Airport } from '@prisma/client';
+
 import { getConnectionsForOperator } from 'helpers/common';
 import { formatDate } from '@common/date';
 
-import { AirlineClient, AirlineClientParams, Airport, Fare, Operator } from '@common/types';
+import { AirlineClient, AirlineClientParams} from '@common/types';
 import { getAirportsWithRoutes } from './airports';
 import { getFares } from './fares';
 
 export class RyanAirClient implements AirlineClient {
   private params: AirlineClientParams;
-  public airports: Airport[] = [];
-  public fares: Fare[] = [];
+  public airportsData: Prisma.AirportCreateInput[] = [];
+  public faresData: Prisma.FareCreateInput[] = [];
 
   constructor (params: AirlineClientParams) {
     this.params = params;
   }
 
   public getAirports = async () => {
-    this.airports = await getAirportsWithRoutes();
-    return this.airports;
+    this.airportsData = await getAirportsWithRoutes();
+    return this.airportsData;
   };
 
   public getFares = async (airports: Airport[]) => {
@@ -37,9 +39,9 @@ export class RyanAirClient implements AirlineClient {
           lookupDays: this.params.lookupDays
         });
 
-        this.fares = [...this.fares, ...outboundFares, ...returnFares];
+        this.faresData = [...this.faresData, ...outboundFares, ...returnFares];
       }
     }
-    return this.fares;
+    return this.faresData;
   };
 }

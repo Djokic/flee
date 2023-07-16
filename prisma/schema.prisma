@@ -25,7 +25,8 @@ model Airport {
   id          String       @id @default(uuid()) @map("_id")
   code        String       @unique
   name        String
-  country     String
+  countryName String
+  countryCode String
   latitude    Float
   longitude   Float
   connections Connection[]
