@@ -83,8 +83,8 @@ async function run (operator: Operator, allAirports: boolean) {
 
 async function runAll () {
   await Promise.all([
-    // run(Operator.RYANAIR, false),
-    run(Operator.WIZZAIR, false)
+    run(Operator.RYANAIR, true),
+    run(Operator.WIZZAIR, true)
   ]);
 }
 

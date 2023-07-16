@@ -1,3 +1,4 @@
+import axios from 'axios';
 import { Prisma, Operator } from '@prisma/client';
 
 import { addDaysToDate, formatDate } from '@common/date';
@@ -38,9 +39,10 @@ export async function getFares (params: GetFaresParams): Promise<Prisma.FareCrea
   console.log(`[RyanAir] Getting Flights -> ${params.origin} -> ${params.destination}`);
   await wait(500);
   const endDate = formatDate(addDaysToDate(new Date(params.startDate), params.lookupDays));
-  const res = await fetch(`https://www.ryanair.com/api/farfnd/3/oneWayFares/${params.origin}/${params.destination}/cheapestPerDay?outboundDateFrom=${params.startDate}&outboundDateTo=${endDate}`);
-  const data: GetFaresResponse = await res.json();
-
+  const url = `https://www.ryanair.com/api/farfnd/3/oneWayFares/${params.origin}/${params.destination}/cheapestPerDay?outboundDateFrom=${params.startDate}&outboundDateTo=${endDate}`;
+  const res = await axios.request({ url, method: 'GET' });
+  const data: GetFaresResponse = res.data;
+  
   const fares: Prisma.FareCreateInput[] = [];
   const targetCurrency = process.env.TARGET_CURRENCY || 'EUR';
 
