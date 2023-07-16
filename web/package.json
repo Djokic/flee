@@ -6,25 +6,18 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "lint-fix": "eslint --quiet --fix --ext=jsx,ts,tsx ."
+    "lint": "next lint"
   },
   "dependencies": {
-    "mongodb": "^4.7.0",
-    "next": "12.2.0",
-    "node-fetch": "^3.2.6",
+    "@types/node": "20.4.2",
+    "@types/react": "18.2.15",
+    "@types/react-dom": "18.2.7",
+    "eslint": "8.45.0",
+    "eslint-config-next": "13.4.10",
+    "next": "13.4.10",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "react-icons": "^4.4.0",
-    "sass": "^1.53.0",
-    "tsconfig-paths": "^4.0.0"
-  },
-  "devDependencies": {
-    "@types/node": "18.0.0",
-    "@types/react": "18.0.14",
-    "@types/react-dom": "18.0.5",
-    "eslint": "8.18.0",
-    "eslint-config-next": "12.2.0",
-    "typescript": "4.7.4"
+    "sass": "^1.63.6",
+    "typescript": "5.1.6"
   }
 }

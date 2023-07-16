@@ -1,0 +1,50 @@
+.MainLayout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+
+  > header {
+    position: relative;
+    height: 10rem;
+    
+
+    &::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image: url(/bg.jpg);
+      background-size: contain;
+      // animation: 120s slide infinite linear;
+      background-repeat: repeat;
+    }
+  }
+
+  h1 {
+    text-align: center;
+    background-color: rgba(255,255,255,1);
+    mix-blend-mode: lighten;
+    line-height: 10rem;
+    font-size: 5rem;
+    letter-spacing: -0.085rem;
+
+    span {
+      display: inline-block;
+      height: 1em;
+      width: 0.66em;
+      background: black;
+      border-radius: 2.5rem;
+      margin-inline: .25rem;
+      border: 0.25rem solid lightgray;
+      margin-bottom: -0.5rem;
+    }
+  }
+}
+
+@keyframes slide {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 100% 0;
+  }
+}

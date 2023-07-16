@@ -1,0 +1,27 @@
+.TabsList {
+  display: flex;
+  padding: .25rem;
+  overflow: hidden;
+  border-radius: var(--radius);
+  background-color: var(--background-secondary);
+
+  a {
+    padding: 0.5rem 1rem;
+    font-weight: var(--font-medium);
+    color: var(--text-muted);
+    border-radius: calc(var(--radius) - 2px);
+    cursor: pointer;
+    transition: var(--transition-primary);
+
+    &:hover {
+      color: var(--text-primary);
+    }
+
+    &[aria-selected="true"] {
+      box-shadow: var(--card-shadow);
+      background: var(--card-background);
+      color: var(--text-primary);
+
+    }
+  }
+}
