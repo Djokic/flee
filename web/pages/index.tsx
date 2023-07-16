@@ -1,11 +1,32 @@
-import Head from 'next/head'
-import Image from 'next/image'
-import { Inter } from 'next/font/google'
-import styles from '@/styles/Home.module.css'
+import Head from 'next/head';
 
-const inter = Inter({ subsets: ['latin'] })
+import { Inter } from 'next/font/google';
+import styles from '@/styles/Home.module.css';
 
-export default function Home() {
+import AirportSelect from '@/components/AirportSelect/AirportSelect';
+import { prisma } from '@/helpers/db';
+import { Airport } from '@prisma/client';
+import { AIRPORTS_TEST_DATA } from '@/components/AirportSelect/data';
+
+const inter = Inter({ subsets: ['latin'] });
+
+export const getStaticProps = async () => {
+  // const airports = await prisma.airport.findMany();
+  const airports: Airport[] = [];
+
+  return {
+    props: {
+      airports,
+    },
+  };
+};
+
+type HomeProps = {
+  airports: Airport[];
+};
+
+
+export default function Home({ airports }: HomeProps) {
   return (
     <>
       <Head>
@@ -16,6 +37,7 @@ export default function Home() {
       </Head>
       <main className={`${styles.main} ${inter.className}`}>
         One Way
+        <AirportSelect airports={airports.length ? airports : AIRPORTS_TEST_DATA } selectedAirports={[]} onAirportClick={() => undefined} />
       </main>
     </>
   )

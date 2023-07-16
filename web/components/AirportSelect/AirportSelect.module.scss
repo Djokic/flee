@@ -1,0 +1,44 @@
+.AirportSelect {
+
+
+  &__Dropdown {
+    background-color: var(--card-background);
+    border-radius: var(--radius);
+    box-shadow: var(--card-shadow);
+    padding: 2rem;
+    max-height: var(--radix-popover-content-available-height);
+    overflow-y: auto;
+  }
+
+  &__Search {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border-primary);
+
+    svg {
+      width: 1rem;
+      height: 1rem;
+    }
+
+    input {
+      border: none;
+      background: none;
+      outline: none;
+      font-size: var(--text-s);
+      color: var(--text-primary);
+
+      width: 100%;
+      padding: 0.5rem;
+    }
+  }
+
+  &__CountryGroup {
+    margin-top: 1rem;
+
+    [cmdk-group-heading] {
+      color: var(--text-muted);
+      margin-bottom: 0.25rem;
+    }
+  }
+}
