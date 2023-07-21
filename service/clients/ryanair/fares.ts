@@ -1,4 +1,5 @@
 import axios from 'axios';
+import axiosRetry from 'axios-retry';
 import { Prisma, Operator } from '@prisma/client';
 
 import { addDaysToDate, formatDate } from '@common/date';
@@ -34,6 +35,8 @@ type GetFaresResponse = {
     fares: FareResponse[]
   }
 }
+
+axiosRetry(axios, { retries: 3, retryDelay: axiosRetry.exponentialDelay });
 
 export async function getFares (params: GetFaresParams): Promise<Prisma.FareCreateInput[]> {
   await wait(500);

@@ -1,4 +1,4 @@
-import axios, { Axios, AxiosRequestConfig, AxiosResponse } from 'axios';
+import axios, { Axios, AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { Prisma, Operator, Airport } from '@prisma/client';
 
 import { getConnectionsForOperator } from 'helpers/common';
@@ -9,6 +9,7 @@ import setCookie from 'set-cookie-parser';
 import { AirlineClient, AirlineClientParams } from '@common/types';
 import { getAirportsWithRoutes } from './airports';
 import { getFares } from './fares';
+import axiosRetry from 'axios-retry';
 
 const defaultRequestHeaders = {
   'Content-Type': 'application/json; charset=utf-8',
@@ -28,7 +29,7 @@ export class WizzAirClient implements AirlineClient {
   private faresCache: Prisma.FareCreateInput[] = [];
 
   public cookies: Record<string, string> = {};
-  private axiosClient: Axios = axios.create({ withCredentials: true, timeout: 60_000 });
+  private axiosClient: AxiosInstance = axios.create({ withCredentials: true, timeout: 60_000 });
 
   constructor (private params: AirlineClientParams) {
     this.setupInterceptors();
@@ -71,6 +72,7 @@ export class WizzAirClient implements AirlineClient {
   private initializeAxiosClient = async () => {
     if (!this.axiosClient.defaults.baseURL) {
       this.axiosClient.defaults.baseURL = await getApiUrl();
+      axiosRetry(this.axiosClient, { retries: 3, retryDelay: axiosRetry.exponentialDelay });
     }
   };
 
