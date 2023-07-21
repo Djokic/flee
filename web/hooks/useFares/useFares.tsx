@@ -2,15 +2,13 @@ import { useCallback, useState } from 'react';
 import useSWR from 'swr';
 import { Airport, Fare } from '@prisma/client';
 
-
-
-type UseFaresInput = {
+export type UseFaresInput = {
   origins: Airport[];
   destinations: Airport[];
   dates: Date[];
 }
 
-type UseFaresOutput = {
+export type UseFaresOutput = {
   handleSearch: () => void;
   fares?: Fare[];
   loading: boolean;
@@ -36,5 +34,3 @@ export function useFares({ origins, destinations, dates }: UseFaresInput): UseFa
     error,
   };
 }
-
-  

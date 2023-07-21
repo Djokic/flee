@@ -11,7 +11,7 @@ type Data = {
 
 enum FaresError {
   MISSING_ORIGINS = 'Missing origins',
-  METHOD_NOT_ALLOWED = 'Method not allowed'
+  METHOD_NOT_ALLOWED = 'Method not allowed',
 }
 
 
@@ -23,7 +23,7 @@ export default async function handler(
     res.status(405).json({ error: FaresError.METHOD_NOT_ALLOWED });
     return;
   }
-
+  
   const origins = getQueryArrayParam(req.query.origins as string);
   const destinations = getQueryArrayParam(req.query.destinations as string);
   const dates = getQueryArrayParam(req.query.dates as string);
@@ -33,7 +33,6 @@ export default async function handler(
     return;
   }
 
-  console.log('SSS', origins, destinations, dates);
 
   const data = await prisma.fare.findMany({
     where: {
@@ -46,5 +45,5 @@ export default async function handler(
   });
 
   
-  res.status(200).json({ fares: data })
+  res.status(200).json({ fares: data });
 }

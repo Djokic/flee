@@ -23,6 +23,10 @@ type AirportsGroup = {
   airports: Airport[];
 }
 
+function filterFn(value: string, search: string) {
+  return value.toLowerCase().includes(search.trim().toLowerCase()) ? 1 : 0;
+}
+
 function AirportPicker({ airports, selectedAirports, maxSelected, label, placeholder, onChange }: AirportPickerProps) {
   const airportsByCountry: AirportsGroup[] = useMemo(() => {
     const airportsByCountryMap: Record<string, Airport[]> = {};
@@ -69,11 +73,11 @@ function AirportPicker({ airports, selectedAirports, maxSelected, label, placeho
         ))}
       </FieldContainer>
 
-      <Command>
+      <Command filter={filterFn}>
         <div className={styles.AirportPicker__Search}>
           <Command.Input autoFocus placeholder="Find airports by name, code, country" />
         </div>
-        <Command.List >
+        <Command.List ariaa-aria-disabled={isSelectionDisabled}>
           {airportsByCountry.map(({ airports, countryCode, countryName }) => (
             <Command.Group
               key={countryCode}
@@ -82,7 +86,7 @@ function AirportPicker({ airports, selectedAirports, maxSelected, label, placeho
               {airports.map((airport) => (
                 <Command.Item
                   key={airport.id}
-                  value={`${airport.name} ${airport.code} ${airport.countryName}`}
+                  value={`${airport.name}_${airport.code}_${airport.countryName}`}
                   onSelect={() => handleAirportPicker(airport)}
                 >
                   {airport.name}

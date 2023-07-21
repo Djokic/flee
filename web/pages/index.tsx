@@ -9,10 +9,10 @@ import { Airport } from '@prisma/client';
 import { AIRPORTS_TEST_DATA } from '@/components/AirportSelect/data';
 import { useFares } from '@/hooks/useFares/useFares';
 import DatePicker, { DatePickerMode } from '@/components/DatePicker/DatePicker';
+import { useOneWayFares } from '@/hooks/useOneWayFares/useOneWayFares';
 
 export const getStaticProps = async () => {
   const airports = await prisma.airport.findMany();
-  // const airports: Airport[] = [];
 
   return {
     props: {
@@ -27,15 +27,17 @@ type HomeProps = {
 
 
 function Home({ airports }: HomeProps) {
-  const [origins, setOrigins] = useState<Airport[]>([]);
-  const [destinations, setDestinations] = useState<Airport[]>([]);
-  const [departure, setDeparture] = useState<Date | undefined>();
-
-  const { fares, loading, error, handleSearch } = useFares({
+  const {
     origins,
+    potentialOrigins,
     destinations,
-    dates: departure ? [departure] : [],
-  });
+    potentialDestinations,
+    departure,
+    handleOriginsChange,
+    handleDestinationsChange,
+    handleDepartureChange,
+    handleSearch,
+  } = useOneWayFares({ airports });
 
   return (
     <>
@@ -48,19 +50,19 @@ function Home({ airports }: HomeProps) {
             label='From'
             placeholder='Select up to 3 origin airports'
             name="origins"
-            airports={airports.length ? airports : AIRPORTS_TEST_DATA }
+            airports={potentialOrigins}
             selectedAirports={origins} 
             maxSelected={3}
-            onChange={setOrigins}
+            onChange={handleOriginsChange}
           />
           <hr/>
           <AirportPicker
             label='To'
             placeholder='Select up to 3 destination airports'
             name="origins"
-            airports={airports.length ? airports : AIRPORTS_TEST_DATA }
+            airports={potentialDestinations}
             selectedAirports={destinations} 
-            onChange={setDestinations}
+            onChange={handleDestinationsChange}
           />
           <hr />
           <DatePicker
@@ -69,7 +71,7 @@ function Home({ airports }: HomeProps) {
             name="departureDate"
             mode={DatePickerMode.Single}
             selected={departure}
-            onSelect={setDeparture}
+            onSelect={handleDepartureChange}
           />
         </div>
         <button onClick={handleSearch}>Search</button>
