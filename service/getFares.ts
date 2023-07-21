@@ -49,12 +49,13 @@ async function run (operator: Operator, allAirports: boolean) {
         ? airports
         : airports.filter(({ code }) => airportCodes.includes(code));
 
-    await client.getFares(filteredAirports);
+
+    const fares = await client.getFaresForAirports(filteredAirports);
 
     await prisma.$transaction([
       prisma.fare.deleteMany({ where: { operator } }),
       prisma.fare.createMany({
-        data: client.faresData
+        data: fares
       })
     ]);
 
@@ -66,7 +67,7 @@ async function run (operator: Operator, allAirports: boolean) {
       }
     });
 
-    console.log('Saved Fares to DB!');
+    console.log(`---Saved Fares to DB! [${operator}]---`);
   } catch (error: any) {
     await prisma.serviceStatus.update({
       where: { id },

@@ -1,4 +1,4 @@
-import axios, { Axios } from 'axios';
+import axios, { Axios, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { Prisma, Operator, Airport } from '@prisma/client';
 
 import { getConnectionsForOperator } from 'helpers/common';
@@ -10,48 +10,58 @@ import { AirlineClient, AirlineClientParams } from '@common/types';
 import { getAirportsWithRoutes } from './airports';
 import { getFares } from './fares';
 
+const defaultRequestHeaders = {
+  'Content-Type': 'application/json; charset=utf-8',
+  'Access-Control-Allow-Origin': 'https://wizzair.com',
+  'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.0 Safari/605.1.15',
+  'Accept-Encoding': 'gzip, deflate, br',
+  'Accept-Language': 'en-gb',
+  Accept: 'application/json, text/plain, */*',
+  Host: 'be.wizzair.com',
+  Origin: 'https://wizzair.com',
+  Connection: 'keep-alive',
+  Referer: 'https://wizzair.com/en-gb/flights/fare-finder',
+};
+
 export class WizzAirClient implements AirlineClient {
   private static readonly MAX_REQUESTS_PER_SESSION = 5;
-  private params: AirlineClientParams;
-  public airportsData: Prisma.AirportCreateInput[] = [];
-  public faresData: Prisma.FareCreateInput[] = [];
+  private faresCache: Prisma.FareCreateInput[] = [];
 
   public cookies: Record<string, string> = {};
   private axiosClient: Axios = axios.create({ withCredentials: true, timeout: 60_000 });
 
-  constructor (params: AirlineClientParams) {
-    this.params = params;
-
-    this.axiosClient.interceptors.request.use(async (config) => {
-      console.log(`[WizzAir] Sending request to ${config.url}`);
-      return {
-        ...config,
-        headers: this.headers
-      };
-    });
-    this.axiosClient.interceptors.response.use((response) => {
-      const cookieStore = setCookie.parse(response?.headers?.['set-cookie'] as string[]);
-      cookieStore.forEach((cookie) => {
-        this.cookies[cookie.name] = cookie.value;
-      });
-      return response;
-    });
+  constructor (private params: AirlineClientParams) {
+    this.setupInterceptors();
   }
+
+  private setupInterceptors() {
+    this.axiosClient.interceptors.request.use(this.requestInterceptor);
+    this.axiosClient.interceptors.response.use(this.responseInterceptor);
+  }
+
+  private requestInterceptor = (config: AxiosRequestConfig) => {
+    return {
+      ...config,
+      headers: this.headers
+    };
+  };
+
+  private responseInterceptor = (response: AxiosResponse) => {
+    const cookieStore = setCookie.parse(response?.headers?.['set-cookie'] as string[]);
+    cookieStore.forEach((cookie) => {
+      this.cookies[cookie.name] = cookie.value;
+    });
+    return response;
+  };
+
+  private getCookieString = () => {
+    return Object.entries(this.cookies).map(([key, value]) => `${key}=${value}`).join('; ');
+  };
 
   private get headers () {
     return {
-      'Content-Type': 'application/json; charset=utf-8',
-      'Access-Control-Allow-Origin': 'https://wizzair.com',
-      'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.0 Safari/605.1.15',
-      'Accept-Encoding': 'gzip, deflate, br',
-      'Accept-Language': 'en-gb',
-      Accept: 'application/json, text/plain, */*',
-      Host: 'be.wizzair.com',
-      Origin: 'https://wizzair.com',
-      Connection: 'keep-alive',
-      Referer: 'https://wizzair.com/en-gb/flights/fare-finder',
-      Cookie: Object.entries(this.cookies).map(([key, value]) => `${key}=${value}`).join('; '),
-
+      Cookie: this.getCookieString(),
+      ...defaultRequestHeaders,
       ...this.cookies.RequestVerificationToken
         ? { 'X-RequestVerificationToken': this.cookies?.RequestVerificationToken }
         : {}
@@ -71,40 +81,50 @@ export class WizzAirClient implements AirlineClient {
   public getAirports = async () => {
     await this.initializeAxiosClient();
     await this.login();
-    this.airportsData = await getAirportsWithRoutes(this.axiosClient);
-    return this.airportsData;
+    return await getAirportsWithRoutes(this.axiosClient);
   };
 
-  public getFares = async (airports: Airport[]) => {
+  public getFaresForAirports = async (airports: Airport[]) => {
+    this.faresCache = [];
+
     await this.initializeAxiosClient();
-    let requestsCount = 0;
-    const doneConnections: Record<string, boolean> = {};
+    const fetchedConnectionsFlags: Record<string, boolean> = {};
+    let reqestsCount = 0;
+
+    const totalConnections = airports.flatMap((airport) => getConnectionsForOperator(airport, Operator.WIZZAIR)).length;
+    let currentConnection = 0;
 
     for (const airport of airports) {
       const connections = getConnectionsForOperator(airport, Operator.WIZZAIR);
+
       for (const connection of connections) {
         const notAlreadyFetched =
-          !doneConnections[`${airport.code}-${connection.code}`] ||
-          !doneConnections[`${connection.code}-${airport.code}`];
+          !fetchedConnectionsFlags[`${airport.code}-${connection.code}`] ||
+          !fetchedConnectionsFlags[`${connection.code}-${airport.code}`];
 
         if (notAlreadyFetched) {
-          if (requestsCount % WizzAirClient.MAX_REQUESTS_PER_SESSION === 0) {
+          if (reqestsCount % WizzAirClient.MAX_REQUESTS_PER_SESSION === 0) {
             await this.login();
           }
-          requestsCount++;
+          reqestsCount++;
+          
+          currentConnection++;
+          console.log(`[WizzAir][${currentConnection}/${totalConnections}] -> ${airport.code} <--> ${connection.code} `);
+
           const fares = await getFares(this.axiosClient, {
             origin: airport.code,
             destination: connection.code,
             startDate: formatDate(new Date()),
             lookupDays: this.params.lookupDays
           });
-          this.faresData = [...this.faresData, ...fares];
+          this.faresCache = [...this.faresCache, ...fares];
 
-          doneConnections[`${airport.code}-${connection.code}`] = true;
-          doneConnections[`${connection.code}-${airport.code}`] = true;
+          fetchedConnectionsFlags[`${airport.code}-${connection.code}`] = true;
+          fetchedConnectionsFlags[`${connection.code}-${airport.code}`] = true;
         }
       }
     }
-    return this.faresData;
+
+    return this.faresCache;
   };
 }

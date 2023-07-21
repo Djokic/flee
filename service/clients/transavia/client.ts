@@ -11,7 +11,7 @@ import { getFares } from './fares';
 export class TransaviaClient implements AirlineClient {
   private params: AirlineClientParams;
   public airportsData: Airport[] = [];
-  public faresData: Fare[] = [];
+  public faresCache: Fare[] = [];
 
   public cookies: Record<string, string> = {};
   private axiosClient: Axios = axios.create({ withCredentials: true, timeout: 60_000 });
@@ -69,7 +69,7 @@ export class TransaviaClient implements AirlineClient {
     return this.airportsData;
   };
 
-  public getFares = async (airports: Airport[]) => {
+  public getFaresForAirports = async (airports: Airport[]) => {
     for (const airport of airports) {
       const connections = getConnectionsForOperator(airport, Operator.WIZZAIR);
       for (const connection of connections) {
@@ -79,9 +79,9 @@ export class TransaviaClient implements AirlineClient {
           startDate: formatDate(new Date()),
           lookupDays: this.params.lookupDays
         });
-        this.faresData = [...this.faresData, ...fares];
+        this.faresCache = [...this.faresCache, ...fares];
       }
     }
-    return this.faresData;
+    return this.faresCache;
   };
 }

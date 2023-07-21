@@ -31,7 +31,6 @@ type GetFaresResponse = {
 }
 
 export async function getFares (axios: Axios, params: GetFaresParams): Promise<Prisma.FareCreateInput[]> {
-  console.log(`[WizzAir] Getting Flights -> ${params.origin} <--> ${params.destination}`);
   const maxDays = 21;
   const batchesCount = Math.ceil(params.lookupDays / maxDays);
 

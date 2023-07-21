@@ -8,23 +8,26 @@ import { getAirportsWithRoutes } from './airports';
 import { getFares } from './fares';
 
 export class RyanAirClient implements AirlineClient {
-  private params: AirlineClientParams;
-  public airportsData: Prisma.AirportCreateInput[] = [];
-  public faresData: Prisma.FareCreateInput[] = [];
+  private faresCache: Prisma.FareCreateInput[] = [];
 
-  constructor (params: AirlineClientParams) {
-    this.params = params;
+  constructor (private params: AirlineClientParams) {
   }
 
   public getAirports = async () => {
-    this.airportsData = await getAirportsWithRoutes();
-    return this.airportsData;
+    return await getAirportsWithRoutes();
   };
 
-  public getFares = async (airports: Airport[]) => {
+  public getFaresForAirports = async (airports: Airport[]) => {
+    this.faresCache = [];
+    const totalConnections = airports.flatMap((airport) => getConnectionsForOperator(airport, Operator.RYANAIR)).length;
+    let currentConnection = 0;
+
     for (const airport of airports) {
       const connections = getConnectionsForOperator(airport, Operator.RYANAIR);
       for (const connection of connections) {
+        currentConnection++;
+        console.log(`[RyanAir][${currentConnection}/${totalConnections}] -> ${airport.code} <--> ${connection.code} `);
+
         const outboundFares = await getFares({
           origin: airport.code,
           destination: connection.code,
@@ -39,9 +42,10 @@ export class RyanAirClient implements AirlineClient {
           lookupDays: this.params.lookupDays
         });
 
-        this.faresData = [...this.faresData, ...outboundFares, ...returnFares];
+        this.faresCache = [...this.faresCache, ...outboundFares, ...returnFares];
       }
     }
-    return this.faresData;
+
+    return this.faresCache;
   };
 }

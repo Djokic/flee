@@ -1,19 +1,20 @@
 import React, { useMemo } from "react";
 import { Command } from "cmdk"
 import * as Popover from '@radix-ui/react-popover';
-import { useState } from "react";
 
 import styles from './AirportSelect.module.scss';
 import { Airport } from "@prisma/client";
 
 type AirportSelectProps = {
+  name: string;
   airports: Airport[];
-  selectedAirports: string[];
-  onAirportClick: (airport: string) => void;
+  selectedAirports: Airport[];
+  onChange: (airports: Airport[]) => void;
 }
 
 type AirportsGroup = {
   countryCode: string;
+  countryName?: string;
   airports: Airport[];
 }
 
@@ -21,33 +22,47 @@ function AirportSelect({ airports, selectedAirports, onAirportsSelect }: Airport
   const airportsByCountry: AirportsGroup[] = useMemo(() => {
     const airportsByCountryMap: Record<string, Airport[]> = {};
     airports.forEach((airport) => {
-      airportsByCountryMap[airport.country] = airportsByCountryMap[airport.country] || [];
-      airportsByCountryMap[airport.country].push(airport);
+      const countryCode = airport.countryCode.toLocaleLowerCase();
+      airportsByCountryMap[countryCode] = airportsByCountryMap[countryCode] || [];
+      airportsByCountryMap[countryCode].push(airport);
     });
 
-    return Object.entries(airportsByCountryMap).map(([countryCode, airports]) => ({ countryCode, airports }));
+    return Object.entries(airportsByCountryMap).map(([countryCode, airports]) => ({ 
+      countryCode,
+      airports: airports.sort((a, b) => a.name.localeCompare(b.name)),
+      countryName: airports[0].countryName,
+    })).sort((a, b) => a.countryName.localeCompare(b.countryName));
   }, [airports]);
 
   return (
     <Popover.Root>
       <Popover.Trigger asChild>
-        <button className="IconButton" aria-label="Update dimensions">
-          Open Here
-        </button>
+        <div className={styles.AirportSelect__ValueField}>
+          {selectedAirports.map((airport) => (
+            <div key={airport.id} className={styles.AirportSelect__Value}>
+              {airport.name}
+            </div>
+          ))}
+        </div>
       </Popover.Trigger>
       <Popover.Portal>
         <Popover.Content className={styles.AirportSelect__Dropdown} sideOffset={5}>
           <Command>
             <div className={styles.AirportSelect__Search}>
-              <SearchIcon />
-              <Command.Input autoFocus placeholder="Find airports by name, code, country..." />
+              <Command.Input autoFocus placeholder="Find airports by name, code, country" />
             </div>
             <Command.List>
-              {airportsByCountry.map(({ airports, countryCode }) => (
-                <Command.Group key={countryCode} heading={countryCode} className={styles.AirportSelect__CountryGroup}>
+              {airportsByCountry.map(({ airports, countryCode, countryName }) => (
+                <Command.Group 
+                  key={countryCode} 
+                  heading={countryName} 
+                  className={styles.AirportSelect__CountryGroup}>
                   {airports.map((airport) => (
-                    <Command.Item key={airport.id} value={airport.name}>
+                    <Command.Item key={airport.id} value={`${airport.name}-${airport.countryName}`}>
                       {airport.name}
+                      <small>
+                        {airport.code}
+                      </small>
                     </Command.Item>
                   ))}
                 </Command.Group>

@@ -36,7 +36,6 @@ type GetFaresResponse = {
 }
 
 export async function getFares (params: GetFaresParams): Promise<Prisma.FareCreateInput[]> {
-  console.log(`[RyanAir] Getting Flights -> ${params.origin} -> ${params.destination}`);
   await wait(500);
   const endDate = formatDate(addDaysToDate(new Date(params.startDate), params.lookupDays));
   const url = `https://www.ryanair.com/api/farfnd/3/oneWayFares/${params.origin}/${params.destination}/cheapestPerDay?outboundDateFrom=${params.startDate}&outboundDateTo=${endDate}`;

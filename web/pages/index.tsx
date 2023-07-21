@@ -1,6 +1,6 @@
 import Head from 'next/head';
 
-import { Inter } from 'next/font/google';
+
 import styles from '@/styles/Home.module.css';
 
 import AirportSelect from '@/components/AirportSelect/AirportSelect';
@@ -8,11 +8,9 @@ import { prisma } from '@/helpers/db';
 import { Airport } from '@prisma/client';
 import { AIRPORTS_TEST_DATA } from '@/components/AirportSelect/data';
 
-const inter = Inter({ subsets: ['latin'] });
-
 export const getStaticProps = async () => {
-  // const airports = await prisma.airport.findMany();
-  const airports: Airport[] = [];
+  const airports = await prisma.airport.findMany();
+  // const airports: Airport[] = [];
 
   return {
     props: {
@@ -35,9 +33,21 @@ export default function Home({ airports }: HomeProps) {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className={`${styles.main} ${inter.className}`}>
-        One Way
-        <AirportSelect airports={airports.length ? airports : AIRPORTS_TEST_DATA } selectedAirports={[]} onAirportClick={() => undefined} />
+      <main className={styles.main}>
+        <div className={styles.Selector}>
+          <AirportSelect
+            name="origins"
+            airports={airports.length ? airports : AIRPORTS_TEST_DATA }
+            selectedAirports={[ airports[0], airports[1]]} 
+            onChange={() => undefined}
+          />
+          <AirportSelect
+            name="origins"
+            airports={airports.length ? airports : AIRPORTS_TEST_DATA }
+            selectedAirports={[ airports[74], airports[139]]} 
+            onChange={() => undefined}
+          />
+        </div>
       </main>
     </>
   )
