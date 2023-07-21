@@ -4,7 +4,7 @@
   width: fit-content;
   gap: 2rem;
 
-  button {
+  & > button {
     width: 100%;
     padding: 1rem 2rem;
     background-color: #10ac84;

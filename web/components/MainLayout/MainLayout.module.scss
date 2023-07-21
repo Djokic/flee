@@ -5,7 +5,8 @@
 
   > header {
     position: relative;
-    height: 10rem;
+    font-size: 5rem;
+    height: 2em;
     
 
     &::before {
@@ -23,9 +24,11 @@
     text-align: center;
     background-color: var(--background-primary);
     mix-blend-mode: lighten;
-    line-height: 10rem;
-    font-size: 5rem;
+    line-height: 2em;
+    font-size: 1em;
     letter-spacing: -0.085rem;
+    color: black;
+    user-select: none;
 
     span {
       display: inline-block;
@@ -36,6 +39,11 @@
       margin-inline: .25rem;
       border: 0.25rem solid lightgray;
       margin-bottom: -0.5rem;
+      transition: 0.25s ease-out;
+
+      &:hover {
+        transform: scale(1.15);
+      }
     }
   }
 

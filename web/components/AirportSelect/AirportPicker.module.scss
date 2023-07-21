@@ -1,27 +1,5 @@
 .AirportPicker {
 
-  &__FieldContainer {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    width: 24rem;
-    padding: 1rem;
-    font-weight: 300;
-
-    label {
-      font-size: var(--text-s);
-      color: var(--text-muted);
-      font-weight: 500;
-    }
-  }
-
-  &__Field {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    font-size: var(--text-s);
-  }
-
   &__Value {
     display: flex;
     align-items: center;
@@ -36,30 +14,6 @@
 
     svg {
       cursor: pointer;
-    }
-  }
-
-  &__Placeholder {
-    display: flex;
-    align-items: center;
-    height: 2rem;
-    color: var(--text-muted);
-  }
-
-
-  &__Dropdown {
-    position: relative;
-    font-weight: 300;
-    background-color: var(--card-background);
-    border-radius: var(--radius);
-    box-shadow: var(--card-shadow);
-    border: 1px solid var(--border-);
-    padding: 0 0.5rem;
-    max-height: var(--radix-popover-content-available-height);
-    overflow-y: auto;
-
-    &[aria-disabled="true"] > * {
-      opacity: 0.2;
     }
   }
 

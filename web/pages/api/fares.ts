@@ -2,6 +2,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { Fare } from '@prisma/client'
 import { prisma } from '@/helpers/db';
+import { getQueryArrayParam } from '@/helpers/query';
 
 type Data = {
   fares?: Fare[];
@@ -23,28 +24,24 @@ export default async function handler(
     return;
   }
 
-  const {
-    origins,
-    destinations,
-    dates,
-  } = req.query;
+  const origins = getQueryArrayParam(req.query.origins as string);
+  const destinations = getQueryArrayParam(req.query.destinations as string);
+  const dates = getQueryArrayParam(req.query.dates as string);
 
-  if (!origins) {
+  if (!origins?.length) {
     res.status(400).json({ error: FaresError.MISSING_ORIGINS });
     return;
   }
 
+  console.log('SSS', origins, destinations, dates);
+
   const data = await prisma.fare.findMany({
     where: {
       origin: {
-        in: origins as string[]
+        in: origins
       },
-      destination: {
-        in: Array.isArray(destinations) ? destinations as string[] : []
-      },
-      date: {
-        in: Array.isArray(dates) ? dates.map((date) => new Date(date as string)) : []
-      }
+      ...(Array.isArray(destinations) ? { destination: { in: destinations } } : {}),
+      ...(Array.isArray(dates) ? { date: { in: dates } } : {}),
     }
   });
 

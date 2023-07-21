@@ -1,0 +1,26 @@
+.Popover {
+  position: relative;
+  font-weight: 300;
+  background-color: var(--card-background);
+  border-radius: var(--radius);
+  box-shadow: var(--card-shadow);
+  border: 1px solid var(--border-primary);
+  padding: 0 0.5rem;
+  max-height: var(--radix-popover-content-available-height);
+  min-width: var(--radix-popover-trigger-width);
+  overflow: auto;
+
+  &[aria-disabled="true"]>* {
+    opacity: 0.2;
+  }
+
+  &[data-side="top"] {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+
+  &[data-side="bottom"] {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+  }
+}

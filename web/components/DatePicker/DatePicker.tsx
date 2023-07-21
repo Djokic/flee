@@ -1,27 +1,39 @@
 import React from 'react';
-import * as Popover from '@radix-ui/react-popover';
+import { DateRange, DayPicker, DayPickerProps } from 'react-day-picker';
+import 'react-day-picker/dist/style.css';
+
+import Popover from '../Popover/Popover';
+
+import styles from './DatePicker.module.scss';
 
 import { format } from 'date-fns';
-import { DayPicker } from 'react-day-picker';
+import FieldContainer from '../FieldContainer/FieldContainer';
 
-function DatePicker() {
-  const [selected, setSelected] = React.useState<Date>();
+export enum DatePickerMode {
+  Default = 'default',
+  Single = 'single',
+  Range = 'range',
+  Multiple = 'multiple',
+}
 
+type DatePickerProps = {
+  label: string;
+  name: string;
+  placeholder: string;
+  mode?: DatePickerMode;
+} & DayPickerProps;
+
+
+function DatePicker({ label, placeholder, name, ...rest }: DatePickerProps) {
   return (
-    <Popover.Root>
-      <Popover.Trigger asChild>
-        <div>{selected ? selected?.toISOString() : 'Pick a date'}</div>
-      </Popover.Trigger>
-      <Popover.Portal>
-        <Popover.Content>
-        <DayPicker
-          mode="single"
-          selected={selected}
-          onSelect={setSelected}
-        />
-        </Popover.Content>
-      </Popover.Portal>
-    </Popover.Root>
+    <Popover>
+      <FieldContainer label={label} placeholder={placeholder}>
+
+        {rest.selected ? format(rest.selected as Date, 'dd/MM/yyyy') : undefined}
+      </FieldContainer>
+
+      <DayPicker {...rest} className={styles.DatePicker}/>
+    </Popover>
   );
 }
 

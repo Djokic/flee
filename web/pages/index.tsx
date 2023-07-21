@@ -8,7 +8,7 @@ import { prisma } from '@/helpers/db';
 import { Airport } from '@prisma/client';
 import { AIRPORTS_TEST_DATA } from '@/components/AirportSelect/data';
 import { useFares } from '@/hooks/useFares/useFares';
-import DatePicker from '@/components/DatePicker/DatePicker';
+import DatePicker, { DatePickerMode } from '@/components/DatePicker/DatePicker';
 
 export const getStaticProps = async () => {
   const airports = await prisma.airport.findMany();
@@ -25,16 +25,16 @@ type HomeProps = {
   airports: Airport[];
 };
 
-const date = new Date();
 
 function Home({ airports }: HomeProps) {
   const [origins, setOrigins] = useState<Airport[]>([]);
   const [destinations, setDestinations] = useState<Airport[]>([]);
+  const [departure, setDeparture] = useState<Date | undefined>();
 
   const { fares, loading, error, handleSearch } = useFares({
     origins,
     destinations,
-    dates: [date],
+    dates: departure ? [departure] : [],
   });
 
   return (
@@ -62,10 +62,15 @@ function Home({ airports }: HomeProps) {
             selectedAirports={destinations} 
             onChange={setDestinations}
           />
-
           <hr />
-
-          <DatePicker/>
+          <DatePicker
+            label='Departure date'
+            placeholder='Select departure date'
+            name="departureDate"
+            mode={DatePickerMode.Single}
+            selected={departure}
+            onSelect={setDeparture}
+          />
         </div>
         <button onClick={handleSearch}>Search</button>
       </aside>

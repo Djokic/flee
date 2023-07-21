@@ -1,10 +1,11 @@
 import React, { useMemo, useCallback } from "react";
 import { Command } from "cmdk"
-import * as Popover from '@radix-ui/react-popover';
 import { Cross2Icon } from '@radix-ui/react-icons';
+import Popover from "../Popover/Popover";
 
 import styles from './AirportPicker.module.scss';
 import { Airport } from "@prisma/client";
+import FieldContainer from "../FieldContainer/FieldContainer";
 
 type AirportPickerProps = {
   label: string;
@@ -31,7 +32,7 @@ function AirportPicker({ airports, selectedAirports, maxSelected, label, placeho
       airportsByCountryMap[countryCode].push(airport);
     });
 
-    return Object.entries(airportsByCountryMap).map(([countryCode, airports]) => ({ 
+    return Object.entries(airportsByCountryMap).map(([countryCode, airports]) => ({
       countryCode,
       airports: airports.sort((a, b) => a.name.localeCompare(b.name)),
       countryName: airports[0].countryName,
@@ -48,7 +49,7 @@ function AirportPicker({ airports, selectedAirports, maxSelected, label, placeho
     if (maxSelected && selectedAirports.length >= maxSelected) {
       return;
     }
-    
+
     onChange([...selectedAirports, airport]);
   }, [selectedAirports, onChange]);
 
@@ -59,56 +60,42 @@ function AirportPicker({ airports, selectedAirports, maxSelected, label, placeho
   const isSelectionDisabled = Boolean(maxSelected && selectedAirports.length >= maxSelected);
 
   return (
-    <Popover.Root>
-      <Popover.Trigger asChild>
-        <div className={styles.AirportPicker__FieldContainer}>
-          <label className={styles.AirportPicker__Label}>{label}</label>
-          <div className={styles.AirportPicker__Field}>
-            {selectedAirports.length === 0 && (
-              <div className={styles.AirportPicker__Placeholder}>
-                {placeholder}
-              </div>
-            )}
-
-            {selectedAirports.map((airport) => (
-              <div key={airport.id} className={styles.AirportPicker__Value}>
-                {airport.name} <Cross2Icon onClick={() => handleAirportRemove(airport)}/>
-              </div>
-            ))}
+    <Popover>
+      <FieldContainer label={label} placeholder={placeholder}>
+        {selectedAirports.map((airport) => (
+          <div key={airport.id} className={styles.AirportPicker__Value}>
+            {airport.name} <Cross2Icon onClick={() => handleAirportRemove(airport)} />
           </div>
+        ))}
+      </FieldContainer>
+
+      <Command>
+        <div className={styles.AirportPicker__Search}>
+          <Command.Input autoFocus placeholder="Find airports by name, code, country" />
         </div>
-      </Popover.Trigger>
-      <Popover.Portal>
-        <Popover.Content className={styles.AirportPicker__Dropdown} aria-disabled={isSelectionDisabled}>
-          <Command>
-            <div className={styles.AirportPicker__Search}>
-              <Command.Input autoFocus placeholder="Find airports by name, code, country" />
-            </div>
-            <Command.List >
-              {airportsByCountry.map(({ airports, countryCode, countryName }) => (
-                <Command.Group 
-                  key={countryCode} 
-                  heading={countryName} 
-                  className={styles.AirportPicker__CountryGroup}>
-                  {airports.map((airport) => (
-                    <Command.Item 
-                      key={airport.id} 
-                      value={`${airport.name} ${airport.code} ${airport.countryName}`}
-                      onSelect={() => handleAirportPicker(airport)}
-                    >
-                      {airport.name}
-                      <small>
-                        {airport.code}
-                      </small>
-                    </Command.Item>
-                  ))}
-                </Command.Group>
+        <Command.List >
+          {airportsByCountry.map(({ airports, countryCode, countryName }) => (
+            <Command.Group
+              key={countryCode}
+              heading={countryName}
+              className={styles.AirportPicker__CountryGroup}>
+              {airports.map((airport) => (
+                <Command.Item
+                  key={airport.id}
+                  value={`${airport.name} ${airport.code} ${airport.countryName}`}
+                  onSelect={() => handleAirportPicker(airport)}
+                >
+                  {airport.name}
+                  <small>
+                    {airport.code}
+                  </small>
+                </Command.Item>
               ))}
-            </Command.List>
-          </Command>
-        </Popover.Content>
-      </Popover.Portal>
-    </Popover.Root>
+            </Command.Group>
+          ))}
+        </Command.List>
+      </Command>
+    </Popover>
   )
 }
 
