@@ -1,0 +1,51 @@
+.aside {
+  display: flex;
+  flex-direction: column;
+  width: fit-content;
+  gap: 2rem;
+
+  button {
+    width: 100%;
+    padding: 1rem 2rem;
+    background-color: #10ac84;
+    border-radius: var(--radius);
+    border: 0;
+    font-size: 1rem;
+    text-align: center;
+    font-weight: 500;
+    color: white;
+    cursor: pointer;
+    transition: .2s ease-in;
+
+    &:hover {
+      filter: brightness(1.1);
+      transform: scale(1.005);
+    }
+
+    &:focus {
+      outline: none;
+      box-shadow: 0 0 0 2px var(--border-primary);
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+}
+
+.Selector {
+  display: flex;
+  width: fit-content;
+  flex-direction: column;
+  background-color: var(--card-background);
+  border-radius: var(--radius);
+  border: 1px solid var(--border-primary);
+  box-shadow: var(--card-shadow);
+
+  hr {
+    margin: 0;
+    border: 0;
+    border-top: 1px solid var(--border-primary);
+  }
+}

@@ -42,10 +42,13 @@
   main {
     display: flex;
     flex-direction: column;
+    min-width: 60rem;
+    padding: 0 2rem;
+    margin: 0 auto;
   }
 
   &__Content {
-    margin-top: 4rem;
+    margin-top: 2rem;
   }
 }
 

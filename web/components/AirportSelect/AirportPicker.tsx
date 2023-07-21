@@ -3,10 +3,10 @@ import { Command } from "cmdk"
 import * as Popover from '@radix-ui/react-popover';
 import { Cross2Icon } from '@radix-ui/react-icons';
 
-import styles from './AirportSelect.module.scss';
+import styles from './AirportPicker.module.scss';
 import { Airport } from "@prisma/client";
 
-type AirportSelectProps = {
+type AirportPickerProps = {
   label: string;
   placeholder: string;
   name: string;
@@ -22,7 +22,7 @@ type AirportsGroup = {
   airports: Airport[];
 }
 
-function AirportSelect({ airports, selectedAirports, maxSelected, label, placeholder, onChange }: AirportSelectProps) {
+function AirportPicker({ airports, selectedAirports, maxSelected, label, placeholder, onChange }: AirportPickerProps) {
   const airportsByCountry: AirportsGroup[] = useMemo(() => {
     const airportsByCountryMap: Record<string, Airport[]> = {};
     airports.forEach((airport) => {
@@ -38,7 +38,7 @@ function AirportSelect({ airports, selectedAirports, maxSelected, label, placeho
     })).sort((a, b) => a.countryName.localeCompare(b.countryName));
   }, [airports]);
 
-  const handleAirportSelect = useCallback((airport: Airport) => {
+  const handleAirportPicker = useCallback((airport: Airport) => {
     // Do not select the same airport twice
     if (selectedAirports.find((a) => a.id === airport.id)) {
       return;
@@ -61,17 +61,17 @@ function AirportSelect({ airports, selectedAirports, maxSelected, label, placeho
   return (
     <Popover.Root>
       <Popover.Trigger asChild>
-        <div className={styles.AirportSelect__FieldContainer}>
-          <label className={styles.AirportSelect__Label}>{label}</label>
-          <div className={styles.AirportSelect__Field}>
+        <div className={styles.AirportPicker__FieldContainer}>
+          <label className={styles.AirportPicker__Label}>{label}</label>
+          <div className={styles.AirportPicker__Field}>
             {selectedAirports.length === 0 && (
-              <div className={styles.AirportSelect__Placeholder}>
+              <div className={styles.AirportPicker__Placeholder}>
                 {placeholder}
               </div>
             )}
 
             {selectedAirports.map((airport) => (
-              <div key={airport.id} className={styles.AirportSelect__Value}>
+              <div key={airport.id} className={styles.AirportPicker__Value}>
                 {airport.name} <Cross2Icon onClick={() => handleAirportRemove(airport)}/>
               </div>
             ))}
@@ -79,9 +79,9 @@ function AirportSelect({ airports, selectedAirports, maxSelected, label, placeho
         </div>
       </Popover.Trigger>
       <Popover.Portal>
-        <Popover.Content className={styles.AirportSelect__Dropdown} aria-disabled={isSelectionDisabled}>
+        <Popover.Content className={styles.AirportPicker__Dropdown} aria-disabled={isSelectionDisabled}>
           <Command>
-            <div className={styles.AirportSelect__Search}>
+            <div className={styles.AirportPicker__Search}>
               <Command.Input autoFocus placeholder="Find airports by name, code, country" />
             </div>
             <Command.List >
@@ -89,12 +89,12 @@ function AirportSelect({ airports, selectedAirports, maxSelected, label, placeho
                 <Command.Group 
                   key={countryCode} 
                   heading={countryName} 
-                  className={styles.AirportSelect__CountryGroup}>
+                  className={styles.AirportPicker__CountryGroup}>
                   {airports.map((airport) => (
                     <Command.Item 
                       key={airport.id} 
                       value={`${airport.name} ${airport.code} ${airport.countryName}`}
-                      onSelect={() => handleAirportSelect(airport)}
+                      onSelect={() => handleAirportPicker(airport)}
                     >
                       {airport.name}
                       <small>
@@ -112,4 +112,4 @@ function AirportSelect({ airports, selectedAirports, maxSelected, label, placeho
   )
 }
 
-export default React.memo(AirportSelect);
+export default React.memo(AirportPicker);

@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import Head from 'next/head';
 
-import styles from '@/styles/Home.module.css';
+import styles from '@/styles/Home.module.scss';
 
-import AirportSelect from '@/components/AirportSelect/AirportSelect';
+import AirportPicker from '@/components/AirportSelect/AirportPicker';
 import { prisma } from '@/helpers/db';
 import { Airport } from '@prisma/client';
 import { AIRPORTS_TEST_DATA } from '@/components/AirportSelect/data';
 import { useFares } from '@/hooks/useFares/useFares';
+import DatePicker from '@/components/DatePicker/DatePicker';
 
 export const getStaticProps = async () => {
   const airports = await prisma.airport.findMany();
@@ -41,9 +42,9 @@ function Home({ airports }: HomeProps) {
       <Head>
         <title>One-way flights</title>
       </Head>
-      <main className={styles.main}>
+      <aside className={styles.aside}>
         <div className={styles.Selector}>
-          <AirportSelect
+          <AirportPicker
             label='From'
             placeholder='Select up to 3 origin airports'
             name="origins"
@@ -52,7 +53,8 @@ function Home({ airports }: HomeProps) {
             maxSelected={3}
             onChange={setOrigins}
           />
-          <AirportSelect
+          <hr/>
+          <AirportPicker
             label='To'
             placeholder='Select up to 3 destination airports'
             name="origins"
@@ -60,9 +62,13 @@ function Home({ airports }: HomeProps) {
             selectedAirports={destinations} 
             onChange={setDestinations}
           />
-          <button onClick={handleSearch}>Search</button>
+
+          <hr />
+
+          <DatePicker/>
         </div>
-      </main>
+        <button onClick={handleSearch}>Search</button>
+      </aside>
     </>
   )
 }
