@@ -1,14 +1,18 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useCallback } from "react";
 import { Command } from "cmdk"
 import * as Popover from '@radix-ui/react-popover';
+import { Cross2Icon } from '@radix-ui/react-icons';
 
 import styles from './AirportSelect.module.scss';
 import { Airport } from "@prisma/client";
 
 type AirportSelectProps = {
+  label: string;
+  placeholder: string;
   name: string;
   airports: Airport[];
   selectedAirports: Airport[];
+  maxSelected?: number;
   onChange: (airports: Airport[]) => void;
 }
 
@@ -18,7 +22,7 @@ type AirportsGroup = {
   airports: Airport[];
 }
 
-function AirportSelect({ airports, selectedAirports, onAirportsSelect }: AirportSelectProps) {
+function AirportSelect({ airports, selectedAirports, maxSelected, label, placeholder, onChange }: AirportSelectProps) {
   const airportsByCountry: AirportsGroup[] = useMemo(() => {
     const airportsByCountryMap: Record<string, Airport[]> = {};
     airports.forEach((airport) => {
@@ -34,31 +38,64 @@ function AirportSelect({ airports, selectedAirports, onAirportsSelect }: Airport
     })).sort((a, b) => a.countryName.localeCompare(b.countryName));
   }, [airports]);
 
+  const handleAirportSelect = useCallback((airport: Airport) => {
+    // Do not select the same airport twice
+    if (selectedAirports.find((a) => a.id === airport.id)) {
+      return;
+    }
+
+    // Do not select more than maxSelected
+    if (maxSelected && selectedAirports.length >= maxSelected) {
+      return;
+    }
+    
+    onChange([...selectedAirports, airport]);
+  }, [selectedAirports, onChange]);
+
+  const handleAirportRemove = useCallback((airport: Airport) => {
+    onChange(selectedAirports.filter((a) => a.id !== airport.id));
+  }, [selectedAirports, onChange]);
+
+  const isSelectionDisabled = Boolean(maxSelected && selectedAirports.length >= maxSelected);
+
   return (
     <Popover.Root>
       <Popover.Trigger asChild>
-        <div className={styles.AirportSelect__ValueField}>
-          {selectedAirports.map((airport) => (
-            <div key={airport.id} className={styles.AirportSelect__Value}>
-              {airport.name}
-            </div>
-          ))}
+        <div className={styles.AirportSelect__FieldContainer}>
+          <label className={styles.AirportSelect__Label}>{label}</label>
+          <div className={styles.AirportSelect__Field}>
+            {selectedAirports.length === 0 && (
+              <div className={styles.AirportSelect__Placeholder}>
+                {placeholder}
+              </div>
+            )}
+
+            {selectedAirports.map((airport) => (
+              <div key={airport.id} className={styles.AirportSelect__Value}>
+                {airport.name} <Cross2Icon onClick={() => handleAirportRemove(airport)}/>
+              </div>
+            ))}
+          </div>
         </div>
       </Popover.Trigger>
       <Popover.Portal>
-        <Popover.Content className={styles.AirportSelect__Dropdown} sideOffset={5}>
+        <Popover.Content className={styles.AirportSelect__Dropdown} aria-disabled={isSelectionDisabled}>
           <Command>
             <div className={styles.AirportSelect__Search}>
               <Command.Input autoFocus placeholder="Find airports by name, code, country" />
             </div>
-            <Command.List>
+            <Command.List >
               {airportsByCountry.map(({ airports, countryCode, countryName }) => (
                 <Command.Group 
                   key={countryCode} 
                   heading={countryName} 
                   className={styles.AirportSelect__CountryGroup}>
                   {airports.map((airport) => (
-                    <Command.Item key={airport.id} value={`${airport.name}-${airport.countryName}`}>
+                    <Command.Item 
+                      key={airport.id} 
+                      value={`${airport.name} ${airport.code} ${airport.countryName}`}
+                      onSelect={() => handleAirportSelect(airport)}
+                    >
                       {airport.name}
                       <small>
                         {airport.code}
@@ -76,19 +113,3 @@ function AirportSelect({ airports, selectedAirports, onAirportsSelect }: Airport
 }
 
 export default React.memo(AirportSelect);
-
-
-function SearchIcon() {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      className="h-6 w-6"
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke="currentColor"
-      strokeWidth={1.5}
-    >
-      <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-    </svg>
-  )
-}

@@ -21,7 +21,7 @@
 
   h1 {
     text-align: center;
-    background-color: rgba(255,255,255,1);
+    background-color: var(--background-primary);
     mix-blend-mode: lighten;
     line-height: 10rem;
     font-size: 5rem;
@@ -37,6 +37,15 @@
       border: 0.25rem solid lightgray;
       margin-bottom: -0.5rem;
     }
+  }
+
+  main {
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__Content {
+    margin-top: 4rem;
   }
 }
 

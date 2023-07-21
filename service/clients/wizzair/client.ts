@@ -1,4 +1,4 @@
-import axios, { Axios, AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
+import axios, { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { Prisma, Operator, Airport } from '@prisma/client';
 
 import { getConnectionsForOperator } from 'helpers/common';
@@ -112,17 +112,23 @@ export class WizzAirClient implements AirlineClient {
           
           currentConnection++;
           console.log(`[WizzAir][${currentConnection}/${totalConnections}] -> ${airport.code} <--> ${connection.code} `);
+          
+          let fares: Prisma.FareCreateInput[] = [];
 
-          const fares = await getFares(this.axiosClient, {
-            origin: airport.code,
-            destination: connection.code,
-            startDate: formatDate(new Date()),
-            lookupDays: this.params.lookupDays
-          });
+          try {
+            fares = await getFares(this.axiosClient, {
+              origin: airport.code,
+              destination: connection.code,
+              startDate: formatDate(new Date()),
+              lookupDays: this.params.lookupDays
+            });
+            fetchedConnectionsFlags[`${airport.code}-${connection.code}`] = true;
+            fetchedConnectionsFlags[`${connection.code}-${airport.code}`] = true;
+          } catch (error) {
+            console.log(`[Error!][WizzAir] -> ${airport.code} <--> ${connection.code} -> ${(error as AxiosError).message || error}`);
+          }
+          
           this.faresCache = [...this.faresCache, ...fares];
-
-          fetchedConnectionsFlags[`${airport.code}-${connection.code}`] = true;
-          fetchedConnectionsFlags[`${connection.code}-${airport.code}`] = true;
         }
       }
     }

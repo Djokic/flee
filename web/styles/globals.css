@@ -1,7 +1,7 @@
 :root {
   --rem-size: 16px;
-  --background-primary: #fff;
-  --background-secondary: #f5f5f5;
+
+  --background-primary: #f2f4f6;
 
   --text-primary: #000;
   --text-secondary: #333;
@@ -46,7 +46,7 @@ html {
 }
 
 body {
-
+  background-color: var(--background-primary);
 }
 
 a {
