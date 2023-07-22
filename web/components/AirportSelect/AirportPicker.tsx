@@ -77,7 +77,7 @@ function AirportPicker({ airports, selectedAirports, maxSelected, label, placeho
         <div className={styles.AirportPicker__Search}>
           <Command.Input autoFocus placeholder="Find airports by name, code, country" />
         </div>
-        <Command.List ariaa-aria-disabled={isSelectionDisabled}>
+        <Command.List aria-disabled={isSelectionDisabled}>
           {airportsByCountry.map(({ airports, countryCode, countryName }) => (
             <Command.Group
               key={countryCode}
