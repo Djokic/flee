@@ -6,10 +6,10 @@ import styles from '@/styles/Home.module.scss';
 import AirportPicker from '@/components/AirportSelect/AirportPicker';
 import { prisma } from '@/helpers/db';
 import { Airport } from '@prisma/client';
-import { AIRPORTS_TEST_DATA } from '@/components/AirportSelect/data';
-import { useFares } from '@/hooks/useFares/useFares';
 import DatePicker, { DatePickerMode } from '@/components/DatePicker/DatePicker';
-import { useOneWayFares } from '@/hooks/useOneWayFares/useOneWayFares';
+import { FaresSortBy, useOneWayFares } from '@/hooks/useOneWayFares/useOneWayFares';
+import FareView from '@/components/FareView/FareView';
+import RadioGroup from '@/components/RadioGroup/RadioGroup';
 
 export const getStaticProps = async () => {
   const airports = await prisma.airport.findMany();
@@ -28,15 +28,19 @@ type HomeProps = {
 
 function Home({ airports }: HomeProps) {
   const {
+    fares,
+    airportsMap,
     origins,
     potentialOrigins,
     destinations,
     potentialDestinations,
     departure,
+    sortBy,
     handleOriginsChange,
     handleDestinationsChange,
     handleDepartureChange,
     handleSearch,
+    handleSort
   } = useOneWayFares({ airports });
 
   return (
@@ -44,8 +48,9 @@ function Home({ airports }: HomeProps) {
       <Head>
         <title>One-way flights</title>
       </Head>
-      <aside className={styles.aside}>
-        <div className={styles.Selector}>
+      <div className={styles.MainContent}>
+      <aside className={styles.Search}>
+        <div className={styles.SearchForm}>
           <AirportPicker
             label='From'
             placeholder='Select up to 3 origin airports'
@@ -76,6 +81,28 @@ function Home({ airports }: HomeProps) {
         </div>
         <button onClick={handleSearch}>Search</button>
       </aside>
+      <div className={styles.Results}>
+        <header>
+          <label>Sort by</label>
+          <RadioGroup
+            value={sortBy}
+            items={[
+              { label: FaresSortBy.DATE, value: FaresSortBy.DATE },
+              { label: FaresSortBy.PRICE, value: FaresSortBy.PRICE }
+            ]}
+            onChange={handleSort} 
+          />
+        </header>
+        
+        {fares.map((fare) => (
+          <FareView key={fare.id}
+            fare={fare}
+            origin={airportsMap[fare.origin]}
+            destination={airportsMap[fare.destination]}
+          />
+        ))}
+      </div> 
+      </div>
     </>
   )
 }

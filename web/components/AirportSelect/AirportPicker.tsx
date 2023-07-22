@@ -1,6 +1,6 @@
 import React, { useMemo, useCallback } from "react";
 import { Command } from "cmdk"
-import { Cross2Icon } from '@radix-ui/react-icons';
+import { BiX } from 'react-icons/bi';
 import Popover from "../Popover/Popover";
 
 import styles from './AirportPicker.module.scss';
@@ -68,7 +68,7 @@ function AirportPicker({ airports, selectedAirports, maxSelected, label, placeho
       <FieldContainer label={label} placeholder={placeholder}>
         {selectedAirports.map((airport) => (
           <div key={airport.id} className={styles.AirportPicker__Value}>
-            {airport.name} <Cross2Icon onClick={() => handleAirportRemove(airport)} />
+            {airport.name} <BiX onClick={() => handleAirportRemove(airport)} />
           </div>
         ))}
       </FieldContainer>

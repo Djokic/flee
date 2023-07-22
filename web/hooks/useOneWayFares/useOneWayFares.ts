@@ -2,15 +2,19 @@ import { useCallback, useMemo, useState } from 'react';
 
 import { useFares } from '../useFares/useFares';
 import { Airport, Fare } from '@prisma/client';
-import { set } from 'lodash';
+
+export enum FaresSortBy {
+  PRICE = 'Price',
+  DATE = 'Date'
+}
 
 type UseOneWayFaresInput = {
   airports: Airport[];
 }
 
 type UseOneWayFaresOutput = {
-  handleSearch: () => void;
   fares: Fare[];
+  airportsMap: Record<string, Airport>;
   loading: boolean;
   error: string;
   origins: Airport[];
@@ -18,15 +22,19 @@ type UseOneWayFaresOutput = {
   destinations: Airport[];
   potentialDestinations: Airport[];
   departure: Date | undefined;
+  sortBy: FaresSortBy;
   handleOriginsChange: (origins: Airport[]) => void;
   handleDestinationsChange: (destinations: Airport[]) => void;
   handleDepartureChange: (departure: Date | undefined) => void;
+  handleSearch: () => void;
+  handleSort: (sortBy: FaresSortBy) => void;
 }
 
 export function useOneWayFares({ airports }: UseOneWayFaresInput): UseOneWayFaresOutput {
   const [origins, setOrigins] = useState<Airport[]>([]);
   const [destinations, setDestinations] = useState<Airport[]>([]);
   const [departure, setDeparture] = useState<Date | undefined>();
+  const [sortBy, setSortBy] = useState<FaresSortBy | string>(FaresSortBy.DATE);
 
   const { fares = [], loading, error, handleSearch } = useFares({
     origins,
@@ -48,10 +56,25 @@ export function useOneWayFares({ airports }: UseOneWayFaresInput): UseOneWayFare
     setDestinations([]);
   }, [setOrigins, setDestinations]);
 
+  const airportsMap: Record<string, Airport> = useMemo(() => {
+    const airportsMap: Record<string, Airport> = {};
+    airports.forEach((airport) => {
+      airportsMap[airport.code] = airport;
+    });
+    return airportsMap;
+  }, [airports]);
 
+  const sortedFares = useMemo(() => {
+    if (sortBy === FaresSortBy.DATE) {
+      return fares.sort((a, b) => a.date > b.date ? 1 : -1);
+    }
+    
+    return fares.sort((a, b) => a.price > b.price ? 1 : -1);
+  }, [fares, sortBy]);
 
   return {
-    fares,
+    fares: sortedFares,
+    airportsMap,
     loading,
     error,
     origins,
@@ -63,5 +86,6 @@ export function useOneWayFares({ airports }: UseOneWayFaresInput): UseOneWayFare
     handleDestinationsChange: setDestinations,
     handleDepartureChange: setDeparture,
     handleSearch,
+    handleSort: setSortBy
   }
 }

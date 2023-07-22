@@ -6,6 +6,7 @@ type FieldContainerProps = {
   children: React.ReactNode;
   label: string;
   placeholder?: string;
+  icon?: React.ReactNode;
 }
 
 const FieldContainer = React.forwardRef(({ children, label, placeholder, ...rest }: FieldContainerProps, forwardedRef: React.ForwardedRef<HTMLDivElement>) =>  {
@@ -13,7 +14,7 @@ const FieldContainer = React.forwardRef(({ children, label, placeholder, ...rest
     <div className={styles.FieldContainer} {...rest} ref={forwardedRef}>
       <label>{label}</label>
       <div className={styles.Field}>
-        {!React.isValidElement(children) && (
+        {React.Children.count(children) === 0 && (
           <div className={styles.Field__Placeholder}>
             {placeholder}
           </div>

@@ -19,6 +19,8 @@
   gap: 0.5rem;
   font-size: var(--text-s);
   color: var(--text-primary);
+  min-height: 2rem;
+  align-items: center;
 
   &__Placeholder {
     display: flex;

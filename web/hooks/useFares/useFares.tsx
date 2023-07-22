@@ -21,7 +21,7 @@ function getFaresUrl({ origins, destinations, dates }: UseFaresInput) {
 
 export function useFares({ origins, destinations, dates }: UseFaresInput): UseFaresOutput {
   const [url, setUrl] = useState<string | null>(null);
-  const { data, error } = useSWR<Fare[]>(url);
+  const { data, error } = useSWR<{ fares: Fare[] }>(url);
 
   const handleSearch = useCallback(() => {
     setUrl(getFaresUrl({ origins, destinations, dates }));
@@ -29,7 +29,7 @@ export function useFares({ origins, destinations, dates }: UseFaresInput): UseFa
 
   return {
     handleSearch,
-    fares: data,
+    fares: data?.fares,
     loading: !error && !data,
     error,
   };

@@ -38,5 +38,8 @@ export function getFlightTime(airport1: Airport, airport2: Airport) {
   const hours = Math.floor(flightTimeInMins / 60);
   const minutes = flightTimeInMins % 60;
 
+  if (hours === 0) return `${minutes}m`;
+  if (minutes === 0) return `${hours}h`;
+
   return `${hours}h ${minutes}m`;
 }

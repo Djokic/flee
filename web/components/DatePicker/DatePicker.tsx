@@ -29,7 +29,7 @@ function DatePicker({ label, placeholder, name, ...rest }: DatePickerProps) {
     <Popover>
       <FieldContainer label={label} placeholder={placeholder}>
 
-        {rest.selected ? format(rest.selected as Date, 'dd/MM/yyyy') : undefined}
+        {rest.selected ? format(rest.selected as Date, 'dd. LLL yyyy') : undefined}
       </FieldContainer>
 
       <DayPicker {...rest} className={styles.DatePicker}/>

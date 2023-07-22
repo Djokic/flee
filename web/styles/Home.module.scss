@@ -1,4 +1,12 @@
-.aside {
+.MainContent {
+  display: flex;
+  gap: 2rem;
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.Search {
   display: flex;
   flex-direction: column;
   width: fit-content;
@@ -34,7 +42,7 @@
   }
 }
 
-.Selector {
+.SearchForm {
   display: flex;
   width: fit-content;
   flex-direction: column;
@@ -47,5 +55,28 @@
     margin: 0;
     border: 0;
     border-top: 1px solid var(--border-primary);
+  }
+}
+
+.Results {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  width: 100%;
+  margin: 0 auto;
+
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    font-size: var(--text-s);
+    gap: 1rem;
+    margin-top: -3.25rem;
+    margin-bottom: -0.25rem;
+    
+    > label {
+      color: var(--text-muted);
+      font-weight: 500;
+    }
   }
 }
