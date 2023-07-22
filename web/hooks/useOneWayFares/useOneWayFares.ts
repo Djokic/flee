@@ -34,7 +34,7 @@ export function useOneWayFares({ airports }: UseOneWayFaresInput): UseOneWayFare
   const [origins, setOrigins] = useState<Airport[]>([]);
   const [destinations, setDestinations] = useState<Airport[]>([]);
   const [departure, setDeparture] = useState<Date | undefined>();
-  const [sortBy, setSortBy] = useState<FaresSortBy | string>(FaresSortBy.DATE);
+  const [sortBy, setSortBy] = useState<FaresSortBy>(FaresSortBy.DATE);
 
   const { fares = [], loading, error, handleSearch } = useFares({
     origins,
@@ -72,8 +72,16 @@ export function useOneWayFares({ airports }: UseOneWayFaresInput): UseOneWayFare
     return fares.sort((a, b) => a.price > b.price ? 1 : -1);
   }, [fares, sortBy]);
 
+  const faresSortedByPrice = useMemo(() => {
+    return fares.sort((a, b) => a.price > b.price ? 1 : -1);
+  }, [fares]);
+
+  const faresSortedByDate = useMemo(() => {
+    return fares.sort((a, b) => a.date > b.date ? 1 : -1);
+  }, [fares]);
+
   return {
-    fares: sortedFares,
+    fares: sortBy === FaresSortBy.DATE ? faresSortedByDate : faresSortedByPrice,
     airportsMap,
     loading,
     error,
@@ -82,6 +90,7 @@ export function useOneWayFares({ airports }: UseOneWayFaresInput): UseOneWayFare
     destinations,
     potentialDestinations,
     departure,
+    sortBy,
     handleOriginsChange,
     handleDestinationsChange: setDestinations,
     handleDepartureChange: setDeparture,
