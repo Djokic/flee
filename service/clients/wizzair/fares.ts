@@ -52,8 +52,6 @@ type TimetableResponse = {
 type FetcherFn = (url: string, params: TimetableParams) => Promise<AxiosResponse>;
 
 
-
-
 export async function getFares(fetcher: FetcherFn, params: GetFaresParams): Promise<Prisma.FareCreateInput[]> {
   const maxDays = 30;
   const batchesCount = Math.ceil(params.lookupDays / maxDays);
@@ -89,20 +87,22 @@ export async function getFares(fetcher: FetcherFn, params: GetFaresParams): Prom
 
     for (const flight of joinFlights) {
       if (flight.priceType === 'price' && flight.departureDate) {
-        fares.push({
-          origin: flight.departureStation,
-          destination: flight.arrivalStation,
-          date: new Date(flight.departureDate),
-          operator: Operator.WIZZAIR,
-          currency: targetCurrency,
-          price: flight.price.currencyCode.toUpperCase() === targetCurrency
-            ? flight.price.amount
-            : await Exchange.convert({
-              source: flight.price.currencyCode,
-              target: targetCurrency,
-              amount: flight.price.amount
-            })
-        });
+        for (const departureDate of flight.departureDates) {
+          fares.push({
+            origin: flight.departureStation,
+            destination: flight.arrivalStation,
+            date: new Date(departureDate),
+            operator: Operator.WIZZAIR,
+            currency: targetCurrency,
+            price: flight.price.currencyCode.toUpperCase() === targetCurrency
+              ? flight.price.amount
+              : await Exchange.convert({
+                source: flight.price.currencyCode,
+                target: targetCurrency,
+                amount: flight.price.amount
+              })
+          });
+        }
       }
     }
   }

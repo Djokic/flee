@@ -44,8 +44,6 @@ export async function getFares (params: GetFaresParams): Promise<Prisma.FareCrea
   const url = `https://www.ryanair.com/api/farfnd/3/oneWayFares/${params.origin}/${params.destination}/cheapestPerDay?outboundDateFrom=${params.startDate}&outboundDateTo=${endDate}`;
   const res = await axios.request({ url, method: 'GET' });
   const data: GetFaresResponse = res.data;
-
-  console.log('DD', data.outbound.fares[0]);
   
   const fares: Prisma.FareCreateInput[] = [];
   const targetCurrency = process.env.TARGET_CURRENCY || 'EUR';
