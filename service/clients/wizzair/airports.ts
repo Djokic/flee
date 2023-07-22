@@ -1,4 +1,4 @@
-import { Axios } from 'axios';
+import { Axios, AxiosResponse } from 'axios';
 import { Prisma, Operator } from '@prisma/client';
 
 type Connection = {
@@ -29,14 +29,16 @@ type GetAirportsResponse = {
   cities: AirportResponse[]
 }
 
-async function getAirports (axios: Axios): Promise<GetAirportsResponse> {
-  const { data } = await axios.get('/asset/map?languageCode=en-gb');
+type FetcherFn = (url: string) => Promise<AxiosResponse>;
+
+async function getAirports(fetcher: FetcherFn): Promise<GetAirportsResponse> {
+  const { data } = await fetcher('/asset/map?languageCode=en-gb');
   return data as GetAirportsResponse;
 }
 
-export async function getAirportsWithRoutes (axios: Axios): Promise<Prisma.AirportCreateInput[]> {
+export async function getAirportsWithRoutes (fetcher: FetcherFn): Promise<Prisma.AirportCreateInput[]> {
   console.log('[WizzAir] Getting Airports');
-  const response = await getAirports(axios);
+  const response = await getAirports(fetcher);
 
   return response.cities.map((airport) => ({
     code: airport.iata,

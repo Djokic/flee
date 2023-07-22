@@ -1,9 +1,10 @@
-import { Axios } from 'axios';
+import { Axios, AxiosResponse } from 'axios';
 import { wait } from 'helpers/wait';
 import { getUniqueFares } from 'helpers/common';
 import { addDaysToDate, formatDate } from '@common/date';
 import Exchange from '@common/exchange';
 import { Prisma, Operator } from '@prisma/client';
+
 
 type GetFaresParams = {
   origin: string;
@@ -12,71 +13,86 @@ type GetFaresParams = {
   lookupDays: number;
 }
 
-type FlightResponse = {
-  departureStation: string,
-  arrivalStation: string,
-  date: string,
-  priceType: 'price' | 'checkPrice' | 'noData',
-  classOfService: string,
-  hasMacFlight: boolean,
-  price: {
-    amount: number,
-    currencyCode: string
-  },
-}
+type FlightPayload = {
+  departureStation: string;
+  arrivalStation: string;
+  from: string;
+  to: string;
+};
 
-type GetFaresResponse = {
-  outboundFlights: FlightResponse[];
-  returnFlights: FlightResponse[]
-}
+type TimetableParams = {
+  flightList: FlightPayload[];
+  priceType: string;
+  adultCount: number;
+  childCount: number;
+  infantCount: number;
+};
 
-export async function getFares (axios: Axios, params: GetFaresParams): Promise<Prisma.FareCreateInput[]> {
-  const maxDays = 21;
+type Price = {
+  amount: number;
+  currencyCode: string;
+};
+
+type Flight = {
+  departureStation: string;
+  arrivalStation: string;
+  departureDate: string;
+  price: Price;
+  priceType: string;
+  departureDates: string[];
+  classOfService: string;
+  hasMacFlight: boolean;
+};
+
+type TimetableResponse = {
+  outboundFlights: Flight[];
+  returnFlights: Flight[];
+};
+
+type FetcherFn = (url: string, params: TimetableParams) => Promise<AxiosResponse>;
+
+
+
+
+export async function getFares(fetcher: FetcherFn, params: GetFaresParams): Promise<Prisma.FareCreateInput[]> {
+  const maxDays = 30;
   const batchesCount = Math.ceil(params.lookupDays / maxDays);
 
   const fares: Prisma.FareCreateInput[] = [];
   for (let i = 0; i < batchesCount; i++) {
-    const date = formatDate(addDaysToDate(new Date(params.startDate), (i * maxDays) + 11));
+    const from = formatDate(addDaysToDate(new Date(params.startDate), (i * maxDays)));
+    const to = formatDate(addDaysToDate(new Date(params.startDate), ((i + 1) * maxDays)));
 
-    await wait(1000);
-
-    const res: any = await axios.request({
-      url: '/asset/farechart',
-      method: 'POST',
-      data: {
-        adultCount: 1,
-        childCount: 0,
-        infantCount: 0,
-        dayInterval: 10,
-        wdc: true,
-        isRescueFare: false,
-        isFlightChange: false,
-        flightList: [
-          {
-            departureStation: params.origin,
-            arrivalStation: params.destination,
-            date
-          },
-          {
-            departureStation: params.destination,
-            arrivalStation: params.origin,
-            date
-          }
-        ]
-      }
+    const { data }: { data: TimetableResponse } = await fetcher('/search/timetable', {
+      flightList: [
+        {
+          departureStation: params.origin,
+          arrivalStation: params.destination,
+          from,
+          to
+        },
+        {
+          departureStation: params.destination,
+          arrivalStation: params.origin,
+          from,
+          to
+        }
+      ],
+      priceType: 'wdc',
+      adultCount: 1,
+      childCount: 0,
+      infantCount: 0
     });
-
-    const data: GetFaresResponse = res.data;
 
     const targetCurrency = process.env.TARGET_CURRENCY || 'EUR';
     const joinFlights = [...data?.outboundFlights, ...data?.returnFlights].filter((flight) => flight.price.amount > 0);
 
     for (const flight of joinFlights) {
-      if (flight.priceType === 'price' && flight.date) {
+      if (flight.priceType === 'price' && flight.departureDate) {
         fares.push({
           origin: flight.departureStation,
           destination: flight.arrivalStation,
-          date: new Date(flight.date),
+          date: new Date(flight.departureDate),
           operator: Operator.WIZZAIR,
           currency: targetCurrency,
           price: flight.price.currencyCode.toUpperCase() === targetCurrency
