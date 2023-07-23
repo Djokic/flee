@@ -3,7 +3,7 @@ import Link from "next/link";
 import {useRouter} from "next/router";
 
 import {TabsList} from "@/components/TabsList/TabsList";
-import {Routes} from "@/helpers/routes";
+import {Routes} from "@/app/routes";
 import { SWRConfig } from "swr";
 
 import styles from './MainLayout.module.scss';

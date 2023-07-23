@@ -1,12 +1,12 @@
-import React from 'react';
-import { DateRange, DayPicker, DayPickerProps } from 'react-day-picker';
+import {prettifyDatePickerValue} from "@/components/DatePicker/helpers";
+import React, {useCallback} from 'react';
+import { DateRange, DayPicker } from 'react-day-picker';
 import 'react-day-picker/dist/style.css';
 
 import Popover from '../Popover/Popover';
 
 import styles from './DatePicker.module.scss';
 
-import { format } from 'date-fns';
 import FieldContainer from '../FieldContainer/FieldContainer';
 
 export enum DatePickerMode {
@@ -16,23 +16,36 @@ export enum DatePickerMode {
   Multiple = 'multiple',
 }
 
+export type DatePickerValue = Date | Date[] | DateRange | undefined;
+
 type DatePickerProps = {
   label: string;
   name: string;
   placeholder: string;
+  value?: DatePickerValue;
   mode?: DatePickerMode;
-} & DayPickerProps;
+  onChange: (value: Record<string, DatePickerValue>) => void;
+}
 
+function DatePicker({ label, placeholder, mode = DatePickerMode.Range, name, onChange, value }: DatePickerProps) {
+  const handleChange = useCallback((selected: DatePickerValue) => {
+    onChange({
+      [name]: selected
+    });
+  }, [name, onChange]);
 
-function DatePicker({ label, placeholder, name, ...rest }: DatePickerProps) {
   return (
     <Popover>
       <FieldContainer label={label} placeholder={placeholder}>
-
-        {rest.selected ? format(rest.selected as Date, 'dd. LLL yyyy') : undefined}
+        {value ? (prettifyDatePickerValue(value)) : undefined}
       </FieldContainer>
 
-      <DayPicker {...rest} className={styles.DatePicker}/>
+      <DayPicker
+        mode={mode as any}
+        selected={value}
+        className={styles.DatePicker}
+        onSelect={handleChange}
+      />
     </Popover>
   );
 }

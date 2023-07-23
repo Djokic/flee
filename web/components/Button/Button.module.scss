@@ -1,0 +1,38 @@
+.Button {
+  padding: 1em 2em;
+  border-radius: 0.5em;
+  font-size: 1rem;
+  background: none;
+  border: 1px solid var(--border-primary);
+  color: var(--text-primary);
+  transition: var(--transition-primary);
+  cursor: pointer;
+  text-align: center;
+
+  &:hover {
+    transform: scale(1.005);
+    filter: brightness(0.8);
+  }
+
+  &:active {
+    transform: scale(0.995);
+  }
+
+  &[disabled] {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &[data-type="primary"] {
+    background: var(--accent-color);
+    color: var(--card-background);
+
+    &:hover {
+      filter: brightness(1.1);
+    }
+  }
+
+  &[data-type="minimal"] {
+
+  }
+}

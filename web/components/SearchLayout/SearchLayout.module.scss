@@ -1,0 +1,23 @@
+.SearchLayout {
+  display: flex;
+  gap: 2rem;
+
+  &__Form {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  &__Header {
+    //margin-top: -3.5rem;
+    //margin-bottom: -5rem;
+  }
+
+  &__Results {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    max-width: 100%;
+    width: 30rem;
+  }
+}

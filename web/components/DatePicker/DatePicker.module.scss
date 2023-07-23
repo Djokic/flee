@@ -2,7 +2,7 @@
   color: var(--text-primary);
   font-size: var(--text-s);
 
-  --rdp-cell-size: 2rem;
+  --rdp-cell-size: 2.5rem;
   --rdp-accent-color: var(--accent-color);
   --rdp-background-color: transparent;
   /* Switch to dark colors for dark themes */
@@ -12,4 +12,34 @@
   --rdp-outline: 2px solid var(--accent-color);
   /* Outline border for focused and selected elements */
   --rdp-outline-selected: 2px solid rgba(0, 0, 0, 0.75);
+
+  :global(.rdp-day) {
+    border-radius: var(--radius);
+    transition: var(--transition-primary);
+  }
+
+  :global(.rdp-day_range_start) {
+    border-top-left-radius: var(--radius);
+    border-bottom-left-radius: var(--radius);
+  }
+  :global(.rdp-day_range_end) {
+    border-top-right-radius: var(--radius);
+    border-bottom-right-radius: var(--radius);
+  }
+
+  :global(.rdp-day_range_middle) {
+    position: relative;
+    color: var(--text-primary);
+    background: var(--card-background);
+    overflow: visible;
+    border-color: transparent;
+
+    &:before {
+      content: "";
+      position: absolute;
+      inset: -1px;
+      background: var(--rdp-accent-color);
+      opacity: 0.1;
+    }
+  }
 }

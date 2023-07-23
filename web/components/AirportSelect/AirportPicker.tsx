@@ -12,9 +12,9 @@ type AirportPickerProps = {
   placeholder: string;
   name: string;
   airports: Airport[];
-  selectedAirports: Airport[];
+  value?: Airport[];
   maxSelected?: number;
-  onChange: (airports: Airport[]) => void;
+  onChange: (value: Record<string, Airport[]>) => void;
 }
 
 type AirportsGroup = {
@@ -27,7 +27,7 @@ function filterFn(value: string, search: string) {
   return value.toLowerCase().includes(search.trim().toLowerCase()) ? 1 : 0;
 }
 
-function AirportPicker({ airports, selectedAirports, maxSelected, label, placeholder, onChange }: AirportPickerProps) {
+function AirportPicker({ airports, value = [], maxSelected, name, label, placeholder, onChange }: AirportPickerProps) {
   const airportsByCountry: AirportsGroup[] = useMemo(() => {
     const airportsByCountryMap: Record<string, Airport[]> = {};
     airports.forEach((airport) => {
@@ -45,28 +45,32 @@ function AirportPicker({ airports, selectedAirports, maxSelected, label, placeho
 
   const handleAirportPicker = useCallback((airport: Airport) => {
     // Do not select the same airport twice
-    if (selectedAirports.find((a) => a.id === airport.id)) {
+    if (value?.find((a) => a.id === airport.id)) {
       return;
     }
 
     // Do not select more than maxSelected
-    if (maxSelected && selectedAirports.length >= maxSelected) {
+    if (maxSelected && value.length >= maxSelected) {
       return;
     }
 
-    onChange([...selectedAirports, airport]);
-  }, [selectedAirports, onChange]);
+    onChange({
+      [name]: [...value, airport]
+    });
+  }, [value, onChange]);
 
   const handleAirportRemove = useCallback((airport: Airport) => {
-    onChange(selectedAirports.filter((a) => a.id !== airport.id));
-  }, [selectedAirports, onChange]);
+    onChange({
+      [name]: value.filter((a) => a.id !== airport.id)
+    });
+  }, [value, onChange]);
 
-  const isSelectionDisabled = Boolean(maxSelected && selectedAirports.length >= maxSelected);
+  const isSelectionDisabled = Boolean(maxSelected && value.length >= maxSelected);
 
   return (
     <Popover>
       <FieldContainer label={label} placeholder={placeholder}>
-        {selectedAirports.map((airport) => (
+        {value.map((airport) => (
           <div key={airport.id} className={styles.AirportPicker__Value}>
             {airport.name} <BiX onClick={() => handleAirportRemove(airport)} />
           </div>

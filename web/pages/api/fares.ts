@@ -1,7 +1,7 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { Fare } from '@prisma/client'
-import { prisma } from '@/helpers/db';
+import { prisma } from '@/helpers/prisma';
 import { getQueryArrayParam } from '@/helpers/query';
 
 type Data = {

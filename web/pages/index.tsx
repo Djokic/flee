@@ -4,7 +4,7 @@ import Head from 'next/head';
 import styles from '@/styles/Home.module.scss';
 
 import AirportPicker from '@/components/AirportSelect/AirportPicker';
-import { prisma } from '@/helpers/db';
+import { prisma } from '@/helpers/prisma';
 import { Airport } from '@prisma/client';
 import DatePicker, { DatePickerMode } from '@/components/DatePicker/DatePicker';
 import { FaresSortBy, useOneWayFares } from '@/hooks/useOneWayFares/useOneWayFares';

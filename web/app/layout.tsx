@@ -5,12 +5,12 @@ import { usePathname } from "next/navigation";
 import { Inter } from 'next/font/google'
 
 import { TabsList } from "@/components/TabsList/TabsList";
-import { Routes } from "@/helpers/routes";
+import { Routes } from "@/app/routes";
 
 import '@/styles/globals.css';
 import styles from './layout.module.scss';
 
-const inter = Inter({ subsets: ['latin'] });
+const inter = Inter({ subsets: ['latin'], preload: true });
 
 const Links = [
   { href: Routes.ONE_WAY, label: 'One Way' },
