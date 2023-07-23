@@ -2,7 +2,7 @@
 
 import {Routes} from "@/app/routes";
 import {formatDatePickerValueAsParams} from "@/components/DatePicker/helpers";
-import {generateSearchUrl} from "@/helpers/searchUrl";
+import {formatLocationsAndDates} from "@/helpers/urlHelper";
 import React, {useMemo} from "react";
 
 import useForm from "@/hooks/useForm/useForm";
@@ -21,7 +21,6 @@ type OneWayFormProps = {
   departureDates?: DatePickerValue;
 }
 
-
 export default function OneWayForm({ airports, origins, destinations, departureDates }: OneWayFormProps) {
   const { values, handleChange } = useForm({
     initialValues: { origins, destinations, departureDates }
@@ -35,14 +34,14 @@ export default function OneWayForm({ airports, origins, destinations, departureD
   }, [values.origins, airports]);
 
   const searchUrl = useMemo(() => {
-    const originCodes = values.origins?.map(airport => airport.code).join('.');
-    const destinationCodes = values.destinations?.map(airport => airport.code).join('.');
-    const departureDates = formatDatePickerValueAsParams(values.departureDates);
-    return generateSearchUrl(Routes.ONE_WAY, [
-      originCodes,
-      destinationCodes,
-      departureDates,
-    ])
+    const originCodes = values.origins?.map(airport => airport.code) || [];
+    const destinationCodes = values.destinations?.map(airport => airport.code) || [];
+    const departureDates = formatDatePickerValueAsParams(values.departureDates)
+    const { locations, dates} = formatLocationsAndDates({
+      locations: [originCodes, destinationCodes],
+      dates: [departureDates]
+    })
+    return `${Routes.ONE_WAY}/${locations}/${dates}`
   }, [values.origins, values.destinations, values.departureDates]);
 
   return (

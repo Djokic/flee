@@ -16,7 +16,6 @@ const Links = [
   {href: Routes.ONE_WAY, label: 'One Way'},
   {href: Routes.RETURN, label: 'Return'},
   {href: Routes.MULTI_CITY, label: 'Multi City'},
-  {href: Routes.EXPLORE, label: 'Explore'}
 ]
 
 const swrConfig = {

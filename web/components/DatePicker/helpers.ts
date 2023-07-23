@@ -27,32 +27,19 @@ export function prettifyDatePickerValue(value: DatePickerValue): string {
   return format(value, dateFormat);
 }
 
-export function formatDatePickerValueAsParams(value?: DatePickerValue): string {
-  if (!value) {
-    return '';
-  }
-
-  if (Array.isArray(value)) {
-    return value.map(formatDatePickerValueAsParams).join('.');
-  }
-
-  if (isDateRange(value)) {
-    const {from, to} = value;
-    return `${from && format(from, 'yyyy-MM-dd')}:${to && format(to, 'yyyy-MM-dd')}`;
-  }
-
-  return format(value, 'yyyy-MM-dd');
-}
-
-export function parseDatePickerValueFromParams(value: string): Date[] {
+export function formatDatePickerValueAsParams(value?: DatePickerValue): Date[] {
   if (!value) {
     return [];
   }
 
-  if(value.includes(':')) {
-    const [from, to] = value.split(':');
-    return eachDayOfInterval({start: new Date(from), end: new Date(to)});
+  if (Array.isArray(value)) {
+    return value as Date[];
   }
 
-  return value.split('.').map((date) => new Date(date));
+  if (isDateRange(value)) {
+    const {from, to} = value;
+    return [from, to].filter(Boolean) as Date[];
+  }
+
+  return Object.keys(value).length ? [value as Date] : [];
 }

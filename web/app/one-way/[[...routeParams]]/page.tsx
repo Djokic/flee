@@ -1,10 +1,11 @@
-import FareView from "@/components/FareView/FareView";
+import {parseLocationsAndDates} from "@/helpers/urlHelper";
 import React from "react";
 
 import OneWayForm from "@/components/OneWayForm/OneWayForm";
 import SearchLayout from "@/components/SearchLayout/SearchLayout";
-import {prisma} from "@/helpers/prisma";
-import {getUrlArrayParam} from "@/helpers/query";
+import FareView from "@/components/FareView/FareView";
+
+import {getData} from "./data";
 
 type PageParams = {
   params: {
@@ -12,48 +13,25 @@ type PageParams = {
   }
 }
 
-async function getData(origins: string, destinations: string, departures: string) {
-  const originsArray = getUrlArrayParam(origins);
-  const destinationsArray = getUrlArrayParam(destinations);
-  const departuresArray = getUrlArrayParam(departures);
-
-  const airports = await prisma.airport.findMany();
-
-  if (!originsArray) {
-    return {
-      airports,
-      fares: [],
-    }
-  }
-
-  const fares = await prisma.fare.findMany({
-    where: {
-      origin: {
-          in: originsArray
-      },
-      ...(Array.isArray(destinationsArray) ? { destination: { in: destinationsArray } } : {}),
-      ...(Array.isArray(departuresArray) ? { date: { in: departuresArray } } : {}),
-    }
-  });
-
-  return {
-    airports,
-    fares,
-  }
-}
-
 export default async function Page({params: {routeParams}}: PageParams) {
-  const [originCodes, destinationCodes, departureDates] = routeParams || [];
-  const { airports, fares } = await getData(originCodes, destinationCodes, departureDates);
+  const [ locationsString, datesString] = routeParams || [];
+  const { locations, dates } = parseLocationsAndDates(locationsString, datesString);
+  const [ origins = [], destinations= [] ] = locations;
+  const [ departures = [] ] = dates;
+  const { airports, fares } = await getData(origins, destinations, departures);
   const airportsMap = new Map(airports.map(airport => [airport.code, airport]));
 
   return (
     <SearchLayout>
       <OneWayForm
         airports={airports}
-        origins={airports.filter(airport => originCodes?.includes(airport.code))}
-        destinations={airports.filter(airport => destinationCodes?.includes(airport.code))}
-        departureDates={departureDates ? new Date(departureDates) : undefined}
+        origins={airports.filter(airport => origins?.includes(airport.code))}
+        destinations={airports.filter(airport => destinations?.includes(airport.code))}
+        departureDates={
+          Array.isArray(departures) && departures.length === 2
+            ? { from: departures[0], to: departures[1] }
+            : departures
+        }
       />
 
       <>
