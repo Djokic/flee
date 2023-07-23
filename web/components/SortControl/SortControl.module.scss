@@ -1,0 +1,81 @@
+.SortControl {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  color: var(--text-primary);
+
+  header {
+    font-weight: 500;
+  }
+
+  div {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    font-size: var(--text-s);
+  }
+
+  a {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-muted);
+    text-decoration: none;
+    font-weight: 300;
+    transition: var(--transition-primary);
+
+    &:before {
+      content: "";
+      display: inline-block;
+      width: 1rem;
+      height: 1rem;
+      background: var(--card-background);
+      border-radius: 50%;
+      border: 1px solid var(--border-primary);
+      transition: var(--transition-primary);
+    }
+
+    &:after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: .325rem;
+      transform: translateY(-50%) scale(0);
+      display: inline-block;
+      width: 0.5rem;
+      height: 0.5rem;
+      background: var(--accent-color);
+      border-radius: 50%;
+      transition: var(--transition-primary);
+    }
+
+    &:hover {
+      &:before {
+        border-color: var(--accent-color);
+      }
+    }
+
+    &:focus {
+      &:before {
+        border-color: var(--accent-color);
+      }
+    }
+
+    &[data-active="true"] {
+      color: var(--text-primary);
+
+      &:before {
+        border-color: var(--accent-color);
+      }
+
+      &:after {
+        transform: translateY(-50%) scale(1);
+      }
+    }
+  }
+
+}

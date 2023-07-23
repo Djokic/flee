@@ -1,10 +1,11 @@
 import {prisma} from "@/helpers/prisma";
 import {getDateQueryConditions} from "@/helpers/prismaQueryHelpers";
+import {SortType} from "@/helpers/sort";
 
-export async function getData(origins: string[], destinations: string[], departures: Date[]) {
+export async function getData(origins: string[], destinations: string[], departures: Date[], sortBy: SortType) {
   const airports = await prisma.airport.findMany();
 
-  if (!origins.length) {
+  if (!origins.length && !destinations.length) {
     return {
       airports,
       fares: [],
@@ -13,17 +14,14 @@ export async function getData(origins: string[], destinations: string[], departu
 
   const departuresConditions = getDateQueryConditions(departures);
 
-
   const fares = await prisma.fare.findMany({
     where: {
-      origin: {
-        in: origins
-      },
+      ...(origins.length ? { origin: { in: origins } } : {}),
       ...(destinations.length ? { destination: { in: destinations } } : {}),
       ...(departuresConditions ? { date: departuresConditions } : {}),
     },
     orderBy: {
-      date: 'asc',
+      [sortBy]: 'asc',
     }
   });
 
