@@ -4,7 +4,7 @@ import setCookie from 'set-cookie-parser';
 import { getConnectionsForOperator } from 'helpers/common';
 import { formatDate } from '@common/date';
 
-import { AirlineClient, AirlineClientParams, Airport, Fare, Operator } from '@common/types';
+import { AirlineClient, AirlineClientParams, Airport, Fare, Operator } from 'clients/types';
 import { getAirportsWithRoutes } from './airports';
 import { getFares } from './fares';
 

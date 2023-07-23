@@ -1,6 +1,6 @@
 import { Axios } from 'axios';
 import { wait } from 'helpers/wait';
-import { Airport, Operator } from '@common/types';
+import { Airport, Operator } from 'clients/types';
 
 type AirportResponse = {
   AirportName: string;

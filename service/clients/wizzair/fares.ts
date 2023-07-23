@@ -2,7 +2,7 @@ import { Axios, AxiosResponse } from 'axios';
 import { wait } from 'helpers/wait';
 import { getUniqueFares } from 'helpers/common';
 import { addDaysToDate, formatDate } from '@common/date';
-import Exchange from '@common/exchange';
+import Exchange from 'helpers/exchange';
 import { Prisma, Operator } from '@prisma/client';
 
 

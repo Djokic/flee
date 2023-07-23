@@ -5,7 +5,7 @@ import { Prisma, Operator } from '@prisma/client';
 import { addDaysToDate, formatDate } from '@common/date';
 import { wait } from 'helpers/wait';
 import { getUniqueFares } from 'helpers/common';
-import Exchange from '@common/exchange';
+import Exchange from 'helpers/exchange';
 
 type GetFaresParams = {
   origin: string;

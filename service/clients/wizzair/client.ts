@@ -4,7 +4,7 @@ import { Prisma, Operator, Airport } from '@prisma/client';
 import { getConnectionsForOperator } from 'helpers/common';
 import { formatDate } from '@common/date';
 
-import { AirlineClient, AirlineClientParams } from '@common/types';
+import { AirlineClient, AirlineClientParams } from 'clients/types';
 import { getAirportsWithRoutes } from './airports';
 import { getFares } from './fares';
 import { WizzAirRequestsManager } from './requestsManager';
