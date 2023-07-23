@@ -1,7 +1,6 @@
 export enum Routes {
-  ONE_WAY = '/',
+  ONE_WAY = '/one-way',
   RETURN = '/return',
   MULTI_CITY = '/multi-city',
-  EXPLORE = '/explore',
   SERVICE_STATUS = '/service-status',
 }
