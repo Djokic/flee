@@ -37,7 +37,7 @@ export class WizzAirClient implements AirlineClient {
           lookupDays: this.params.lookupDays
         });
       } catch (error) {
-        console.log(`[Error!][WizzAir] -> ${airport.code} <--> ${connection.code} -> ${(error as AxiosError).message || error}`);
+        console.log(`[Error!][WizzAir] -> ${airport.code} --> ${connection.code} -> ${(error as AxiosError).message || error}`);
       }
 
       fares = [...fares, ...connectionFares];

@@ -25,7 +25,6 @@ export class RyanAirClient implements AirlineClient {
     const connections = getConnectionsForOperator(airport, Operator.RYANAIR);
     for (const connection of connections) {
       let outboundFares: Prisma.FareCreateInput[] = [];
-      let returnFares: Prisma.FareCreateInput[] = [];
 
       try {
         outboundFares = await getFares({
@@ -34,18 +33,11 @@ export class RyanAirClient implements AirlineClient {
           startDate: formatDate(new Date()),
           lookupDays: this.params.lookupDays
         });
-
-        returnFares = await getFares({
-          origin: connection.code,
-          destination: airport.code,
-          startDate: formatDate(new Date()),
-          lookupDays: this.params.lookupDays
-        });
       } catch (error) {
-        console.log(`[Error!][RyanAir] -> ${airport.code} <--> ${connection.code} -> ${(error as AxiosError).message || error}`);
+        console.log(`[Error!][RyanAir] -> ${airport.code} --> ${connection.code} -> ${(error as AxiosError).message || error}`);
       }
 
-      fares = [...fares, ...outboundFares, ...returnFares];
+      fares = [...fares, ...outboundFares];
     }
 
     return fares;
