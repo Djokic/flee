@@ -5,7 +5,7 @@ import { BiSolidPlane } from 'react-icons/bi';
 import styles from './FareView.module.scss';
 
 import { getFlightTime } from '@/helpers/flightTime';
-import { createRyanairUrl, getBuyLink } from '@/helpers/buyLinks';
+import {  getBuyLink } from '@/helpers/buyLinks';
 import { getOperatorIcon } from '@/helpers/operatorIcons';
 
 type FareViewProps = {

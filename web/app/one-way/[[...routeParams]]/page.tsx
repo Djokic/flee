@@ -1,12 +1,7 @@
 import {Routes} from "@/app/routes";
-import OneWayList from "@/components/OneWayList/OneWayList";
-import RadioGroup from "@/components/RadioGroup/RadioGroup";
 import SortControl from "@/components/SortControl/SortControl";
-import {TabsList} from "@/components/TabsList/TabsList";
-import {SortType} from "@/helpers/sort";
-import {createRouteUrl, parseLocationsAndDates, parseRouteParams} from "@/helpers/urlHelper";
-import {FaresSortBy} from "@/hooks/useOneWayFares/useOneWayFares";
-import Link from "next/link";
+
+import { parseRouteParams} from "@/helpers/urlHelper";
 import React from "react";
 
 import OneWayForm from "@/components/OneWayForm/OneWayForm";
@@ -49,7 +44,16 @@ export default async function Page({params: {routeParams}}: PageParams) {
         }
       />
 
-      <OneWayList airportsMap={airportsMap} fares={fares}/>
+      <>
+        {fares.map(fare => (
+          <FareView
+            fare={fare}
+            origin={airportsMap.get(fare.origin)!}
+            destination={airportsMap.get(fare.destination)!}
+            key={`${fare.origin}-${fare.destination}-${fare.date}`}
+          />
+        ))}
+      </>
     </SearchLayout>
   )
 }
