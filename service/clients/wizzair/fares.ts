@@ -80,9 +80,9 @@ export async function getFares (fetcher: FetcherFn, params: GetFaresParams): Pro
     });
 
     const targetCurrency = process.env.TARGET_CURRENCY || 'EUR';
-    const joinFlights = [...data?.outboundFlights, ...data?.returnFlights].filter((flight) => flight.price.amount > 0);
+    const flights = data?.outboundFlights.filter((flight) => flight.price.amount > 0);
 
-    for (const flight of joinFlights) {
+    for (const flight of flights) {
       if (flight.priceType === 'price' && flight.departureDate) {
         for (const departureDate of flight.departureDates) {
           fares.push({
