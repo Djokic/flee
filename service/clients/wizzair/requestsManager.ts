@@ -1,4 +1,4 @@
-import axios, { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
+import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 import setCookie from 'set-cookie-parser';
 import axiosRetry from 'axios-retry';
 
@@ -15,16 +15,17 @@ const defaultRequestHeaders = {
   Host: 'be.wizzair.com',
   Origin: 'https://wizzair.com',
   Connection: 'keep-alive',
-  Referer: 'https://wizzair.com/en-gb/flights/fare-finder',
+  Referer: 'https://wizzair.com/en-gb/flights/fare-finder'
 };
 
 export class WizzAirRequestsManager {
   private axiosClient: AxiosInstance = axios.create({ withCredentials: true, timeout: 60_000 });
   private cookies: Record<string, string> = {};
   private requestsCount = 0;
+  private initializationComplete: Promise<void>;
 
   constructor (private maxRequestsPerSession: number) {
-    this.initializeAxiosClient();
+    this.initializationComplete = this.initializeAxiosClient();
   }
 
   private requestInterceptor = (config: AxiosRequestConfig) => {
@@ -70,6 +71,8 @@ export class WizzAirRequestsManager {
   };
 
   private doRequestPreCheck = async () => {
+    await this.initializationComplete;
+
     if (this.requestsCount % this.maxRequestsPerSession === 0) {
       await this.login();
     }
@@ -82,10 +85,10 @@ export class WizzAirRequestsManager {
   public get = async (url: string, config?: AxiosRequestConfig): Promise<AxiosResponse> => {
     await this.doRequestPreCheck();
     return this.axiosClient.get(url, config);
-  }
+  };
 
   public post = async (url: string, data?: any, config?: AxiosRequestConfig): Promise<AxiosResponse> => {
     await this.doRequestPreCheck();
     return this.axiosClient.post(url, data, config);
-  }
+  };
 }

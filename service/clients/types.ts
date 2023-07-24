@@ -1,5 +1,4 @@
-import { Prisma, Airport } from "@prisma/client";
-
+import { Prisma, Airport } from '@prisma/client';
 
 export interface AirlineClient {
   getAirports: () => Promise<Prisma.AirportCreateInput[]>;

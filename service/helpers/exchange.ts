@@ -1,4 +1,4 @@
-import {CacheStore} from "./cacheStore";
+import { CacheStore } from './cacheStore';
 
 const getExchangeRate = async (source: string, target: string): Promise<number> => {
   const res = await fetch(
@@ -22,10 +22,10 @@ class Exchange {
       key: `${source}-${target}`,
       getter: async () => await getExchangeRate(source, target),
       ttl: 720 * 60_000
-    }
+    };
     const rate = await this.cache.get(fieldParams.key, fieldParams);
     return rate * amount;
-  }
+  };
 }
 
 const exchange = new Exchange();

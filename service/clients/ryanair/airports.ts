@@ -23,6 +23,7 @@ type AirportResponse = {
 }
 
 export async function getAirportsWithRoutes (): Promise<Prisma.AirportCreateInput[]> {
+  console.log('[RyanAir] Getting Airports');
   const request = await fetch('https://www.ryanair.com/api/views/locate/3/airports/en/active');
   const response: AirportResponse[] = await request.json();
   return response.map((airport) => ({

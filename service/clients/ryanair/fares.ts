@@ -2,7 +2,7 @@ import axios from 'axios';
 import axiosRetry from 'axios-retry';
 import { Prisma, Operator } from '@prisma/client';
 
-import { addDaysToDate, formatDate } from '@common/date';
+import { addDaysToDate, formatDate } from 'helpers/date';
 import { wait } from 'helpers/wait';
 import { getUniqueFares } from 'helpers/common';
 import Exchange from 'helpers/exchange';

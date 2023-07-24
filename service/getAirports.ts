@@ -14,12 +14,13 @@ async function run () {
   const ryanAirClient = new RyanAirClient({ lookupDays });
   const wizzAirClient = new WizzAirClient({ lookupDays });
 
-  await Promise.all([
+  const airportsArrays = await Promise.all([
     ryanAirClient.getAirports(),
     wizzAirClient.getAirports()
   ]);
 
-  const airports: Prisma.AirportCreateInput[] = mergeAirports([ryanAirClient.airportsData, wizzAirClient.airportsData]);
+  const airports: Prisma.AirportCreateInput[] = mergeAirports(airportsArrays)
+    .filter((airport) => airport.code !== null && !airport.name.includes('(Any)'));
 
   // Delete all airports and save new ones
   await prisma.$transaction([

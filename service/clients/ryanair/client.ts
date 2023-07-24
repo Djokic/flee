@@ -1,17 +1,19 @@
-import{ Prisma, Operator, Airport } from '@prisma/client';
+import { Prisma, Operator, Airport } from '@prisma/client';
 
 import { getConnectionsForOperator } from 'helpers/common';
-import { formatDate } from '@common/date';
+import { formatDate } from 'helpers/date';
 
-import { AirlineClient, AirlineClientParams} from 'clients/types';
+import { AirlineClient, AirlineClientParams } from 'clients/types';
 import { getAirportsWithRoutes } from './airports';
 import { getFares } from './fares';
 import { AxiosError } from 'axios';
 
 export class RyanAirClient implements AirlineClient {
   private faresCache: Prisma.FareCreateInput[] = [];
+  private params: AirlineClientParams;
 
-  constructor (private params: AirlineClientParams) {
+  constructor (params: AirlineClientParams) {
+    this.params = params;
   }
 
   public getAirports = async () => {

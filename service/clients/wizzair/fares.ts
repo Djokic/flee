@@ -1,10 +1,8 @@
-import { Axios, AxiosResponse } from 'axios';
-import { wait } from 'helpers/wait';
+import { AxiosResponse } from 'axios';
 import { getUniqueFares } from 'helpers/common';
-import { addDaysToDate, formatDate } from '@common/date';
+import { addDaysToDate, formatDate } from 'helpers/date';
 import Exchange from 'helpers/exchange';
 import { Prisma, Operator } from '@prisma/client';
-
 
 type GetFaresParams = {
   origin: string;
@@ -51,8 +49,7 @@ type TimetableResponse = {
 
 type FetcherFn = (url: string, params: TimetableParams) => Promise<AxiosResponse>;
 
-
-export async function getFares(fetcher: FetcherFn, params: GetFaresParams): Promise<Prisma.FareCreateInput[]> {
+export async function getFares (fetcher: FetcherFn, params: GetFaresParams): Promise<Prisma.FareCreateInput[]> {
   const maxDays = 30;
   const batchesCount = Math.ceil(params.lookupDays / maxDays);
 

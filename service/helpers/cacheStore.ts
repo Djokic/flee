@@ -13,7 +13,7 @@ export class CacheStore {
   setField = ({ key, getter, ttl }: FieldParams) => {
     this.getters[key] = getter;
     this.ttls[key] = ttl || Infinity;
-  }
+  };
 
   get = async (key: string, fieldParams?: FieldParams) => {
     if (fieldParams) {
@@ -30,7 +30,7 @@ export class CacheStore {
     this.values[key] = await this.getters[key]?.();
     this.timestamps[key] = Date.now();
     return this.values[key];
-  }
+  };
 }
 
 const cacheStore = new CacheStore();

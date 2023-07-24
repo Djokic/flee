@@ -1,4 +1,4 @@
-import { Axios, AxiosResponse } from 'axios';
+import { AxiosResponse } from 'axios';
 import { Prisma, Operator } from '@prisma/client';
 
 type Connection = {
@@ -31,7 +31,7 @@ type GetAirportsResponse = {
 
 type FetcherFn = (url: string) => Promise<AxiosResponse>;
 
-async function getAirports(fetcher: FetcherFn): Promise<GetAirportsResponse> {
+async function getAirports (fetcher: FetcherFn): Promise<GetAirportsResponse> {
   const { data } = await fetcher('/asset/map?languageCode=en-gb');
   return data as GetAirportsResponse;
 }
