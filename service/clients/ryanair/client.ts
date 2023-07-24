@@ -9,7 +9,6 @@ import { getFares } from './fares';
 import { AxiosError } from 'axios';
 
 export class RyanAirClient implements AirlineClient {
-  private faresCache: Prisma.FareCreateInput[] = [];
   private params: AirlineClientParams;
 
   constructor (params: AirlineClientParams) {
@@ -20,42 +19,35 @@ export class RyanAirClient implements AirlineClient {
     return await getAirportsWithRoutes();
   };
 
-  public getFaresForAirports = async (airports: Airport[]) => {
-    this.faresCache = [];
-    const totalConnections = airports.flatMap((airport) => getConnectionsForOperator(airport, Operator.RYANAIR)).length;
-    let currentConnection = 0;
+  public getFaresForAirport = async (airport: Airport) => {
+    let fares: Prisma.FareCreateInput[] = [];
 
-    for (const airport of airports) {
-      const connections = getConnectionsForOperator(airport, Operator.RYANAIR);
-      for (const connection of connections) {
-        currentConnection++;
-        console.log(`[RyanAir][${currentConnection}/${totalConnections}] -> ${airport.code} <--> ${connection.code} `);
+    const connections = getConnectionsForOperator(airport, Operator.RYANAIR);
+    for (const connection of connections) {
+      let outboundFares: Prisma.FareCreateInput[] = [];
+      let returnFares: Prisma.FareCreateInput[] = [];
 
-        let outboundFares: Prisma.FareCreateInput[] = [];
-        let returnFares: Prisma.FareCreateInput[] = [];
+      try {
+        outboundFares = await getFares({
+          origin: airport.code,
+          destination: connection.code,
+          startDate: formatDate(new Date()),
+          lookupDays: this.params.lookupDays
+        });
 
-        try {
-          outboundFares = await getFares({
-            origin: airport.code,
-            destination: connection.code,
-            startDate: formatDate(new Date()),
-            lookupDays: this.params.lookupDays
-          });
-
-          returnFares = await getFares({
-            origin: connection.code,
-            destination: airport.code,
-            startDate: formatDate(new Date()),
-            lookupDays: this.params.lookupDays
-          });
-        } catch (error) {
-          console.log(`[Error!][RyanAir] -> ${airport.code} <--> ${connection.code} -> ${(error as AxiosError).message || error}`);
-        }
-
-        this.faresCache = [...this.faresCache, ...outboundFares, ...returnFares];
+        returnFares = await getFares({
+          origin: connection.code,
+          destination: airport.code,
+          startDate: formatDate(new Date()),
+          lookupDays: this.params.lookupDays
+        });
+      } catch (error) {
+        console.log(`[Error!][RyanAir] -> ${airport.code} <--> ${connection.code} -> ${(error as AxiosError).message || error}`);
       }
+
+      fares = [...fares, ...outboundFares, ...returnFares];
     }
 
-    return this.faresCache;
+    return fares;
   };
 }

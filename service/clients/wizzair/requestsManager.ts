@@ -22,7 +22,7 @@ export class WizzAirRequestsManager {
   private axiosClient: AxiosInstance = axios.create({ withCredentials: true, timeout: 60_000 });
   private cookies: Record<string, string> = {};
   private requestsCount = 0;
-  private initializationComplete: Promise<void>;
+  private readonly initializationComplete: Promise<void>;
 
   constructor (private maxRequestsPerSession: number) {
     this.initializationComplete = this.initializeAxiosClient();

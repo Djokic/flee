@@ -16,7 +16,7 @@ function getOperatorClient (operator: Operator) {
     return WizzAirClient;
   }
 
-  return undefined
+  return undefined;
 }
 
 async function run (operator: Operator, allAirports: boolean) {
@@ -49,15 +49,23 @@ async function run (operator: Operator, allAirports: boolean) {
         ? airports
         : airports.filter(({ code }) => airportCodes.includes(code));
 
+    const totalAirports = filteredAirports.length;
+    let currentAirport = 0;
 
-    const fares = await client.getFaresForAirports(filteredAirports);
+    for (const airport of filteredAirports) {
+      currentAirport++;
+      console.log(`[${operator}] ${airport.code} (${currentAirport}/${totalAirports})`);
+      const fares = await client.getFaresForAirport(airport);
 
-    await prisma.$transaction([
-      prisma.fare.deleteMany({ where: { operator } }),
-      prisma.fare.createMany({
-        data: fares
-      })
-    ]);
+      if (fares.length !== 0) {
+        await prisma.$transaction([
+          prisma.fare.deleteMany({ where: { operator, origin: airport.code } }),
+          prisma.fare.createMany({
+            data: fares
+          })
+        ]);
+      }
+    }
 
     await prisma.serviceStatus.update({
       where: { id },
@@ -84,8 +92,8 @@ async function run (operator: Operator, allAirports: boolean) {
 
 async function runAll () {
   await Promise.all([
-    run(Operator.RYANAIR, false),
-    run(Operator.WIZZAIR, false)
+    run(Operator.RYANAIR, true),
+    run(Operator.WIZZAIR, true)
   ]);
 }
 

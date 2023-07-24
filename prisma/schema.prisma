@@ -40,6 +40,8 @@ model Fare {
   price       Float
   currency    String
   operator    Operator
+
+  @@unique([origin, destination, date, operator])
 }
 
 enum ServiceStatusCode {
