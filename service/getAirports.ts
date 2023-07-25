@@ -19,8 +19,25 @@ async function run () {
     wizzAirClient.getAirports()
   ]);
 
-  const airports: Prisma.AirportCreateInput[] = mergeAirports(airportsArrays)
-    .filter((airport) => airport.code !== null && !airport.name.includes('(Any)'));
+  let airports: Prisma.AirportCreateInput[] = mergeAirports(airportsArrays);
+
+  // Get list of unusable airports
+  const unusableAirportCodes = airports
+    .filter((airport) => {
+      const doesNotHaveConnections = !Array.isArray(airport.connections) || !airport.connections.length;
+      const isPlaceholder = airport.name.includes('(Any)');
+      return doesNotHaveConnections || isPlaceholder;
+    })
+    .map((airport) => airport.code);
+
+  // Remove unusable airports and connections
+  airports = airports
+    .filter((airport) => !unusableAirportCodes.includes(airport.code))
+    .map((airport) => ({
+      ...airport,
+      connections: (airport.connections as Prisma.ConnectionCreateInput[])
+        .filter((connection) => !unusableAirportCodes.includes(connection.code))
+    }));
 
   // Delete all airports and save new ones
   await prisma.$transaction([

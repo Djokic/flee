@@ -41,10 +41,11 @@ function DatePicker({ label, placeholder, mode = DatePickerMode.Range, name, onC
       </FieldContainer>
 
       <DayPicker
-        mode={mode as any}
+        mode="range"
         selected={value}
         className={styles.DatePicker}
         onSelect={handleChange}
+        minDate={new Date()}
       />
     </Popover>
   );

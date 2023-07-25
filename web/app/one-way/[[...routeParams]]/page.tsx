@@ -1,12 +1,13 @@
 import {Routes} from "@/app/routes";
+import {JourneyView} from "@/components/JourneyView/JourneyView";
 import SortControl from "@/components/SortControl/SortControl";
 
 import { parseRouteParams} from "@/helpers/urlHelper";
+import {Fare} from "@prisma/client";
 import React from "react";
 
 import OneWayForm from "@/components/OneWayForm/OneWayForm";
 import SearchLayout from "@/components/SearchLayout/SearchLayout";
-import FareView from "@/components/FareView/FareView";
 
 import {getData} from "./data";
 
@@ -21,7 +22,7 @@ export default async function Page({params: {routeParams}}: PageParams) {
   const [origins = [], destinations = []] = locations;
   const [departures = []] = dates;
   const {airports, fares} = await getData(origins, destinations, departures, sortBy);
-  const airportsMap = new Map(airports.map(airport => [airport.code, airport]));
+  const airportsMap = Object.fromEntries((airports.map(airport => [airport.code, airport])));
 
   return (
     <SearchLayout header={
@@ -45,12 +46,11 @@ export default async function Page({params: {routeParams}}: PageParams) {
       />
 
       <>
-        {fares.map(fare => (
-          <FareView
-            fare={fare}
-            origin={airportsMap.get(fare.origin)!}
-            destination={airportsMap.get(fare.destination)!}
-            key={`${fare.origin}-${fare.destination}-${fare.date}`}
+        {fares.map((fare: Fare | Fare[], index) => (
+          <JourneyView
+            key={index}
+            airportsMap={airportsMap}
+            fares={fare}
           />
         ))}
       </>

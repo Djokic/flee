@@ -1,13 +1,9 @@
 import {Routes} from "@/app/routes";
-import OneWayList from "@/components/OneWayList/OneWayList";
-import RadioGroup from "@/components/RadioGroup/RadioGroup";
+import {JourneyView} from "@/components/JourneyView/JourneyView";
 import ReturnForm from "@/components/ReturnForm/ReturnForm";
 import SortControl from "@/components/SortControl/SortControl";
-import {TabsList} from "@/components/TabsList/TabsList";
-import {SortType} from "@/helpers/sort";
-import {createRouteUrl, parseLocationsAndDates, parseRouteParams} from "@/helpers/urlHelper";
-import {FaresSortBy} from "@/hooks/useOneWayFares/useOneWayFares";
-import Link from "next/link";
+import { parseRouteParams} from "@/helpers/urlHelper";
+import {Fare} from "@prisma/client";
 import React from "react";
 
 import OneWayForm from "@/components/OneWayForm/OneWayForm";
@@ -25,15 +21,15 @@ type PageParams = {
 export default async function Page({params: {routeParams}}: PageParams) {
   const { locations, dates, sortBy } = parseRouteParams(routeParams);
   const [origins = [], destinations = []] = locations;
-  const [departures = [], returnDates =[]] = dates;
-  const {airports, fares} = await getData(origins, destinations, departures, sortBy);
-  const airportsMap = new Map(airports.map(airport => [airport.code, airport]));
+  const [departureDates = [], returnDates =[]] = dates;
+  const {airports, fares} = await getData(origins, destinations, departureDates, returnDates,  sortBy);
+  const airportsMap = Object.fromEntries((airports.map(airport => [airport.code, airport])));
 
   return (
     <SearchLayout header={
       <SortControl
         label={`${fares.length} results found`}
-        baseUrl={Routes.ONE_WAY}
+        baseUrl={Routes.RETURN}
         locations={locations}
         dates={dates}
         currentSortBy={sortBy}
@@ -44,9 +40,9 @@ export default async function Page({params: {routeParams}}: PageParams) {
         origins={airports.filter(airport => origins?.includes(airport.code))}
         destinations={airports.filter(airport => destinations?.includes(airport.code))}
         departureDates={
-          Array.isArray(departures) && departures.length === 2
-            ? {from: departures[0], to: departures[1]}
-            : departures
+          Array.isArray(departureDates) && departureDates.length === 2
+            ? {from: departureDates[0], to: departureDates[1]}
+            : departureDates
         }
         returnDates={
           Array.isArray(returnDates) && returnDates.length === 2
@@ -54,7 +50,11 @@ export default async function Page({params: {routeParams}}: PageParams) {
             : returnDates
         }
       />
-      <></>
+      <>
+        {fares.map((fare: Fare[], index) => (
+          <JourneyView airportsMap={airportsMap} fares={fare} key={index}/>
+        ))}
+      </>
 
     </SearchLayout>
   )

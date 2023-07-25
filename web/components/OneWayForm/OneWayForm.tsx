@@ -61,7 +61,7 @@ export default function OneWayForm({ airports, origins, destinations, departureD
           label='To'
           placeholder='Select up to 3 destination airports'
           name="destinations"
-          airports={possibleDestinations}
+          airports={airports}
           value={values.destinations}
           onChange={handleChange}
         />

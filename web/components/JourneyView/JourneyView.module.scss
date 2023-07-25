@@ -1,0 +1,36 @@
+.JourneyView {
+  display: flex;
+  flex-direction: column;
+
+  > div:not(:first-child) > div {
+    border-top: none;
+  }
+
+  > div:not(:last-child) > div {
+      border-bottom-style: dashed;
+  }
+
+  &__TotalPrice {
+    display: flex;
+    padding: 0.5rem 1rem;
+    flex-direction: column;
+    align-items: flex-end;
+    align-self: flex-end;
+    background: var(--card-background);
+    border-radius: var(--radius);
+    border: 1px solid var(--border-primary);
+    border-top: none;
+    width: 6.5rem;
+
+    span:first-child {
+      color: var(--text-muted);
+      font-size: var(--text-s);
+    }
+
+    span:last-child {
+      font-size: 1rem;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+  }
+}
