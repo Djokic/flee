@@ -38,8 +38,6 @@ async function run () {
     }));
   const session = getDbSession();
 
-  console.log('AA', airports);
-
   await createOrUpdateAirports({ session, airports });
   await session.close();
   console.log('Saved Airports to DB!');
