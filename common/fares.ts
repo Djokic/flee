@@ -204,7 +204,7 @@ type CreateOrUpdateFaresInput = {
   }[];
 }
 
-export async function createOrUpdateFares({session, fares}: CreateOrUpdateFaresInput): Promise<void> {
+export async function createOrUpdateFares({ session, fares }: CreateOrUpdateFaresInput): Promise<void> {
   const query = `
     UNWIND $fares AS fare
     MATCH (origin:Airport {code: fare.origin})
@@ -214,8 +214,22 @@ export async function createOrUpdateFares({session, fares}: CreateOrUpdateFaresI
     ON MATCH SET f.price = fare.price
   `;
 
-  await session.run(query, {fares});
+  const MAX_RETRIES = 5;
+  for (let i = 0; i < MAX_RETRIES; i++) {
+    try {
+      await session.run(query, { fares });
+      break; // Break the loop if the query succeeds
+    } catch (error) {
+      if (i === MAX_RETRIES - 1) {
+        console.error(`Transaction failed after ${MAX_RETRIES} attempts:`, error); // Log the error if this was the last retry
+      } else {
+        console.log(`Retrying transaction. Attempt number: ${i + 1}`);
+        await new Promise((resolve) => setTimeout(resolve, 1000)); // Wait for 1 second before the next retry
+      }
+    }
+  }
 }
+
 
 
 type DeleteFaresInput = {

@@ -1,13 +1,13 @@
 /* eslint-disable import/first */
 require('dotenv').config();
 
+import { Airport, getAllAirports } from '@common/airports';
 import { getDbSession } from '@common/dbSession';
 import { createOrUpdateFares } from '@common/fares';
-import { Operator, Airport } from '@prisma/client';
+import { Operator } from '@common/types';
 
 import { RyanAirClient } from 'clients/ryanair';
 import { WizzAirClient } from 'clients/wizzair';
-import { prisma } from './helpers/prisma';
 
 function getOperatorClient (operator: Operator) {
   if (operator === Operator.RYANAIR) {
@@ -27,82 +27,53 @@ async function run (operator: Operator, allAirports: boolean) {
   const airportCodes: string[] = process.env.AIRPORTS?.split(',') || [];
   const lookupDays = parseInt(process.env.LOOKUP_DAYS || '30');
 
-  // const { id } = await prisma.serviceStatus.create({
-  //   data: {
-  //     code: ServiceStatusCode.IN_PROGRESS,
-  //     operator,
-  //     startAt,
-  //     details: allAirports ? 'all' : airportCodes.join(',')
-  //   }
-  // });
+  const OperatorClient = getOperatorClient(operator);
 
-  try {
-    const OperatorClient = getOperatorClient(operator);
-
-    if (!OperatorClient) {
-      throw new Error('Missing operator');
-    }
-
-    const client = new OperatorClient({ lookupDays });
-
-    const airports: Airport[] = await prisma.airport.findMany() as Airport[];
-    const filteredAirports =
-      allAirports
-        ? airports
-        : airports.filter(({ code }) => airportCodes.includes(code));
-
-    const totalAirports = filteredAirports.length;
-    let currentAirport = 0;
-
-    const session = getDbSession();
-
-    for (const airport of filteredAirports) {
-      currentAirport++;
-      console.log(`[${operator}] ${airport.code} (${currentAirport}/${totalAirports})`);
-      const fares = await client.getFaresForAirport(airport);
-
-      if (fares.length !== 0) {
-        const payload = fares.map((fare) => ({
-          ...fare,
-          date: new Date(fare.date).toISOString(),
-          operator: operator as string,
-          id: `${fare.origin}-${fare.destination}-${fare.date}-${fare.operator}`
-        }));
-
-        // eslint-disable-next-line no-undef
-        await createOrUpdateFares({ session, fares: payload });
-      }
-    }
-
-    await session.close();
-
-    // await prisma.serviceStatus.update({
-    //   where: { id },
-    //   data: {
-    //     endAt: Date.now(),
-    //     code: ServiceStatusCode.SUCCESS
-    //   }
-    // });
-
-    console.log(`---Saved Fares to DB! [${operator}]---`);
-  } catch (error: any) {
-    // await prisma.serviceStatus.update({
-    //   where: { id },
-    //   data: {
-    //     endAt: Date.now(),
-    //     code: ServiceStatusCode.ERROR,
-    //     error: error?.message
-    //   }
-    // });
-
-    throw error;
+  if (!OperatorClient) {
+    throw new Error('Missing operator');
   }
+
+  const client = new OperatorClient({ lookupDays });
+
+  const session = getDbSession();
+
+  const airports: Airport[] = await getAllAirports({ session });
+
+  const filteredAirports =
+    allAirports
+      ? airports
+      : airports.filter(({ code }) => airportCodes.includes(code));
+
+  const totalAirports = filteredAirports.length;
+  let currentAirport = 0;
+
+  for (const airport of filteredAirports) {
+    currentAirport++;
+    console.log(`[${operator}] ${airport.code} (${currentAirport}/${totalAirports})`);
+    const fares = await client.getFaresForAirport(airport);
+
+    if (fares.length !== 0) {
+      const payload = fares.map((fare) => ({
+        ...fare,
+        date: new Date(fare.date).toISOString(),
+        operator: operator as string,
+        id: `${fare.origin}-${fare.destination}-${fare.date}-${fare.operator}`
+      }));
+
+      // eslint-disable-next-line no-undef
+      await createOrUpdateFares({ session, fares: payload });
+    }
+  }
+
+  await session.close();
+
+  console.log(`---Saved Fares to DB! [${operator}]---`);
 }
 
 async function runAll () {
   await Promise.all([
-    // run(Operator.RYANAIR, false)
-    run(Operator.WIZZAIR, false)
+    run(Operator.RYANAIR, false)
+    // run(Operator.WIZZAIR, false)
   ]);
 }
 
