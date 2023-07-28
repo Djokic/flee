@@ -1,7 +1,9 @@
 /* eslint-disable import/first */
 require('dotenv').config();
 
-import { Operator, Airport, ServiceStatusCode } from '@prisma/client';
+import { getDbSession } from '@common/dbSession';
+import { createOrUpdateFares } from '@common/fares';
+import { Operator, Airport } from '@prisma/client';
 
 import { RyanAirClient } from 'clients/ryanair';
 import { WizzAirClient } from 'clients/wizzair';
@@ -20,19 +22,19 @@ function getOperatorClient (operator: Operator) {
 }
 
 async function run (operator: Operator, allAirports: boolean) {
-  const startAt = Date.now();
+  // const startAt = Date.now();
 
   const airportCodes: string[] = process.env.AIRPORTS?.split(',') || [];
   const lookupDays = parseInt(process.env.LOOKUP_DAYS || '30');
 
-  const { id } = await prisma.serviceStatus.create({
-    data: {
-      code: ServiceStatusCode.IN_PROGRESS,
-      operator,
-      startAt,
-      details: allAirports ? 'all' : airportCodes.join(',')
-    }
-  });
+  // const { id } = await prisma.serviceStatus.create({
+  //   data: {
+  //     code: ServiceStatusCode.IN_PROGRESS,
+  //     operator,
+  //     startAt,
+  //     details: allAirports ? 'all' : airportCodes.join(',')
+  //   }
+  // });
 
   try {
     const OperatorClient = getOperatorClient(operator);
@@ -52,39 +54,46 @@ async function run (operator: Operator, allAirports: boolean) {
     const totalAirports = filteredAirports.length;
     let currentAirport = 0;
 
+    const session = getDbSession();
+
     for (const airport of filteredAirports) {
       currentAirport++;
       console.log(`[${operator}] ${airport.code} (${currentAirport}/${totalAirports})`);
       const fares = await client.getFaresForAirport(airport);
 
       if (fares.length !== 0) {
-        await prisma.$transaction([
-          prisma.fare.deleteMany({ where: { operator, origin: airport.code } }),
-          prisma.fare.createMany({
-            data: fares
-          })
-        ]);
+        const payload = fares.map((fare) => ({
+          ...fare,
+          date: new Date(fare.date).toISOString(),
+          operator: operator as string,
+          id: `${fare.origin}-${fare.destination}-${fare.date}-${fare.operator}`
+        }));
+
+        // eslint-disable-next-line no-undef
+        await createOrUpdateFares({ session, fares: payload });
       }
     }
 
-    await prisma.serviceStatus.update({
-      where: { id },
-      data: {
-        endAt: Date.now(),
-        code: ServiceStatusCode.SUCCESS
-      }
-    });
+    await session.close();
+
+    // await prisma.serviceStatus.update({
+    //   where: { id },
+    //   data: {
+    //     endAt: Date.now(),
+    //     code: ServiceStatusCode.SUCCESS
+    //   }
+    // });
 
     console.log(`---Saved Fares to DB! [${operator}]---`);
   } catch (error: any) {
-    await prisma.serviceStatus.update({
-      where: { id },
-      data: {
-        endAt: Date.now(),
-        code: ServiceStatusCode.ERROR,
-        error: error?.message
-      }
-    });
+    // await prisma.serviceStatus.update({
+    //   where: { id },
+    //   data: {
+    //     endAt: Date.now(),
+    //     code: ServiceStatusCode.ERROR,
+    //     error: error?.message
+    //   }
+    // });
 
     throw error;
   }
@@ -92,8 +101,8 @@ async function run (operator: Operator, allAirports: boolean) {
 
 async function runAll () {
   await Promise.all([
-    run(Operator.RYANAIR, true),
-    run(Operator.WIZZAIR, true)
+    // run(Operator.RYANAIR, false)
+    run(Operator.WIZZAIR, false)
   ]);
 }
 

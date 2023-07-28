@@ -6,7 +6,11 @@
     "getFares": "npx ts-node -r tsconfig-paths/register ./getFares.ts",
     "getAirports": "npx ts-node -r tsconfig-paths/register ./getAirports.ts",
     "test-script": "npx ts-node -r tsconfig-paths/register ./testScript.ts",
-    "lint-fix": "eslint --fix --ext .ts"
+    "aura": "npx ts-node -r tsconfig-paths/register ./aura.ts",
+    "db": "npx ts-node -r tsconfig-paths/register ./db-test.ts",
+    "lint-fix": "eslint --fix --ext .ts",
+    "airports.worker": "npx ts-node -r tsconfig-paths/register ./airports.worker.ts",
+    "fares.worker": "npx ts-node -r tsconfig-paths/register ./fares.worker.ts"
   },
   "engines": {
     "node": ">= 18.0.0"
@@ -16,8 +20,9 @@
     "axios": "^0.27.2",
     "axios-retry": "^3.5.1",
     "country-list": "^2.3.0",
+    "date-fns": "^2.30.0",
     "dotenv": "^16.0.1",
-    "mongodb": "^4.7.0",
+    "neo4j-driver": "^5.10.0",
     "set-cookie-parser": "^2.5.0",
     "ts-node": "^10.9.1",
     "tsconfig-paths": "^4.0.0"

@@ -8,6 +8,7 @@ import { TabsList } from "@/components/TabsList/TabsList";
 import { Routes } from "@/app/routes";
 
 import '@/styles/globals.css';
+import '@/styles/helpers.scss';
 import styles from './layout.module.scss';
 
 const inter = Inter({ subsets: ['latin'], preload: true });

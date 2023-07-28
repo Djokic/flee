@@ -3,11 +3,12 @@ import {JourneyView} from "@/components/JourneyView/JourneyView";
 import SortControl from "@/components/SortControl/SortControl";
 
 import { parseRouteParams} from "@/helpers/urlHelper";
-import {Fare} from "@prisma/client";
+import {Metadata} from "next";
 import React from "react";
 
 import OneWayForm from "@/components/OneWayForm/OneWayForm";
 import SearchLayout from "@/components/SearchLayout/SearchLayout";
+import {FareData} from "../../../../common/fares";
 
 import {getData} from "./data";
 
@@ -17,41 +18,36 @@ type PageParams = {
   }
 }
 
+export const metadata: Metadata = {
+  title: 'One-Way Flights',
+}
+
 export default async function Page({params: {routeParams}}: PageParams) {
-  const { locations, dates, sortBy } = parseRouteParams(routeParams);
+  const { locations, dates, sortType } = parseRouteParams(routeParams);
   const [origins = [], destinations = []] = locations;
   const [departures = []] = dates;
-  const {airports, fares} = await getData(origins, destinations, departures, sortBy);
-  const airportsMap = Object.fromEntries((airports.map(airport => [airport.code, airport])));
+  const {airports, fares} = await getData({ origins, destinations, departures, sortType });
 
   return (
     <SearchLayout header={
       <SortControl
-        label={`${fares.length} results found`}
+        faresCount={fares.length}
         baseUrl={Routes.ONE_WAY}
         locations={locations}
         dates={dates}
-        currentSortBy={sortBy}
+        sortType={sortType}
       />
     }>
       <OneWayForm
         airports={airports}
-        origins={airports.filter(airport => origins?.includes(airport.code))}
-        destinations={airports.filter(airport => destinations?.includes(airport.code))}
-        departureDates={
-          Array.isArray(departures) && departures.length === 2
-            ? {from: departures[0], to: departures[1]}
-            : departures
-        }
+        initialLocationCodes={locations}
+        initialDates={dates}
+        sortType={sortType}
       />
 
       <>
-        {fares.map((fare: Fare | Fare[], index) => (
-          <JourneyView
-            key={index}
-            airportsMap={airportsMap}
-            fares={fare}
-          />
+        {fares.map((data: FareData[], index) => (
+          <JourneyView key={index} fares={data}/>
         ))}
       </>
     </SearchLayout>

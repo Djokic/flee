@@ -1,4 +1,5 @@
-import { Prisma, Operator } from '@prisma/client';
+import { Airport } from '@common/airports';
+import { Operator } from '@common/types';
 import { getName } from 'country-list';
 
 type AirportResponse = {
@@ -22,11 +23,12 @@ type AirportResponse = {
   timeZone: string
 }
 
-export async function getAirportsWithRoutes (): Promise<Prisma.AirportCreateInput[]> {
+export async function getAirportsWithRoutes (): Promise<Airport[]> {
   console.log('[RyanAir] Getting Airports');
   const request = await fetch('https://www.ryanair.com/api/views/locate/3/airports/en/active');
   const response: AirportResponse[] = await request.json();
   return response.map((airport) => ({
+    id: airport.iataCode,
     code: airport.iataCode,
     name: airport.name,
     countryCode: airport.countryCode,
@@ -35,9 +37,9 @@ export async function getAirportsWithRoutes (): Promise<Prisma.AirportCreateInpu
     longitude: airport.coordinates.longitude,
     connections: airport.routes
       .filter((route) => route.startsWith('airport:'))
-      .map((route) => ({
-        code: route.replace('airport:', ''),
-        operator: Operator.RYANAIR
-      }))
+      .map((route) => {
+        const code = route.replace('airport:', '');
+        return `${code}.${Operator.RYANAIR}`;
+      })
   }));
 }

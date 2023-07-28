@@ -1,5 +1,6 @@
 import {SortType} from "@/helpers/sort";
 import {format} from 'date-fns';
+import {Airport} from "../../common/airports";
 
 enum Separator {
   GROUP = '->',
@@ -72,7 +73,7 @@ export function formatLocationsAndDates({ locations, dates }: FormatLocationsAnd
 }
 
 type ParseRouteParamsOutput = ParseLocationsAndDatesOutput & {
-  sortBy: SortType;
+  sortType: SortType;
 }
 
 export function parseRouteParams(params: string[] = [], defaultSortBy: SortType = SortType.DATE): ParseRouteParamsOutput {
@@ -85,16 +86,16 @@ export function parseRouteParams(params: string[] = [], defaultSortBy: SortType 
 
   return {
     ...parseLocationsAndDates(locations, dates),
-    sortBy,
+    sortType: sortBy,
   }
 }
 
 type CreateRouteUrlInput = FormatLocationsAndDatesInput & {
   baseUrl: string;
-  sortBy: SortType;
+  sortType: SortType;
 }
 
-export function createRouteUrl({ baseUrl, locations, dates, sortBy }: CreateRouteUrlInput): string {
+export function createRouteUrl({ baseUrl, locations, dates, sortType }: CreateRouteUrlInput): string {
   const { locations: formattedLocations, dates: formattedDates } = formatLocationsAndDates({ locations, dates });
   let url = `${baseUrl}/${formattedLocations}`;
 
@@ -102,8 +103,8 @@ export function createRouteUrl({ baseUrl, locations, dates, sortBy }: CreateRout
     url += `/${formattedDates}`;
   }
 
-  if (sortBy) {
-    url += `/${SORT_DELIMITER}/${sortBy}`;
+  if (sortType) {
+    url += `/${SORT_DELIMITER}/${sortType}`;
   }
   return url;
 }

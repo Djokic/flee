@@ -1,48 +1,35 @@
 'use client';
 
 import {Routes} from "@/app/routes";
-import {formatDatePickerValueAsParams} from "@/components/DatePicker/helpers";
-import {formatLocationsAndDates} from "@/helpers/urlHelper";
-import React, {useMemo} from "react";
-
-import useForm from "@/hooks/useForm/useForm";
-import {Airport} from "@prisma/client";
+import {SortType} from "@/helpers/sort";
+import {useJourneyPlanner} from "@/hooks/useJourneyPlanner";
+import React from "react";
 
 import AirportPicker from "@/components/AirportSelect/AirportPicker";
 import Button, {ButtonType} from "@/components/Button/Button";
 import Card from "@/components/Card/Card";
-import DatePicker, {DatePickerMode, DatePickerValue} from "@/components/DatePicker/DatePicker";
+import DatePicker  from "@/components/DatePicker/DatePicker";
+import {Airport} from "../../../common/airports";
 
 
 type OneWayFormProps = {
   airports: Airport[];
-  origins?: Airport[];
-  destinations?: Airport[];
-  departureDates?: DatePickerValue;
+  initialLocationCodes?: string[][];
+  initialDates?: Date[][];
+  sortType: SortType;
 }
 
-export default function OneWayForm({ airports, origins, destinations, departureDates }: OneWayFormProps) {
-  const { values, handleChange } = useForm({
-    initialValues: { origins, destinations, departureDates }
+const today = new Date();
+
+export default function OneWayForm({ airports, initialLocationCodes, initialDates, sortType }: OneWayFormProps) {
+  const { locations, dates, possibleLocations, handleChange, searchUrl } = useJourneyPlanner({
+    initialLocationCodes,
+    initialDates,
+    airports,
+    baseUrl: Routes.ONE_WAY,
+    onlyDirect: false,
+    sortType,
   });
-
-  const possibleDestinations = useMemo(() => {
-    values.origins
-      ?.map(airport => airport.code)
-      .join(',');
-    return airports.filter(airport => airport.code !== values.origins?.[0]?.code);
-  }, [values.origins, airports]);
-
-  const searchUrl = useMemo(() => {
-    const originCodes = values.origins?.map(airport => airport.code) || [];
-    const destinationCodes = values.destinations?.map(airport => airport.code) || [];
-    const departureDates = formatDatePickerValueAsParams(values.departureDates)
-    const { locations, dates} = formatLocationsAndDates({
-      locations: [originCodes, destinationCodes],
-      dates: [departureDates]
-    })
-    return `${Routes.ONE_WAY}/${locations}/${dates}`
-  }, [values.origins, values.destinations, values.departureDates]);
 
   return (
     <>
@@ -50,9 +37,9 @@ export default function OneWayForm({ airports, origins, destinations, departureD
         <AirportPicker
           label='From'
           placeholder='Select up to 3 origin airports'
-          name="origins"
+          name="locations[0]"
           airports={airports}
-          value={values.origins}
+          value={locations[0]}
           maxSelected={3}
           onChange={handleChange}
         />
@@ -60,19 +47,20 @@ export default function OneWayForm({ airports, origins, destinations, departureD
         <AirportPicker
           label='To'
           placeholder='Select up to 3 destination airports'
-          name="destinations"
+          name="locations[1]"
           airports={airports}
-          value={values.destinations}
+          value={locations[1]}
           onChange={handleChange}
+          maxSelected={3}
         />
         <hr/>
         <DatePicker
           label='Departure date'
           placeholder='Select departure date'
-          name="departureDates"
-          mode={DatePickerMode.Range}
-          value={values.departureDates}
+          name="dates[0]"
+          value={dates[0]}
           onChange={handleChange}
+          from={today}
         />
       </Card>
 

@@ -1,18 +1,23 @@
-import { Prisma, Operator, Connection } from '@prisma/client';
+import { Airport } from '@common/airports';
+import { FareData } from '@common/fares';
+import { Operator } from '@common/types';
 
-export const getConnectionsForOperator = (airport: Prisma.AirportCreateInput, operator: Operator) => {
-  return (airport.connections as Connection[]).filter((connection) => operator === connection.operator);
+export const getConnectionsForOperator = (airport: Airport, operator: Operator) => {
+  return airport.connections.filter((connection) => operator === connection.split('.')[1] as Operator);
 };
 
-export const mergeAirports = (airportsArrays: Prisma.AirportCreateInput[][]): Prisma.AirportCreateInput[] => {
-  const airportsMap: Record<string, Prisma.AirportCreateInput> = {};
+export const mergeAirports = (airportsArrays: Airport[][]): Airport[] => {
+  const airportsMap: Record<string, Airport> = {};
   airportsArrays.reduce((acc, curr) => [...acc, ...curr], []).forEach((airport) => {
     if (!airportsMap[airport.code]) {
       airportsMap[airport.code] = airport;
     } else {
       airportsMap[airport.code] = {
         ...airportsMap[airport.code],
-        connections: [...(airportsMap[airport.code].connections as Connection[]), ...(airport.connections as Connection[])]
+        connections: [
+          ...airportsMap[airport.code].connections,
+          ...airport.connections
+        ]
       };
     }
   });
@@ -20,8 +25,8 @@ export const mergeAirports = (airportsArrays: Prisma.AirportCreateInput[][]): Pr
   return Object.values(airportsMap);
 };
 
-export const getUniqueFares = (fares: Prisma.FareCreateInput[]): Prisma.FareCreateInput[] => {
-  const faresMap: Record<string, Prisma.FareCreateInput> = {};
+export const getUniqueFares = (fares: FareData[]): FareData[] => {
+  const faresMap: Record<string, FareData> = {};
   fares.forEach((fare) => {
     if (!faresMap[fare.origin + fare.destination + fare.date]) {
       faresMap[fare.origin + fare.destination + fare.date] = fare;
@@ -30,3 +35,8 @@ export const getUniqueFares = (fares: Prisma.FareCreateInput[]): Prisma.FareCrea
 
   return Object.values(faresMap);
 };
+
+export function parseConnection (connectionString: string) {
+  const [code, operator] = connectionString.split('.');
+  return [code, operator as Operator];
+}

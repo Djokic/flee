@@ -1,0 +1,39 @@
+.MultiCityForm {
+  width: 40rem;
+  & > div {
+    width: 100%;
+  }
+
+  & > div > div:not([role="button"]) {
+    border-radius: 0 !important;
+  }
+
+  & > div > div:first-child {
+    width: 17rem;
+  }
+
+  &__RemoveButton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    color: var(--text-muted);
+    border: 1px solid var(--border-primary);
+    margin: 1rem;
+    align-self: center;
+    flex-shrink: 0;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: var(--transition-primary);
+
+    &:hover {
+      filter: brightness(0.9);
+    }
+
+    &[data-disabled="true"] {
+      opacity: 0;
+      pointer-events: none;
+    }
+  }
+}

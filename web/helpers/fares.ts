@@ -14,7 +14,7 @@ type GetFaresInput = {
   limit?: number;
 }
 export async function getFares({ origins, destinations, dates, sortBy, minStopoverOffsetInHours = 4, maxStopoverOffsetInHours = 24, limit = 500 }: GetFaresInput): Promise<Fare[] | Fare[][]> {
-  if (!origins.length && !destinations.length) {
+  if (!origins?.length && !destinations?.length) {
     return [];
   }
 

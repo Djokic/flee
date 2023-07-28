@@ -1,6 +1,8 @@
-import { Prisma, Operator, Airport } from '@prisma/client';
+import { Airport } from '@common/airports';
+import { FareData } from '@common/fares';
+import { Operator } from '@common/types';
 
-import { getConnectionsForOperator } from 'helpers/common';
+import { getConnectionsForOperator, parseConnection } from 'helpers/common';
 import { formatDate } from 'helpers/date';
 
 import { AirlineClient, AirlineClientParams } from 'clients/types';
@@ -20,21 +22,22 @@ export class RyanAirClient implements AirlineClient {
   };
 
   public getFaresForAirport = async (airport: Airport) => {
-    let fares: Prisma.FareCreateInput[] = [];
+    let fares: FareData[] = [];
 
     const connections = getConnectionsForOperator(airport, Operator.RYANAIR);
     for (const connection of connections) {
-      let outboundFares: Prisma.FareCreateInput[] = [];
+      let outboundFares: FareData[] = [];
 
+      const [destination] = parseConnection(connection);
       try {
         outboundFares = await getFares({
           origin: airport.code,
-          destination: connection.code,
+          destination,
           startDate: formatDate(new Date()),
           lookupDays: this.params.lookupDays
         });
       } catch (error) {
-        console.log(`[Error!][RyanAir] -> ${airport.code} --> ${connection.code} -> ${(error as AxiosError).message || error}`);
+        console.log(`[Error!][RyanAir] -> ${airport.code} --> ${destination} -> ${(error as AxiosError).message || error}`);
       }
 
       fares = [...fares, ...outboundFares];

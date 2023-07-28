@@ -1,10 +1,39 @@
 .FareView {
   display: flex;
   background-color: var(--card-background);
-  border-radius: var(--radius);
   box-shadow: var(--card-shadow);
   overflow: hidden;
   color: var(--text-primary);
+
+  &:first-child {
+    border-top-left-radius: var(--radius);
+    border-top-right-radius: var(--radius);
+
+    .FareView__Content {
+      border-top: 1px solid var(--border-primary);
+      border-top-left-radius: var(--radius);
+    }
+
+    .FareView__Price {
+      border-top: 1px solid var(--border-primary);
+      border-top-right-radius: var(--radius);
+    }
+  }
+
+  &:last-child {
+    border-bottom-left-radius: var(--radius);
+    border-bottom-right-radius: var(--radius);
+
+    .FareView__Content {
+      border-bottom: 1px solid var(--border-primary);
+      border-bottom-left-radius: var(--radius);
+    }
+
+    .FareView__Price {
+      border-bottom: 1px solid var(--border-primary);
+      border-bottom-right-radius: var(--radius);
+    }
+  }
 
   &__Content {
     padding: 1rem;
@@ -12,9 +41,7 @@
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
-    border: 1px solid var(--border-primary);
-    border-radius: var(--radius);
-    border-right: none;
+    border-left: 1px solid var(--border-primary);
   }
 
   &__Row {
@@ -83,9 +110,8 @@
     align-items: flex-end;
     justify-content: space-between;
     padding: 1rem;
-    border: 1px solid var(--border-primary);
-    border-radius: var(--radius);
     border-left: 1px dashed var(--border-primary);
+    border-right: 1px solid var(--border-primary);
     width: 7rem;
     text-align: right;
     font-weight: 500;
@@ -114,34 +140,12 @@
       font-weight: 500;
       text-decoration: none;
       transition: var(--transition-primary);
-      text-decoration: none;
       border-radius: 4rem;
       width: 100%;
 
       &:hover {
         filter: brightness(0.8);
       }
-    }
-
-    &::before,
-    &::after {
-      content: '';
-      position: absolute;
-      width: 1rem;
-      height: 1rem;
-      background: var(--background-primary);
-      border: 1px solid var(--border-primary);
-      border-radius: 100%;
-    }
-
-    &::before {
-      top: -0.85rem;
-      left: -0.55rem;
-    }
-
-    &::after {
-      bottom: -0.85rem;
-      left: -0.55rem;
     }
   }
 }

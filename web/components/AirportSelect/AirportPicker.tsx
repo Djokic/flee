@@ -1,10 +1,10 @@
 import React, { useMemo, useCallback } from "react";
 import { Command } from "cmdk"
 import { BiX } from 'react-icons/bi';
+import {Airport} from "../../../common/airports";
 import Popover from "../Popover/Popover";
 
 import styles from './AirportPicker.module.scss';
-import { Airport } from "@prisma/client";
 import FieldContainer from "../FieldContainer/FieldContainer";
 
 type AirportPickerProps = {
@@ -50,12 +50,12 @@ function AirportPicker({ airports, value = [], maxSelected, name, label, placeho
     }
 
     // Do not select more than maxSelected
-    if (maxSelected && value.length >= maxSelected) {
+    if (maxSelected && maxSelected > 1 && value.length >= maxSelected) {
       return;
     }
 
     onChange({
-      [name]: [...value, airport]
+      [name]: maxSelected === 1 ? [airport]: [...value, airport]
     });
   }, [value, onChange]);
 
@@ -72,7 +72,13 @@ function AirportPicker({ airports, value = [], maxSelected, name, label, placeho
       <FieldContainer label={label} placeholder={placeholder}>
         {value.map((airport) => (
           <div key={airport.id} className={styles.AirportPicker__Value}>
-            {airport.name} <BiX onClick={() => handleAirportRemove(airport)} />
+            {airport.name}
+            <BiX
+              onClick={(e) => {
+                e.stopPropagation();
+                handleAirportRemove(airport)
+              }}
+            />
           </div>
         ))}
       </FieldContainer>
@@ -81,7 +87,7 @@ function AirportPicker({ airports, value = [], maxSelected, name, label, placeho
         <div className={styles.AirportPicker__Search}>
           <Command.Input autoFocus placeholder="Find airports by name, code, country" />
         </div>
-        <Command.List aria-disabled={isSelectionDisabled}>
+        <Command.List aria-disabled={isSelectionDisabled} className={styles.AirportPicker__List}>
           {airportsByCountry.map(({ airports, countryCode, countryName }) => (
             <Command.Group
               key={countryCode}

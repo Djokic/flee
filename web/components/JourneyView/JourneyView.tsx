@@ -1,31 +1,22 @@
 import FareView from "@/components/FareView/FareView";
-import {Airport, Fare} from "@prisma/client";
+import {FareData} from "../../../common/fares";
+import {Airport} from "../../../common/airports";
 
 import styles from './JourneyView.module.scss';
 
 type JourneyViewProps = {
-  airportsMap: Record<string, Airport>;
-  fares: Fare | Fare[];
+  fares: FareData[];
 }
 
-export function JourneyView({fares, airportsMap}: JourneyViewProps) {
-  const isMultiFare = Array.isArray(fares);
-  const totalPrice = isMultiFare ? fares.reduce((total, fare) => total + fare.price, 0) : fares.price;
+export function JourneyView({fares}: JourneyViewProps) {
+  const isMultiFare = Array.isArray(fares) && fares.length > 1;
+  const totalPrice = isMultiFare ? fares.reduce((total, fare) => total + fare.price, 0) : fares[0].price;
   return (
     <div className={styles.JourneyView}>
-      {isMultiFare ? fares.map((fare: Fare) => (
-        <FareView
-          key={fare.id}
-          fare={fare}
-          origin={airportsMap[fare.origin]}
-          destination={airportsMap[fare.destination]}
-        />
+      {isMultiFare ? fares.map((fare: FareData) => (
+        <FareView key={fare.id} fare={fare}/>
       )) : (
-        <FareView
-          fare={fares}
-          origin={airportsMap[fares.origin]}
-          destination={airportsMap[fares.destination]}
-        />
+        <FareView fare={fares[0]}/>
       )}
       {isMultiFare && (
         <div className={styles.JourneyView__TotalPrice}>

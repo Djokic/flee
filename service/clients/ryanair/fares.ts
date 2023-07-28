@@ -1,6 +1,7 @@
+import { FareData } from '@common/fares';
+import { Operator } from '@common/types';
 import axios from 'axios';
 import axiosRetry from 'axios-retry';
-import { Prisma, Operator } from '@prisma/client';
 
 import { addDaysToDate, formatDate } from 'helpers/date';
 import { wait } from 'helpers/wait';
@@ -38,17 +39,18 @@ type GetFaresResponse = {
 
 axiosRetry(axios, { retries: 3, retryDelay: axiosRetry.exponentialDelay });
 
-export async function getFares (params: GetFaresParams): Promise<Prisma.FareCreateInput[]> {
+export async function getFares (params: GetFaresParams): Promise<FareData[]> {
   await wait(500);
   const endDate = formatDate(addDaysToDate(new Date(params.startDate), params.lookupDays));
   const url = `https://www.ryanair.com/api/farfnd/3/oneWayFares/${params.origin}/${params.destination}/cheapestPerDay?outboundDateFrom=${params.startDate}&outboundDateTo=${endDate}`;
   const res = await axios.request({ url, method: 'GET' });
   const data: GetFaresResponse = res.data;
-  const fares: Prisma.FareCreateInput[] = [];
+  const fares: FareData[] = [];
   const targetCurrency = process.env.TARGET_CURRENCY || 'EUR';
 
   for (const f of data.outbound?.fares.filter((fare) => !fare.unavailable && !fare.soldOut)) {
     fares.push({
+      id: `${params.origin}-${params.destination}-${Operator.RYANAIR}-${f.departureDate}`,
       origin: params.origin,
       destination: params.destination,
       operator: Operator.RYANAIR,

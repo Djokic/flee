@@ -1,8 +1,9 @@
-import { Prisma, Airport } from '@prisma/client';
+import { Airport } from '@common/airports';
+import { FareData } from '@common/fares';
 
 export interface AirlineClient {
-  getAirports: () => Promise<Prisma.AirportCreateInput[]>;
-  getFaresForAirport: (airport: Airport) => Promise<Prisma.FareCreateInput[]>;
+  getAirports: () => Promise<Airport[]>;
+  getFaresForAirport: (airport: Airport) => Promise<FareData[]>;
 }
 
 export type AirlineClientParams = {

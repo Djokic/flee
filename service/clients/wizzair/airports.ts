@@ -1,5 +1,6 @@
+import { Airport } from '@common/airports';
+import { Operator } from '@common/types';
 import { AxiosResponse } from 'axios';
-import { Prisma, Operator } from '@prisma/client';
 
 type Connection = {
   iata: string,
@@ -36,20 +37,20 @@ async function getAirports (fetcher: FetcherFn): Promise<GetAirportsResponse> {
   return data as GetAirportsResponse;
 }
 
-export async function getAirportsWithRoutes (fetcher: FetcherFn): Promise<Prisma.AirportCreateInput[]> {
+export async function getAirportsWithRoutes (fetcher: FetcherFn): Promise<Airport[]> {
   console.log('[WizzAir] Getting Airports');
   const response = await getAirports(fetcher);
 
   return response.cities.map((airport) => ({
+    id: airport.iata,
     code: airport.iata,
     name: airport.shortName.trim(),
     countryName: airport.countryName,
     countryCode: airport.countryCode,
     latitude: airport.latitude,
     longitude: airport.longitude,
-    connections: airport.connections.map((connection) => ({
-      code: connection.iata,
-      operator: Operator.WIZZAIR
-    }))
+    connections: airport.connections.map((connection) => {
+      return `${connection.iata}.${Operator.WIZZAIR}`;
+    })
   }));
 }

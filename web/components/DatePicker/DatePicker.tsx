@@ -1,4 +1,8 @@
-import {prettifyDatePickerValue} from "@/components/DatePicker/helpers";
+import {
+  formatToDayPickerValue,
+  parseFromDayPickerValue,
+  prettifyDatePickerValue
+} from "@/components/DatePicker/helpers";
 import React, {useCallback} from 'react';
 import { DateRange, DayPicker } from 'react-day-picker';
 import 'react-day-picker/dist/style.css';
@@ -16,36 +20,40 @@ export enum DatePickerMode {
   Multiple = 'multiple',
 }
 
-export type DatePickerValue = Date | Date[] | DateRange | undefined;
+export type DatePickerValue = Date[];
 
 type DatePickerProps = {
   label: string;
   name: string;
   placeholder: string;
   value?: DatePickerValue;
-  mode?: DatePickerMode;
-  onChange: (value: Record<string, DatePickerValue>) => void;
+  onChange: (value: Record<string, Date[]>) => void;
+  from?: Date;
+  showOutsideDays?: boolean;
+  numberOfMonths?: number;
 }
 
-function DatePicker({ label, placeholder, mode = DatePickerMode.Range, name, onChange, value }: DatePickerProps) {
-  const handleChange = useCallback((selected: DatePickerValue) => {
+function DatePicker({ label, placeholder, name, onChange, value, from, showOutsideDays, numberOfMonths = 1 }: DatePickerProps) {
+  const handleChange = useCallback((selected: DateRange | undefined) => {
     onChange({
-      [name]: selected
+      [name]: parseFromDayPickerValue(selected)
     });
   }, [name, onChange]);
 
   return (
     <Popover>
       <FieldContainer label={label} placeholder={placeholder}>
-        {value ? (prettifyDatePickerValue(value)) : undefined}
+        {prettifyDatePickerValue(value)}
       </FieldContainer>
 
       <DayPicker
         mode="range"
-        selected={value}
+        selected={formatToDayPickerValue(value)}
         className={styles.DatePicker}
         onSelect={handleChange}
-        minDate={new Date()}
+        fromDate={from}
+        showOutsideDays={showOutsideDays}
+        numberOfMonths={numberOfMonths}
       />
     </Popover>
   );

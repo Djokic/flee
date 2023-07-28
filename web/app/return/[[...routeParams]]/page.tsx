@@ -1,14 +1,15 @@
 import {Routes} from "@/app/routes";
 import {JourneyView} from "@/components/JourneyView/JourneyView";
-import ReturnForm from "@/components/ReturnForm/ReturnForm";
+import ReturnWayForm from "@/components/ReturnWayForm/ReturnWayForm";
 import SortControl from "@/components/SortControl/SortControl";
-import { parseRouteParams} from "@/helpers/urlHelper";
-import {Fare} from "@prisma/client";
+
+import {parseRouteParams} from "@/helpers/urlHelper";
+import {Metadata} from "next";
+import Head from "next/head";
 import React from "react";
 
-import OneWayForm from "@/components/OneWayForm/OneWayForm";
 import SearchLayout from "@/components/SearchLayout/SearchLayout";
-import FareView from "@/components/FareView/FareView";
+import {FareData} from "../../../../common/fares";
 
 import {getData} from "./data";
 
@@ -18,44 +19,38 @@ type PageParams = {
   }
 }
 
+export const metadata: Metadata = {
+  title: 'Return Flights',
+}
+
 export default async function Page({params: {routeParams}}: PageParams) {
-  const { locations, dates, sortBy } = parseRouteParams(routeParams);
+  const {locations, dates, sortType} = parseRouteParams(routeParams);
   const [origins = [], destinations = []] = locations;
-  const [departureDates = [], returnDates =[]] = dates;
-  const {airports, fares} = await getData(origins, destinations, departureDates, returnDates,  sortBy);
-  const airportsMap = Object.fromEntries((airports.map(airport => [airport.code, airport])));
+  const [departures = [], arrivals = []] = dates;
+  const {airports, fares} = await getData({origins, destinations, departures, arrivals, sortType});
 
   return (
     <SearchLayout header={
       <SortControl
-        label={`${fares.length} results found`}
+        faresCount={fares.length}
         baseUrl={Routes.RETURN}
         locations={locations}
         dates={dates}
-        currentSortBy={sortBy}
+        sortType={sortType}
       />
     }>
-      <ReturnForm
+      <ReturnWayForm
         airports={airports}
-        origins={airports.filter(airport => origins?.includes(airport.code))}
-        destinations={airports.filter(airport => destinations?.includes(airport.code))}
-        departureDates={
-          Array.isArray(departureDates) && departureDates.length === 2
-            ? {from: departureDates[0], to: departureDates[1]}
-            : departureDates
-        }
-        returnDates={
-          Array.isArray(returnDates) && returnDates.length === 2
-            ? {from: returnDates[0], to: returnDates[1]}
-            : returnDates
-        }
+        initialLocationCodes={locations}
+        initialDates={dates}
+        sortType={sortType}
       />
+
       <>
-        {fares.map((fare: Fare[], index) => (
-          <JourneyView airportsMap={airportsMap} fares={fare} key={index}/>
+        {fares.map((data: FareData[], index) => (
+          <JourneyView key={index} fares={data}/>
         ))}
       </>
-
     </SearchLayout>
   )
 }

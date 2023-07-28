@@ -1,7 +1,9 @@
-import { Prisma, Operator, Airport } from '@prisma/client';
+import { Airport } from '@common/airports';
+import { FareData } from '@common/fares';
+import { Operator } from '@common/types';
 import { AxiosError } from 'axios';
 
-import { getConnectionsForOperator } from 'helpers/common';
+import { getConnectionsForOperator, parseConnection } from 'helpers/common';
 import { formatDate } from 'helpers/date';
 
 import { AirlineClient, AirlineClientParams } from 'clients/types';
@@ -23,21 +25,21 @@ export class WizzAirClient implements AirlineClient {
   };
 
   public getFaresForAirport = async (airport: Airport) => {
-    let fares: Prisma.FareCreateInput[] = [];
+    let fares: FareData[] = [];
 
     const connections = getConnectionsForOperator(airport, Operator.WIZZAIR);
     for (const connection of connections) {
-      let connectionFares: Prisma.FareCreateInput[] = [];
-
+      let connectionFares: FareData[] = [];
+      const [destination] = parseConnection(connection);
       try {
         connectionFares = await getFares(this.requestsManager.post, {
           origin: airport.code,
-          destination: connection.code,
+          destination,
           startDate: formatDate(new Date()),
           lookupDays: this.params.lookupDays
         });
       } catch (error) {
-        console.log(`[Error!][WizzAir] -> ${airport.code} --> ${connection.code} -> ${(error as AxiosError).message || error}`);
+        console.log(`[Error!][WizzAir] -> ${airport.code} --> ${destination} -> ${(error as AxiosError).message || error}`);
       }
 
       fares = [...fares, ...connectionFares];

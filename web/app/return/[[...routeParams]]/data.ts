@@ -1,51 +1,42 @@
-import {getAllAirports} from "@/helpers/airports";
-import {getFares} from "@/helpers/fares";
+import {joinFares} from "@/helpers/joinFares";
 import {SortType} from "@/helpers/sort";
-import {Fare} from "@prisma/client";
-import {differenceInHours} from "date-fns";
+import { getAllAirports} from "../../../../common/airports";
+import {getDbSession} from "../../../../common/dbSession";
+import { getFares} from "../../../../common/fares";
 
-const MIN_DIFF_BETWEEN_INBOUND_AND_OUTBOUND = 1; // in days
-const MAX_DIFF_BETWEEN_INBOUND_AND_OUTBOUND = 30; // in days
+type GetDataParams = {
+  origins: string[];
+  destinations?: string[];
+  departures?: Date[];
+  arrivals?: Date[];
+  sortType: SortType;
+}
 
-export async function getData(origins: string[], destinations: string[], departureDates: Date[], returnDates: Date[], sortBy: SortType) {
-  const [
-    airports,
-    outboundFares,
-    inboundFares,
-  ] = await Promise.all([
-    getAllAirports(),
-    getFares({
-      origins,
-      destinations,
-      dates: departureDates,
-      sortBy,
-      limit: 10000
-    }),
-    getFares({
-      origins: destinations,
-      destinations: origins,
-      dates: returnDates,
-      sortBy,
-      limit: 10000
-    })
-  ]);
+export async function getData({ origins, destinations = [], departures, arrivals, sortType }: GetDataParams) {
+  const session = getDbSession()
+  const airports = await getAllAirports({ session });
 
-  const fares: Fare[][] = outboundFares.map((outboundFare) => {
-    const lastOutboundFare = Array.isArray(outboundFare) ? outboundFare[outboundFare.length - 1] : outboundFare;
+  const departureFares = await getFares({
+    session,
+    origins,
+    destinations,
+    dates: departures,
+    sortType,
+    limit: 100
+  });
 
-    return inboundFares.map((inboundFare) => {
-      const firstInboundFare = Array.isArray(inboundFare) ? inboundFare[0] : inboundFare;
-      const isToShortStay = differenceInHours(firstInboundFare.date, lastOutboundFare.date) < MIN_DIFF_BETWEEN_INBOUND_AND_OUTBOUND * 24;
-      const isToLongStay = differenceInHours(firstInboundFare.date, lastOutboundFare.date) > MAX_DIFF_BETWEEN_INBOUND_AND_OUTBOUND * 24;
-      const notSameTarget = lastOutboundFare.destination !== firstInboundFare.origin;
+  const arrivalFares = await getFares({
+    session,
+    origins: destinations,
+    destinations: origins,
+    dates: arrivals,
+    sortType,
+    limit: 100
+  });
 
-      if (isToShortStay || isToLongStay || notSameTarget) {
-        return [];
-      }
+  session.close();
 
-      return [outboundFare, inboundFare].flat();
-    }).filter(item => item.length);
-  }).flat().filter(item => item.length).slice(0, 500);
+  const fares = joinFares(departureFares, arrivalFares);
 
   return {
     airports,

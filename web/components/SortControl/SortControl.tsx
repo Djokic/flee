@@ -5,41 +5,45 @@ import Link from "next/link";
 import styles from './SortControl.module.scss';
 
 type SortControlProps = {
-  label: string;
+  faresCount: number;
   baseUrl: string;
   locations: string[][];
   dates: Date[][];
-  currentSortBy: SortType;
+  sortType: SortType;
 }
 
-export default function SortControl({label, baseUrl, locations, dates, currentSortBy}: SortControlProps) {
+export default function SortControl({ faresCount, baseUrl, locations, dates, sortType}: SortControlProps) {
+  if (!faresCount) {
+    return null;
+  }
+
   return (
     <div className={styles.SortControl}>
-      <header>{label}</header>
+      <header>{`${faresCount} results found`}</header>
 
       <div>
         Sort
 
         <Link
-          data-active={currentSortBy === SortType.DATE}
+          data-active={sortType === SortType.DATE}
           tabIndex={0}
           href={createRouteUrl({
             baseUrl,
             locations,
             dates,
-            sortBy: SortType.DATE
+            sortType: SortType.DATE
           })}>
           By Date
         </Link>
 
         <Link
-          data-active={currentSortBy === SortType.PRICE}
+          data-active={sortType === SortType.PRICE}
           tabIndex={0}
           href={createRouteUrl({
             baseUrl,
             locations,
             dates,
-            sortBy: SortType.PRICE
+            sortType: SortType.PRICE
           })}
         >
           By Price
