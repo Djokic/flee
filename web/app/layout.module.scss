@@ -2,6 +2,7 @@
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  width: 100%;
 
   > header {
     position: relative;
@@ -17,6 +18,12 @@
       background-size: contain;
       animation: 120s slide infinite linear;
       background-repeat: repeat;
+    }
+  }
+
+  &:has([data-results]:not(:empty)) {
+    > header {
+      font-size: 3rem;
     }
   }
 
@@ -50,13 +57,10 @@
   main {
     display: flex;
     flex-direction: column;
-    min-width: 60rem;
-    padding: 0 2rem;
+    padding: 0 1rem;
     margin: 0 auto;
-  }
-
-  &__Content {
-    margin-top: 1rem;
+    width: 100%;
+    max-width: 60rem;
   }
 }
 

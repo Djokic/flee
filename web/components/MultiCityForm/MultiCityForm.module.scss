@@ -1,5 +1,7 @@
 .MultiCityForm {
-  width: 40rem;
+  //width: 40rem;
+  width: 100%;
+
   & > div {
     width: 100%;
   }
@@ -9,7 +11,7 @@
   }
 
   & > div > div:first-child {
-    width: 17rem;
+    //width: 17rem;
   }
 
   &__RemoveButton {

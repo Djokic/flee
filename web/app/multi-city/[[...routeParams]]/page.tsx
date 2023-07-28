@@ -22,6 +22,7 @@ type PageParams = {
 
 export const metadata: Metadata = {
   title: 'Multi-City Journey',
+  viewport: 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no',
 }
 
 export default async function Page({params: {routeParams}}: PageParams) {
@@ -29,15 +30,7 @@ export default async function Page({params: {routeParams}}: PageParams) {
   const {airports, fares} = await getData({locations, dates, sortType});
 
   return (
-    <SearchLayout header={
-      <SortControl
-        faresCount={fares.length}
-        baseUrl={Routes.MULTI_CITY}
-        locations={locations}
-        dates={dates}
-        sortType={sortType}
-      />
-    }>
+    <SearchLayout baseUrl={Routes.MULTI_CITY} locations={locations} dates={dates} sortType={sortType} faresCount={fares.length} >
       <MultiCityForm
         airports={airports}
         initialLocationCodes={locations}

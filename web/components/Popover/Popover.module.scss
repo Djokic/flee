@@ -8,7 +8,8 @@
   padding: 0 0.5rem;
   max-height: var(--radix-popover-content-available-height);
   width: var(--radix-popover-trigger-width);
-  overflow: hidden;
+  overflow: auto;
+  z-index: 9;
 
   &[aria-disabled="true"]>* {
     opacity: 0.2;

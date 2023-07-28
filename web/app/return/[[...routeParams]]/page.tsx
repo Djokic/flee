@@ -21,6 +21,7 @@ type PageParams = {
 
 export const metadata: Metadata = {
   title: 'Return Flights',
+  viewport: 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no',
 }
 
 export default async function Page({params: {routeParams}}: PageParams) {
@@ -30,15 +31,7 @@ export default async function Page({params: {routeParams}}: PageParams) {
   const {airports, fares} = await getData({origins, destinations, departures, arrivals, sortType});
 
   return (
-    <SearchLayout header={
-      <SortControl
-        faresCount={fares.length}
-        baseUrl={Routes.RETURN}
-        locations={locations}
-        dates={dates}
-        sortType={sortType}
-      />
-    }>
+    <SearchLayout baseUrl={Routes.RETURN} locations={locations} dates={dates} sortType={sortType} faresCount={fares.length} >
       <ReturnWayForm
         airports={airports}
         initialLocationCodes={locations}
