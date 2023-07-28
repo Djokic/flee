@@ -37,7 +37,10 @@ async function run () {
         .filter((connection) => !unusableAirportCodes.includes(connection.split('.')[0]))
     }));
   const session = getDbSession();
-  createOrUpdateAirports({ session, airports });
+
+  console.log('AA', airports);
+
+  await createOrUpdateAirports({ session, airports });
   await session.close();
   console.log('Saved Airports to DB!');
   process.exit(0);

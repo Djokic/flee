@@ -31,17 +31,20 @@ type CreateOrUpdateAirportsInput = {
   airports: Airport[];
 }
 
-export async function createOrUpdateAirports({ session, airports}: CreateOrUpdateAirportsInput) {
+export async function createOrUpdateAirports({ session, airports }: CreateOrUpdateAirportsInput) {
   const query = `
     UNWIND $airports AS airport
     MERGE (a:Airport {code: airport.code})
+    ON CREATE SET a.id = airport.id,
+                  a.code = airport.code,
+                  a.countryName = airport.countryName,
+                  a.countryCode = airport.countryCode,
+                  a.latitude = airport.latitude,
+                  a.longitude = airport.longitude
     SET a.name = airport.name,
-        a.countryName = airport.countryName,
-        a.countryCode = airport.countryCode,
-        a.latitude = airport.latitude,
-        a.longitude = airport.longitude,
         a.connections = airport.connections
   `;
 
   return session.run(query, { airports });
 }
+
