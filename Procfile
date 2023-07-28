@@ -1,2 +1,0 @@
-get-fares: npm install && prisma generate && cd ./service && npm install && npx ts-node -r tsconfig-paths/register ./getFares.ts
-get-airports: npm install && prisma generate && cd ./service && npm install && npx ts-node -r tsconfig-paths/register ./getAirports.ts
