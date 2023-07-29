@@ -11,6 +11,7 @@ import AirportPicker from "@/components/AirportSelect/AirportPicker";
 import Button, {ButtonType} from "@/components/Button/Button";
 import Card from "@/components/Card/Card";
 import DatePicker  from "@/components/DatePicker/DatePicker";
+import {PiAirplaneLandingLight, PiAirplaneTakeoffLight, PiCalendarBlankThin} from "react-icons/pi";
 import {Airport} from "../../../common/airports";
 
 
@@ -44,6 +45,7 @@ export default function ReturnWayForm({ airports, initialLocationCodes, initialD
           value={locations[0]}
           maxSelected={3}
           onChange={handleChange}
+          icon={<PiAirplaneTakeoffLight/>}
         />
         <hr/>
         <AirportPicker
@@ -54,6 +56,7 @@ export default function ReturnWayForm({ airports, initialLocationCodes, initialD
           value={locations[1]}
           onChange={handleChange}
           maxSelected={3}
+          icon={<PiAirplaneLandingLight/>}
         />
         <hr/>
         <DatePicker
@@ -63,6 +66,7 @@ export default function ReturnWayForm({ airports, initialLocationCodes, initialD
           value={dates[0]}
           onChange={handleChange}
           from={today}
+          icon={<PiCalendarBlankThin/>}
         />
         <hr/>
         <DatePicker
@@ -72,6 +76,7 @@ export default function ReturnWayForm({ airports, initialLocationCodes, initialD
           value={dates[1]}
           onChange={handleChange}
           from={getFromDayParam(dates[1], 1)}
+          icon={<PiCalendarBlankThin/>}
         />
       </Card>
 

@@ -14,6 +14,7 @@ type AirportPickerProps = {
   airports: Airport[];
   value?: Airport[];
   maxSelected?: number;
+  icon?: React.ReactNode;
   onChange: (value: Record<string, Airport[]>) => void;
 }
 
@@ -27,7 +28,7 @@ function filterFn(value: string, search: string) {
   return value.toLowerCase().includes(search.trim().toLowerCase()) ? 1 : 0;
 }
 
-function AirportPicker({ airports, value = [], maxSelected, name, label, placeholder, onChange }: AirportPickerProps) {
+function AirportPicker({ airports, value = [], maxSelected, name, label, icon, placeholder, onChange }: AirportPickerProps) {
   const airportsByCountry: AirportsGroup[] = useMemo(() => {
     const airportsByCountryMap: Record<string, Airport[]> = {};
     airports.forEach((airport) => {
@@ -69,7 +70,7 @@ function AirportPicker({ airports, value = [], maxSelected, name, label, placeho
 
   return (
     <Popover>
-      <FieldContainer label={label} placeholder={placeholder}>
+      <FieldContainer label={label} placeholder={placeholder} icon={icon}>
         {value.map((airport) => (
           <div key={airport.id} className={styles.AirportPicker__Value}>
             {airport.name}

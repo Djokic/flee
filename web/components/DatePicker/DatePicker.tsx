@@ -26,6 +26,7 @@ type DatePickerProps = {
   label: string;
   name: string;
   placeholder: string;
+  icon?: React.ReactNode;
   value?: DatePickerValue;
   onChange: (value: Record<string, Date[]>) => void;
   from?: Date;
@@ -33,7 +34,7 @@ type DatePickerProps = {
   numberOfMonths?: number;
 }
 
-function DatePicker({ label, placeholder, name, onChange, value, from, showOutsideDays, numberOfMonths = 1 }: DatePickerProps) {
+function DatePicker({ label, placeholder, name, onChange, value, icon, from, showOutsideDays, numberOfMonths = 1 }: DatePickerProps) {
   const handleChange = useCallback((selected: DateRange | undefined) => {
     onChange({
       [name]: parseFromDayPickerValue(selected)
@@ -42,7 +43,7 @@ function DatePicker({ label, placeholder, name, onChange, value, from, showOutsi
 
   return (
     <Popover>
-      <FieldContainer label={label} placeholder={placeholder}>
+      <FieldContainer label={label} placeholder={placeholder} icon={icon}>
         {prettifyDatePickerValue(value)}
       </FieldContainer>
 

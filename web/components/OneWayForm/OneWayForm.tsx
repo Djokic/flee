@@ -4,6 +4,7 @@ import {Routes} from "@/app/routes";
 import {SortType} from "@/helpers/sort";
 import {useJourneyPlanner} from "@/hooks/useJourneyPlanner";
 import React from "react";
+import { PiAirplaneTakeoffLight, PiAirplaneLandingLight, PiCalendarBlankThin } from "react-icons/pi";
 
 import AirportPicker from "@/components/AirportSelect/AirportPicker";
 import Button, {ButtonType} from "@/components/Button/Button";
@@ -42,6 +43,7 @@ export default function OneWayForm({ airports, initialLocationCodes, initialDate
           value={locations[0]}
           maxSelected={3}
           onChange={handleChange}
+          icon={<PiAirplaneTakeoffLight/>}
         />
         <hr/>
         <AirportPicker
@@ -52,6 +54,7 @@ export default function OneWayForm({ airports, initialLocationCodes, initialDate
           value={locations[1]}
           onChange={handleChange}
           maxSelected={3}
+          icon={<PiAirplaneLandingLight/>}
         />
         <hr/>
         <DatePicker
@@ -61,6 +64,7 @@ export default function OneWayForm({ airports, initialLocationCodes, initialDate
           value={dates[0]}
           onChange={handleChange}
           from={today}
+          icon={<PiCalendarBlankThin/>}
         />
       </Card>
 

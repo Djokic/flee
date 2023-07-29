@@ -9,6 +9,13 @@
   outline: 1px solid transparent;
   border-radius: var(--radius);
 
+  &__Icon {
+    font-size: 1.5rem;
+    color: var(--text-muted);
+    transition: var(--transition-primary);
+    margin-right: 0.25rem;
+  }
+
   label {
     font-size: var(--text-s);
     color: var(--text-muted);
@@ -17,6 +24,10 @@
 
   &[data-state="open"] {
     outline: 1px solid var(--accent-color);
+  }
+
+  &[data-state="open"] &__Icon {
+    color: var(--accent-color);
   }
 
   &[data-state="open"] + hr {

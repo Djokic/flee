@@ -81,7 +81,7 @@ export default function SearchLayout(props: SearchLayoutProps) {
         <div className={styles.SearchLayout__Results} data-results>
           <SortControl
             faresCount={faresCount}
-            baseUrl={Routes.ONE_WAY}
+            baseUrl={baseUrl}
             locations={locations}
             dates={dates}
             sortType={sortType}
