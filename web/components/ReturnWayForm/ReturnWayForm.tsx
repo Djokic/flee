@@ -41,7 +41,7 @@ export default function ReturnWayForm({ airports, initialLocationCodes, initialD
           label='From'
           placeholder='Select up to 3 origin airports'
           name="locations[0]"
-          airports={airports}
+          airports={possibleLocations[0]}
           value={locations[0]}
           maxSelected={3}
           onChange={handleChange}
@@ -52,7 +52,7 @@ export default function ReturnWayForm({ airports, initialLocationCodes, initialD
           label='To'
           placeholder='Select up to 3 destination airports'
           name="locations[1]"
-          airports={airports}
+          airports={possibleLocations[1]}
           value={locations[1]}
           onChange={handleChange}
           maxSelected={3}

@@ -23,7 +23,8 @@ export type UseJourneyPlannerOutput = {
 
 function getPossibleDestinationsFromAirports(airports: Airport[], onlyDirect: boolean, prevAirports: Airport[]) {
   if (!onlyDirect) {
-    return airports;
+    const prevAirportsCodes = prevAirports.map((airport: Airport) => airport.code);
+    return airports.filter((airport: Airport) => !prevAirportsCodes.includes(airport.code));
   }
 
   const connectionsFromPrevAirports = prevAirports
