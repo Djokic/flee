@@ -19,8 +19,8 @@ export async function getStatus({session}: GetStatusInput) {
 
   const result = await session.run(query);
   const singleRecord = result.records[0];
-  const airportCount = singleRecord.get('airportCount').low;
-  const fareCount = singleRecord.get('fareCount').low;
+  const airportCount = singleRecord?.get('airportCount').low || 0;
+  const fareCount = singleRecord?.get('fareCount').low || 0;
 
   return {airportCount, fareCount };
 }

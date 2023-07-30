@@ -1,6 +1,7 @@
 
-import { Fare, Prisma, Operator } from "@prisma/client";
 import { format } from 'date-fns';
+import {FareData} from "../../common/fares";
+import {Operator} from "../../common/types";
 
 function createRyanairUrl(origin: string, destination: string, date: string): string {
   const baseUrl = 'https://www.ryanair.com/gb/en/trip/flights/select';
@@ -54,7 +55,7 @@ function createWizzairUrl(origin: string, destination: string, date: string): st
 }
 
 
-export function getBuyLink(fare: Prisma.FareCreateInput): string {
+export function getBuyLink(fare: FareData): string {
   const date = format(new Date(fare.date), 'yyyy-MM-dd');
   switch (fare.operator) {
     case Operator.RYANAIR:

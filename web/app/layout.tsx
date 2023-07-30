@@ -14,7 +14,7 @@ export default function RootLayout({children}: RootLayoutProps) {
   return (
     <html lang="en">
     <head>
-      <link rel="manifest" href="manifest.json"/>
+      <link rel="manifest" href="/manifest.json"/>
 
       <meta name="mobile-web-app-capable" content="yes"/>
       <meta name="apple-mobile-web-app-capable" content="yes"/>
@@ -26,8 +26,8 @@ export default function RootLayout({children}: RootLayoutProps) {
       <meta name="msapplication-starturl" content="/"/>
       <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
 
-      <link rel="icon" sizes="256x256" href="icon.png"/>
-      <link rel="apple-touch-icon" sizes="256x256" href="icon.png"/>
+      <link rel="icon" sizes="256x256" href="/icon.png"/>
+      <link rel="apple-touch-icon" sizes="256x256" href="/icon.png"/>
     </head>
     <body className={inter.className}>
     <div className={styles.Layout}>
