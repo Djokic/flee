@@ -48,7 +48,7 @@ async function run (operator: Operator) {
 
   console.log(`Worker ${workerIndex}/${totalWorkers}: [${operator}] Starting`);
 
-  const lookupDays = parseInt(process.env.LOOKUP_DAYS || '30');
+  const lookupDays = parseInt(process.env.LOOKUP_DAYS || '60');
 
   const OperatorClient = getOperatorClient(operator);
 
