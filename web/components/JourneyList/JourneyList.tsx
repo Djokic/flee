@@ -6,10 +6,15 @@ import {FareData} from "../../../common/fares";
 import styles from './JourneyList.module.scss';
 
 type JourneyList = {
-  data: FareData[][]
+  data: FareData[][];
+  showNotFoundPlaceholder?: boolean;
 }
 
-export default function JourneyList({ data }: JourneyList) {
+export default function JourneyList({ data, showNotFoundPlaceholder }: JourneyList) {
+  if (!showNotFoundPlaceholder && data.length === 0) {
+    return null;
+  }
+
   return (
     <div className={styles.JourneyList}>
       {data.length > 0 && data.map((journey, index) => (

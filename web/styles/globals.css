@@ -2,20 +2,14 @@
   --rem-size: 16px;
 
   --background-primary: #f2f4f6;
-
   --text-primary: #000;
   --text-muted: #71717a;
-
   --accent-color: #10ac84;
-
   --border-primary: #e2e2e2;
 
   --radius: 0.5rem;
-
   --text-s: 0.875rem;
-
   --font-medium: 500;
-
   --transition-primary: .2s ease-out;
 
   --card-background: #fff;
@@ -37,15 +31,9 @@
   }
 }
 
-@media screen and (max-width: 840px) {
-  :root {
-    /*--rem-size: 16px;*/
-  }
-}
-
 @media (prefers-color-scheme: dark) {
   :root {
-
+    /* Variables for dark mode */
   }
 }
 
