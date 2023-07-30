@@ -1,0 +1,15 @@
+.StatusView {
+  display: flex;
+  margin-top: -1rem;
+  font-weight: 300;
+  color: var(--text-muted);
+  font-size: var(--text-s);
+  text-align: center;
+  align-items: center;
+  justify-content: center;
+
+  svg {
+    font-size: 1.25rem;
+    margin: 0 .5rem;
+  }
+}

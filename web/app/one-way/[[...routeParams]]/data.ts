@@ -2,6 +2,7 @@ import {SortType} from "@/helpers/sort";
 import {Airport, getAllAirports} from "../../../../common/airports";
 import {getDbSession} from "../../../../common/dbSession";
 import {FareData, getFares} from "../../../../common/fares";
+import {getStatus} from "../../../../common/status";
 
 type GetDataParams = {
   origins: string[];
@@ -11,7 +12,8 @@ type GetDataParams = {
 }
 
 export async function getData({ origins, destinations = [], departures, sortType }: GetDataParams) {
-  const session = getDbSession()
+  const session = getDbSession();
+  const { airportCount, fareCount } = await getStatus({ session });
   const airports = await getAllAirports({ session });
 
   const fares = await getFares({
@@ -25,6 +27,8 @@ export async function getData({ origins, destinations = [], departures, sortType
   session.close();
 
   return {
+    airportCount,
+    fareCount,
     airports,
     fares,
   }

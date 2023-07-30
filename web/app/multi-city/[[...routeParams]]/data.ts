@@ -3,6 +3,7 @@ import {SortType} from "@/helpers/sort";
 import {getAllAirports} from "../../../../common/airports";
 import {getDbSession} from "../../../../common/dbSession";
 import {FareData, getFares} from "../../../../common/fares";
+import {getStatus} from "../../../../common/status";
 
 type GetDataParams = {
   locations: string[][];
@@ -12,6 +13,7 @@ type GetDataParams = {
 
 export async function getData({ locations, dates, sortType }: GetDataParams) {
   const session = getDbSession();
+  const { airportCount, fareCount } = await getStatus({ session });
   const airports = await getAllAirports({ session });
 
   const paramGroups = locations.map((location, index) => ({
@@ -37,6 +39,8 @@ export async function getData({ locations, dates, sortType }: GetDataParams) {
 
   return {
     airports,
+    airportCount,
+    fareCount,
     fares: result,
   }
 }

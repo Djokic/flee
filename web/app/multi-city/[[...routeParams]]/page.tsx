@@ -4,6 +4,7 @@ import {JourneyView} from "@/components/JourneyView/JourneyView";
 import MultiCityForm from "@/components/MultiCityForm/MultiCityForm";
 import ReturnWayForm from "@/components/ReturnWayForm/ReturnWayForm";
 import SortControl from "@/components/SortControl/SortControl";
+import StatusView from "@/components/StatusView/StatusView";
 
 import {parseRouteParams} from "@/helpers/urlHelper";
 import {Metadata} from "next";
@@ -28,17 +29,20 @@ export const metadata: Metadata = {
 
 export default async function Page({params: {routeParams}}: PageParams) {
   const {locations, dates, sortType} = parseRouteParams(routeParams);
-  const {airports, fares} = await getData({locations, dates, sortType});
+  const {airports, fares, airportCount, fareCount} = await getData({locations, dates, sortType});
 
   return (
-    <SearchLayout baseUrl={Routes.MULTI_CITY} locations={locations} dates={dates} sortType={sortType} faresCount={fares.length} >
-      <MultiCityForm
-        airports={airports}
-        initialLocationCodes={locations}
-        initialDates={dates}
-        sortType={sortType}
-        maxLocations={5}
-      />
+    <SearchLayout baseUrl={Routes.MULTI_CITY} locations={locations} dates={dates} sortType={sortType} faresCount={fares.length}>
+      <>
+        <MultiCityForm
+          airports={airports}
+          initialLocationCodes={locations}
+          initialDates={dates}
+          sortType={sortType}
+          maxLocations={5}
+        />
+        <StatusView airportCount={airportCount} fareCount={fareCount}/>
+      </>
 
       <JourneyList data={fares} />
     </SearchLayout>

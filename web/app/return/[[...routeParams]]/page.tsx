@@ -3,6 +3,7 @@ import JourneyList from "@/components/JourneyList/JourneyList";
 import {JourneyView} from "@/components/JourneyView/JourneyView";
 import ReturnWayForm from "@/components/ReturnWayForm/ReturnWayForm";
 import SortControl from "@/components/SortControl/SortControl";
+import StatusView from "@/components/StatusView/StatusView";
 
 import {parseRouteParams} from "@/helpers/urlHelper";
 import {Metadata} from "next";
@@ -29,18 +30,28 @@ export default async function Page({params: {routeParams}}: PageParams) {
   const {locations, dates, sortType} = parseRouteParams(routeParams);
   const [origins = [], destinations = []] = locations;
   const [departures = [], arrivals = []] = dates;
-  const {airports, fares} = await getData({origins, destinations, departures, arrivals, sortType});
+  const {airports, fares, airportCount, fareCount} = await getData({
+    origins,
+    destinations,
+    departures,
+    arrivals,
+    sortType
+  });
 
   return (
-    <SearchLayout baseUrl={Routes.RETURN} locations={locations} dates={dates} sortType={sortType} faresCount={fares.length} >
-      <ReturnWayForm
-        airports={airports}
-        initialLocationCodes={locations}
-        initialDates={dates}
-        sortType={sortType}
-      />
+    <SearchLayout baseUrl={Routes.RETURN} locations={locations} dates={dates} sortType={sortType}
+                  faresCount={fares.length}>
+      <>
+        <ReturnWayForm
+          airports={airports}
+          initialLocationCodes={locations}
+          initialDates={dates}
+          sortType={sortType}
+        />
+        <StatusView airportCount={airportCount} fareCount={fareCount}/>
+      </>
 
-      <JourneyList data={fares} />
+      <JourneyList data={fares}/>
     </SearchLayout>
   )
 }
