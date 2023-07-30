@@ -48,7 +48,7 @@ function getQueryDates(dates?: Date[]) {
   return {startDate, endDate};
 }
 
-async function getFaresWithStops(params: GetFaresInput) {
+async function getFaresWithStops(params: GetFaresInput): Promise<FareData[][]> {
   const minDelayBetweenFares = params.delayBetweenFaresInHours || 0;
   const maxDelayBetweenFares = 24 + minDelayBetweenFares;
 
@@ -92,14 +92,14 @@ async function getFaresWithStops(params: GetFaresInput) {
   });
 }
 
-export async function getFaresFromOrigin(params: GetFaresInput) {
+export async function getFaresFromOrigin(params: GetFaresInput): Promise<FareData[][]> {
   const query = `
     MATCH (start:Airport)-[r]->(end:Airport)
     WHERE start.code IN $origins
       AND datetime(r.date) >= datetime($startDate)
       AND datetime(r.date) <= datetime($endDate)
     RETURN start AS origin, end AS destination, r AS fare
-    ORDER BY ${params.sortType === 'price' ? 'r.price' : 'r.date'} ASC
+    ORDER BY ${params.sortType === 'price' ? 'r.price, r.date' : 'r.date, r.price'} ASC
     LIMIT ${params.limit}
   `;
 
@@ -113,9 +113,11 @@ export async function getFaresFromOrigin(params: GetFaresInput) {
 
   return result.records.map((record) => ({
     origin: record.get('origin').properties.code,
+    originName: record.get('origin').properties.name,
     destination: record.get('destination').properties.code,
+    destinationName: record.get('destination').properties.name,
     ...record.get('fare').properties
-  }));
+  })).map((fare) => [fare]);
 }
 
 export async function getFaresToDestination(params: GetFaresInput) {
@@ -125,7 +127,7 @@ export async function getFaresToDestination(params: GetFaresInput) {
       AND datetime(r.date) >= datetime($startDate)
       AND datetime(r.date) <= datetime($endDate)
     RETURN start AS origin, end AS destination, r AS fare
-    ORDER BY ${params.sortType === 'price' ? 'r.price' : 'r.date'} ASC
+    ORDER BY ${params.sortType === 'price' ? 'r.price, r.date' : 'r.date, r.price'} ASC
     LIMIT ${params.limit}
   `;
 
@@ -139,9 +141,11 @@ export async function getFaresToDestination(params: GetFaresInput) {
 
   return result.records.map((record) => ({
     origin: record.get('origin').properties.code,
+    originName: record.get('origin').properties.name,
     destination: record.get('destination').properties.code,
+    destinationName: record.get('destination').properties.name,
     ...record.get('fare').properties
-  }));
+  })).map((fare) => [fare]);
 }
 
 

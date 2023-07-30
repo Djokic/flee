@@ -19,15 +19,15 @@
   --popover-shadow: rgba(50, 50, 105, 0.15) 0px 2px 5px 0px, rgba(0, 0, 0, 0.05) 0px 1px 1px 0px;
 }
 
-@media screen and (max-width: 960px) {
+@media screen and (max-width: 1000px) {
   :root {
-    --rem-size: 15px;
+    --rem-size: 14px;
   }
 }
 
-@media screen and (max-width: 900px) {
+@media screen and (max-width: 860px) and (min-width: 800px) {
   :root {
-    --rem-size: 14px;
+    --rem-size: 13px;
   }
 }
 

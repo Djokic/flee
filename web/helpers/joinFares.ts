@@ -4,14 +4,18 @@ import {FareData} from "../../common/fares";
 const MIN_DIFF_BETWEEN_INBOUND_AND_OUTBOUND = 1; // in days
 const MAX_DIFF_BETWEEN_INBOUND_AND_OUTBOUND = 30; // in days
 
-export function joinFares(faresGroup1: FareData[][], faresGroup2: FareData[][], limit:number = 1000): FareData[][] {
+export function joinFares(faresGroup1: FareData[][], faresGroup2: FareData[][], limit:number = 200): FareData[][] {
   const result: FareData[][] = [];
 
   faresGroup1.forEach((fares1) => {
     const lastOutboundFare = fares1[fares1.length - 1];
 
+    if (!lastOutboundFare) {
+      return;
+    }
+
     faresGroup2.forEach((fares2) => {
-      if (result.length >= limit) {
+      if (result.length >= limit || !fares2.length) {
         return;
       }
 
