@@ -3,6 +3,20 @@ import {PathSegment, Session} from 'neo4j-driver';
 import {SortType} from "../web/helpers/sort";
 import {Operator} from "./types";
 
+export type FareData = {
+  id: string;
+  origin: string;
+  originName?: string;
+  destination: string;
+  destinationName?: string;
+  price: number;
+  date: Date;
+  currency: string;
+  operator: Operator;
+  duration?: number;
+  arrivalDate?: Date;
+}
+
 type GetFaresInput = {
   session: Session;
   origins?: string[];
@@ -32,33 +46,6 @@ function getQueryDates(dates?: Date[]) {
   }
 
   return {startDate, endDate};
-}
-
-export type FareData = {
-  id: string;
-  origin: string;
-  originName?: string;
-  destination: string;
-  destinationName?: string;
-  price: number;
-  date: Date;
-  currency: string;
-  operator: Operator;
-}
-
-function mapPathToFares(result: any): FareData[] {
-  return result.records.map((record: { get: (arg0: string) => any; }) => {
-    const path = record.get('path');
-    const {segments} = path;
-    return segments.map((segment: PathSegment) => {
-      const {start, end, relationship} = segment;
-      return {
-        origin: start.properties.code,
-        destination: end.properties.code,
-        ...relationship.properties
-      } as FareData;
-    });
-  });
 }
 
 async function getFaresWithStops(params: GetFaresInput) {
@@ -210,7 +197,7 @@ export async function createOrUpdateFares({ session, fares }: CreateOrUpdateFare
     MATCH (origin:Airport {code: fare.origin})
     MATCH (destination:Airport {code: fare.destination})
     MERGE (origin)-[f:FARE {id: fare.id}]->(destination)
-    ON CREATE SET f.price = fare.price, f.date = datetime(fare.date), f.currency = fare.currency, f.operator = fare.operator, f.id = fare.id
+    ON CREATE SET f.price = fare.price, f.date = datetime(fare.date), f.currency = fare.currency, f.operator = fare.operator, f.id = fare.id, f.duration = fare.duration, f.arrivalDate = datetime(fare.arrivalDate)
     ON MATCH SET f.price = fare.price
   `;
 

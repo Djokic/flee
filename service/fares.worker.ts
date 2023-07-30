@@ -8,7 +8,9 @@ import { Operator } from '@common/types';
 
 import { RyanAirClient } from 'clients/ryanair';
 import { WizzAirClient } from 'clients/wizzair';
+import { addMinutes } from 'date-fns';
 import * as process from 'process';
+import { TravelTimeStore } from './helpers/travelTime';
 
 function getOperatorClient (operator: Operator) {
   if (operator === Operator.RYANAIR) {
@@ -63,18 +65,27 @@ async function run (operator: Operator) {
   const totalAirports = airportsChunk.length;
   let currentAirport = 0;
 
+  const travelTimeStore = new TravelTimeStore(airports);
+
   for (const airport of airportsChunk) {
     currentAirport++;
     console.log(`[${operator}] ${airport.code} (${currentAirport}/${totalAirports})`);
     const fares = await client.getFaresForAirport(airport);
 
     if (fares.length !== 0) {
-      const payload = fares.map((fare) => ({
-        ...fare,
-        date: new Date(fare.date).toISOString(),
-        operator: operator as string,
-        id: `${fare.origin}-${fare.destination}-${fare.date}-${fare.operator}`
-      }));
+      const payload = fares
+        .filter((fare) => Boolean(fare.price))
+        .map((fare) => {
+          const duration = travelTimeStore.getTravelTimeInMins(fare.origin, fare.destination);
+          return {
+            ...fare,
+            date: new Date(fare.date).toISOString(),
+            operator: operator as string,
+            duration,
+            arrivalDate: addMinutes(new Date(fare.date), duration).toISOString(),
+            id: `${fare.origin}-${fare.destination}-${fare.date}-${fare.operator}`
+          };
+        });
 
       await createOrUpdateFares({ session, fares: payload });
     }
