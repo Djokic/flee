@@ -28,7 +28,7 @@ function filterFn(value: string, search: string) {
   return value.toLowerCase().includes(search.trim().toLowerCase()) ? 1 : 0;
 }
 
-function AirportPicker({ airports, value = [], maxSelected, name, label, icon, placeholder, onChange }: AirportPickerProps) {
+function AirportPicker({ airports = [], value = [], maxSelected, name, label, icon, placeholder, onChange }: AirportPickerProps) {
   const airportsByCountry: AirportsGroup[] = useMemo(() => {
     const airportsByCountryMap: Record<string, Airport[]> = {};
     airports.forEach((airport) => {
