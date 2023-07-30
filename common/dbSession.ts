@@ -1,9 +1,14 @@
 import neo4j from "neo4j-driver";
 
 export function getDbSession() {
-  const driver = neo4j.driver(
-    'neo4j+s://c3e206d8.databases.neo4j.io',
-    neo4j.auth.basic('neo4j', 'NN2mToVhefiC0HqQsturGnHKOwvhy-yMz-VytXPkXKw')
+  if (!process.env.DB_URL || !process.env.DB_USER || !process.env.DB_PASSWORD) {
+    throw new Error('Missing DB_URL, DB_USER or DB_PASSWORD environment variable');
+  }
+
+  const dbDriver = neo4j.driver(
+    process.env.DB_URL,
+    neo4j.auth.basic(process.env.DB_USER, process.env.DB_PASSWORD)
   );
-  return driver.session();
+
+  return dbDriver.session();
 }
