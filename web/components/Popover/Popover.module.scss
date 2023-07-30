@@ -8,6 +8,8 @@
   padding: 0 0.5rem;
   max-height: var(--radix-popover-content-available-height);
   width: var(--radix-popover-trigger-width);
+  min-height: fit-content;
+  min-width: fit-content;
   overflow: auto;
   z-index: 9;
 

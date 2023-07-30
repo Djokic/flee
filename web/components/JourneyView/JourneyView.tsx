@@ -10,13 +10,13 @@ type JourneyViewProps = {
 
 export function JourneyView({fares}: JourneyViewProps) {
   const isMultiFare = Array.isArray(fares) && fares.length > 1;
-  const totalPrice = isMultiFare ? fares.reduce((total, fare) => total + fare.price, 0) : fares[0].price;
+  const totalPrice = isMultiFare ? fares.reduce((total, fare) => total + fare.price, 0) : fares[0]?.price;
   return (
     <div className={styles.JourneyView}>
       {isMultiFare ? fares.map((fare: FareData) => (
         <FareView key={fare.id} fare={fare}/>
       )) : (
-        <FareView fare={fares[0]}/>
+        fares[0] && <FareView fare={fares[0]}/>
       )}
       {isMultiFare && (
         <div className={styles.JourneyView__TotalPrice}>

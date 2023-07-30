@@ -17,7 +17,7 @@ function Popover({ children, popoverClassName, offset = 3, align }: PopoverProps
 
   return (
     <RadixPopover.Root>
-      <RadixPopover.Trigger asChild>
+      <RadixPopover.Trigger asChild >
         {children[0]}
       </RadixPopover.Trigger>
       <RadixPopover.Portal>

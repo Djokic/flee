@@ -4,14 +4,13 @@ import {Routes} from "@/app/routes";
 import {getFromDayParam} from "@/components/DatePicker/helpers";
 import {SortType} from "@/helpers/sort";
 import {useJourneyPlanner} from "@/hooks/useJourneyPlanner";
-import {values} from "lodash";
 import React, {useCallback} from "react";
 
 import AirportPicker from "@/components/AirportSelect/AirportPicker";
 import Button, {ButtonType} from "@/components/Button/Button";
 import Card from "@/components/Card/Card";
 import DatePicker from "@/components/DatePicker/DatePicker";
-import {BiX} from "react-icons/bi";
+import {PiAirplaneInFlightLight, PiAirplaneTakeoffLight, PiCalendarBlankThin, PiXCircleLight} from "react-icons/pi";
 import {Airport} from "../../../common/airports";
 
 import styles from './MultiCityForm.module.scss';
@@ -22,7 +21,7 @@ type MultiCityFormProps = {
   initialLocationCodes?: string[][];
   initialDates?: Date[][];
   sortType: SortType;
-  maxStops?: number;
+  maxLocations?: number;
 }
 
 type JourneyRowProps = {
@@ -35,6 +34,8 @@ type JourneyRowProps = {
 }
 
 function JourneyRow({index, possibleLocations, locations, dates, handleChange, handleRemove}: JourneyRowProps) {
+  if (!locations[index + 1]) return null;
+
   return (
     <>
       <div className="flex" key={index}>
@@ -46,25 +47,21 @@ function JourneyRow({index, possibleLocations, locations, dates, handleChange, h
           value={locations[index + 1]}
           maxSelected={1}
           onChange={handleChange}
+          icon={<PiAirplaneInFlightLight/>}
         />
 
         <DatePicker
           label='On Date'
-          placeholder='Select departure date'
+          placeholder='Departure date'
           name={`dates[${index}]`}
           value={dates[index]}
           onChange={handleChange}
           from={getFromDayParam(dates[index - 1], 0)}
+          icon={<PiCalendarBlankThin/>}
         />
 
-
-        <div
-          role="button"
-          data-disabled={index === 0 || !locations[index + 1]?.length || !dates[index]?.length}
-          className={styles.MultiCityForm__RemoveButton}
-          onClick={() => handleRemove(index)}
-        >
-          <BiX/>
+        <div role="button" className={styles.MultiCityForm__RemoveButton} onClick={() => handleRemove(index)}>
+          <PiXCircleLight/>
         </div>
       </div>
       <hr/>
@@ -72,7 +69,7 @@ function JourneyRow({index, possibleLocations, locations, dates, handleChange, h
   )
 }
 
-export default function MultiCityForm({airports, initialLocationCodes, initialDates, sortType}: MultiCityFormProps) {
+export default function MultiCityForm({airports, initialLocationCodes, initialDates, sortType, maxLocations = 5}: MultiCityFormProps) {
   const {locations, dates, possibleLocations, handleChange, searchUrl} = useJourneyPlanner({
     initialLocationCodes,
     initialDates,
@@ -89,6 +86,15 @@ export default function MultiCityForm({airports, initialLocationCodes, initialDa
     handleChange({dates: newDates});
   }, [locations, dates, handleChange]);
 
+  const handleAdd = useCallback(() => {
+    if (locations.length >= maxLocations) return;
+
+    const newLocations = [...locations, []];
+    const newDates = [...dates, []];
+    handleChange({locations: newLocations});
+    handleChange({dates: newDates});
+  }, [locations, dates, handleChange]);
+
   return (
     <>
       <Card className={styles.MultiCityForm}>
@@ -100,12 +106,12 @@ export default function MultiCityForm({airports, initialLocationCodes, initialDa
           value={locations[0]}
           maxSelected={1}
           onChange={handleChange}
+          icon={<PiAirplaneTakeoffLight/>}
         />
 
         <hr/>
 
         {locations.map((location, index) => (
-          index > 3 ? null : (
             <JourneyRow
               key={index}
               index={index}
@@ -115,8 +121,16 @@ export default function MultiCityForm({airports, initialLocationCodes, initialDa
               handleChange={handleChange}
               handleRemove={handleRemove}
             />
-          )))}
+          ))}
+
+        {locations.length < maxLocations && (
+          <Button type={ButtonType.Minimal} className={styles.MultiCityForm__AddButton} onClick={handleAdd}>
+            Add City
+          </Button>
+        )}
       </Card>
+
+
 
       <Button type={ButtonType.Primary} size={1} href={searchUrl} disabled={!searchUrl}>
         Search

@@ -36,6 +36,7 @@ export default async function Page({params: {routeParams}}: PageParams) {
         initialLocationCodes={locations}
         initialDates={dates}
         sortType={sortType}
+        maxLocations={5}
       />
 
       <>

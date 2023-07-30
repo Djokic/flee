@@ -11,7 +11,7 @@ type FieldContainerProps = {
 
 const FieldContainer = React.forwardRef(({ children, label, placeholder, icon, ...rest }: FieldContainerProps, forwardedRef: React.ForwardedRef<HTMLDivElement>) =>  {
   return (
-    <div className={styles.FieldContainer} {...rest} ref={forwardedRef}>
+    <div className={styles.FieldContainer} {...rest} ref={forwardedRef} tabIndex={0}>
       <label>{label}</label>
       <div className={styles.Field}>
         {icon && <div className={styles.FieldContainer__Icon}>{icon}</div>}

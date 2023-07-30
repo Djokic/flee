@@ -10,6 +10,8 @@
   border-radius: var(--radius);
 
   &__Icon {
+    display: flex;
+    align-items: center;
     font-size: 1.5rem;
     color: var(--text-muted);
     transition: var(--transition-primary);
@@ -22,8 +24,8 @@
     font-weight: 500;
   }
 
-  &[data-state="open"] {
-    outline: 1px solid var(--accent-color);
+  &[data-state="open"], &:focus-within, &:focus {
+    outline: 2px solid var(--accent-color);
   }
 
   &[data-state="open"] &__Icon {
