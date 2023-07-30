@@ -4,7 +4,6 @@ import {FareData} from "../../../common/fares";
 
 import styles from './FareView.module.scss';
 
-import { getFlightTime } from '@/helpers/flightTime';
 import {  getBuyLink } from '@/helpers/buyLinks';
 import { getOperatorIcon } from '@/helpers/operatorIcons';
 
@@ -12,9 +11,18 @@ type FareViewProps = {
   fare: FareData;
 }
 
+function formatFlightTime(flightTimeInMins: number) {
+  const hours = Math.floor(flightTimeInMins / 60);
+  const minutes = flightTimeInMins % 60;
+
+  if (hours === 0) return `${minutes}m`;
+  if (minutes === 0) return `${hours}h`;
+
+  return `${hours}h ${minutes}m`;
+}
+
 export default function FareView({ fare }: FareViewProps) {
   const date = new Date(fare.date);
-  console.log('DD', fare);
 
   return (
     <div className={styles.FareView}>
@@ -31,7 +39,7 @@ export default function FareView({ fare }: FareViewProps) {
           <span className={styles.FareView__Code}>{fare.origin}</span>
           <span className={styles.FareView__FlightTime}>
             <BiSolidPlane/>
-            {/*<span>{getFlightTime(origin, destination)}</span>*/}
+            <span>{formatFlightTime(fare.duration ?? 0)}</span>
           </span>
           <span className={styles.FareView__Code}>{fare.destination}</span>
         </div>
