@@ -1,4 +1,5 @@
 import {Routes} from "@/app/routes";
+import JourneyList from "@/components/JourneyList/JourneyList";
 import {JourneyView} from "@/components/JourneyView/JourneyView";
 import SortControl from "@/components/SortControl/SortControl";
 
@@ -38,11 +39,7 @@ export default async function Page({params: {routeParams}}: PageParams) {
         sortType={sortType}
       />
 
-      <>
-        {fares.map((data: FareData[], index) => (
-          <JourneyView key={index} fares={data}/>
-        ))}
-      </>
+      <JourneyList data={fares} />
     </SearchLayout>
   )
 }

@@ -14,6 +14,8 @@ type FareViewProps = {
 
 export default function FareView({ fare }: FareViewProps) {
   const date = new Date(fare.date);
+  console.log('DD', fare);
+
   return (
     <div className={styles.FareView}>
       <div className={styles.FareView__Content}>

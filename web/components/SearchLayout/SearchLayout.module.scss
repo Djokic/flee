@@ -23,6 +23,11 @@
     & > button, & > a {
       width: 100%;
     }
+
+    @media screen and (min-width: 800px) {
+      position: sticky;
+      top: 6rem;
+    }
   }
 
 
@@ -36,6 +41,27 @@
 
     &:empty {
       display: none;
+    }
+
+    > :first-child {
+      position: sticky;
+      top: 0;
+      z-index: 9;
+
+      &:after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        bottom: -1rem;
+        background: linear-gradient(180deg, var(--background-primary) 70%, transparent 100%);
+        z-index: -1;
+      }
+    }
+
+    @media screen and (min-width: 800px) {
+      > :first-child {
+        top: 6rem;
+      }
     }
   }
 
