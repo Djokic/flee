@@ -93,7 +93,7 @@ export default function MultiCityForm({airports, initialLocationCodes, initialDa
     const newDates = [...dates, []];
     handleChange({locations: newLocations});
     handleChange({dates: newDates});
-  }, [locations, dates, handleChange]);
+  }, [locations, maxLocations, dates, handleChange]);
 
   return (
     <>

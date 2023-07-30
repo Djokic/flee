@@ -58,13 +58,13 @@ function AirportPicker({ airports, value = [], maxSelected, name, label, icon, p
     onChange({
       [name]: maxSelected === 1 ? [airport]: [...value, airport]
     });
-  }, [value, onChange]);
+  }, [value, maxSelected, onChange, name]);
 
   const handleAirportRemove = useCallback((airport: Airport) => {
     onChange({
       [name]: value.filter((a) => a.id !== airport.id)
     });
-  }, [value, onChange]);
+  }, [onChange, name, value]);
 
   const isSelectionDisabled = Boolean(maxSelected && value.length >= maxSelected);
 

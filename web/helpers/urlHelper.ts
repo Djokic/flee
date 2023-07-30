@@ -1,6 +1,5 @@
 import {SortType} from "@/helpers/sort";
 import {format} from 'date-fns';
-import {Airport} from "../../common/airports";
 
 enum Separator {
   GROUP = '->',

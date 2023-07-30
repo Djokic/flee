@@ -1,4 +1,5 @@
 import { format } from 'date-fns';
+import Image from "next/image";
 import { BiSolidPlane } from 'react-icons/bi';
 import {FareData} from "../../../common/fares";
 
@@ -48,7 +49,7 @@ export default function FareView({ fare }: FareViewProps) {
       <div className={styles.FareView__Price}>
         €{fare.price.toFixed(2)} 
 
-          <img src={getOperatorIcon(fare.operator)} alt={fare.operator} />
+          <Image src={getOperatorIcon(fare.operator)} alt={fare.operator} />
 
           <a href={getBuyLink(fare)} target="_blank" rel="noreferrer">
             Book

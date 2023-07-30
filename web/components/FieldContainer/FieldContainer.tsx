@@ -26,4 +26,6 @@ const FieldContainer = React.forwardRef(({ children, label, placeholder, icon, .
   );
 });
 
+FieldContainer.displayName = 'FieldContainer';
+
 export default React.memo(FieldContainer);
