@@ -43,9 +43,9 @@ function getPossibleDestinationsFromAirports(airports: Airport[], onlyDirect: bo
  * It exposes possible locations for each step, selected locations & dates for each step and handlers for change
  * @param airports
  * @param locationCodes
- * @param datesStrings
  * @param onlyDirect
- * @param baseUri
+ * @param sortType
+ * @param baseUrl
  */
 export function useJourneyPlanner({ airports, initialLocationCodes, initialDates, onlyDirect, sortType, baseUrl }: UseJourneyPlannerInput): UseJourneyPlannerOutput {
   // Create a map of airports for faster access later
@@ -76,6 +76,10 @@ export function useJourneyPlanner({ airports, initialLocationCodes, initialDates
    * @type {Airport[][]}
    */
   const possibleLocations = useMemo(() => {
+    if (!locations.length) {
+      return [airports, airports];
+    }
+
     let locationsArray = locations.map((_, index) => {
       // If it is first location, return all airports
       if (index === 0) {
