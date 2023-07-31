@@ -32,7 +32,7 @@ export default function RootLayout({children}: RootLayoutProps) {
     <body className={inter.className}>
     <div className={styles.Layout}>
       <header>
-        <h1>N<span/><span/>mad</h1>
+        <h1>Flee</h1>
       </header>
       <main>
         {children}
