@@ -1,5 +1,5 @@
 import {DateRange} from "react-day-picker";
-import {format} from 'date-fns';
+import {addDays, format} from 'date-fns';
 
 const dateFormat = 'dd. LLL yyyy';
 
@@ -31,6 +31,6 @@ export function parseFromDayPickerValue(value?: DateRange): Date[]{
 
 export function getFromDayParam(value?: Date[], offset: number = 0): Date {
   const day = value?.[1] || value?.[0] || new Date();
-  day.setDate(day.getDate() + offset);
+  addDays(day, offset)
   return day;
 }

@@ -75,7 +75,7 @@ export default function ReturnWayForm({ airports, initialLocationCodes, initialD
           name="dates[1]"
           value={dates[1]}
           onChange={handleChange}
-          from={getFromDayParam(dates[1], 1)}
+          from={getFromDayParam(dates[0], 1)}
           icon={<PiCalendarBlankThin/>}
         />
       </Card>
