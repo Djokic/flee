@@ -1,7 +1,7 @@
-## Flee
+# Flee
 
-An alternative solution for searching 
-low-cost flights across Europe.
+*An alternative solution for searching 
+low-cost flights across Europe.*
 
 It consists of two separate services (service and web).
 They operate independently and communicate through the neo4j database.
