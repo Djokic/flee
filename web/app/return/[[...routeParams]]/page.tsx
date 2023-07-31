@@ -26,6 +26,8 @@ export const metadata: Metadata = {
   viewport: 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no',
 }
 
+export const revalidate = 3600;
+
 export default async function Page({params: {routeParams}}: PageParams) {
   const {locations, dates, sortType} = parseRouteParams(routeParams);
   const [origins = [], destinations = []] = locations;
