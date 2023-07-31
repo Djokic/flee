@@ -12,14 +12,20 @@ type SortControlProps = {
   sortType: SortType;
 }
 
-export default function SortControl({ faresCount, baseUrl, locations, dates, sortType}: SortControlProps) {
+export default function SortControl({faresCount, baseUrl, locations, dates, sortType}: SortControlProps) {
   if (!faresCount) {
     return null;
   }
 
   return (
     <div className={styles.SortControl}>
-      <header>{`${faresCount} results found`}</header>
+      <header>
+        {
+          faresCount % 100 === 0
+            ? `Showing ${faresCount} results`
+            : `${faresCount} results found`
+        }
+      </header>
 
       <div>
         Sort
