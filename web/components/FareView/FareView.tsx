@@ -49,7 +49,7 @@ export default function FareView({ fare }: FareViewProps) {
       <div className={styles.FareView__Price}>
         €{fare.price.toFixed(2)} 
 
-          <img src={getOperatorIcon(fare.operator)} alt={fare.operator}/>
+          <Image src={getOperatorIcon(fare.operator)} alt={fare.operator} width={64} height={64}/>
 
           <a href={getBuyLink(fare)} target="_blank" rel="noreferrer">
             Book
