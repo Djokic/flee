@@ -2,16 +2,16 @@
 
 import {Routes} from "@/app/routes";
 import {getFromDayParam} from "@/components/DatePicker/helpers";
+import InputNumber from "@/components/InputNumber/InputNumber";
 import {SortType} from "@/helpers/sort";
 import {useJourneyPlanner} from "@/hooks/useJourneyPlanner";
-import {addDays} from "date-fns";
 import React from "react";
 
 import AirportPicker from "@/components/AirportSelect/AirportPicker";
 import Button, {ButtonType} from "@/components/Button/Button";
 import Card from "@/components/Card/Card";
 import DatePicker  from "@/components/DatePicker/DatePicker";
-import {PiAirplaneLandingLight, PiAirplaneTakeoffLight, PiCalendarBlankThin} from "react-icons/pi";
+import {PiAirplaneLandingLight, PiAirplaneTakeoffLight, PiCalendarBlankThin, PiUsersThreeThin} from "react-icons/pi";
 import {Airport} from "../../../common/airports";
 
 
@@ -25,7 +25,7 @@ type OneWayFormProps = {
 const today = new Date();
 
 export default function ReturnWayForm({ airports, initialLocationCodes, initialDates, sortType }: OneWayFormProps) {
-  const { locations, dates, possibleLocations, handleChange, searchUrl } = useJourneyPlanner({
+  const { locations, dates, passengersCount, possibleLocations, handleChange, searchUrl } = useJourneyPlanner({
     initialLocationCodes,
     initialDates,
     airports,
@@ -77,6 +77,15 @@ export default function ReturnWayForm({ airports, initialLocationCodes, initialD
           onChange={handleChange}
           from={getFromDayParam(dates[0], 1)}
           icon={<PiCalendarBlankThin/>}
+        />
+        <hr/>
+        <InputNumber
+          label="Number of Passengers"
+          placeholder="1"
+          name="passengersCount"
+          value={passengersCount}
+          onChange={handleChange}
+          icon={<PiUsersThreeThin/>}
         />
       </Card>
 

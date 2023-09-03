@@ -1,10 +1,11 @@
 'use client';
 
 import {Routes} from "@/app/routes";
+import InputNumber from "@/components/InputNumber/InputNumber";
 import {SortType} from "@/helpers/sort";
 import {useJourneyPlanner} from "@/hooks/useJourneyPlanner";
 import React from "react";
-import { PiAirplaneTakeoffLight, PiAirplaneLandingLight, PiCalendarBlankThin } from "react-icons/pi";
+import {PiAirplaneTakeoffLight, PiAirplaneLandingLight, PiCalendarBlankThin, PiUsersThreeThin} from "react-icons/pi";
 
 import AirportPicker from "@/components/AirportSelect/AirportPicker";
 import Button, {ButtonType} from "@/components/Button/Button";
@@ -23,7 +24,7 @@ type OneWayFormProps = {
 const today = new Date();
 
 export default function OneWayForm({ airports, initialLocationCodes, initialDates, sortType }: OneWayFormProps) {
-  const { locations, dates, possibleLocations, handleChange, searchUrl } = useJourneyPlanner({
+  const { locations, dates, possibleLocations, passengersCount, handleChange, searchUrl } = useJourneyPlanner({
     initialLocationCodes,
     initialDates,
     airports,
@@ -65,6 +66,15 @@ export default function OneWayForm({ airports, initialLocationCodes, initialDate
           onChange={handleChange}
           from={today}
           icon={<PiCalendarBlankThin/>}
+        />
+        <hr/>
+        <InputNumber
+          label="Number of Passengers"
+          placeholder="1"
+          name="passengersCount"
+          value={passengersCount}
+          onChange={handleChange}
+          icon={<PiUsersThreeThin/>}
         />
       </Card>
 

@@ -17,6 +17,7 @@ export type UseJourneyPlannerOutput = {
   possibleLocations: Airport[][];
   locations: Airport[][];
   dates: Date[][];
+  passengersCount: number;
   handleChange: (value: Record<string, any>) => void;
   searchUrl: string;
 }
@@ -57,7 +58,7 @@ export function useJourneyPlanner({ airports, initialLocationCodes, initialDates
   }, [airports]);
 
   // Create a form to manage the locations and dates
-  const { values: { locations, dates }, handleChange } = useForm({
+  const { values: { locations, dates, passengersCount }, handleChange } = useForm({
     initialValues: {
       locations: initialLocationCodes
         ?.map((codes: string[]) =>
@@ -66,6 +67,7 @@ export function useJourneyPlanner({ airports, initialLocationCodes, initialDates
             .filter(Boolean)
         ) || [[]],
       dates: initialDates || [[]],
+      passengersCount: 1
     }
   })
 
@@ -114,6 +116,7 @@ export function useJourneyPlanner({ airports, initialLocationCodes, initialDates
     possibleLocations,
     locations,
     dates,
+    passengersCount,
     handleChange,
     searchUrl
   }

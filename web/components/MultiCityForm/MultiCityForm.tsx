@@ -2,6 +2,7 @@
 
 import {Routes} from "@/app/routes";
 import {getFromDayParam} from "@/components/DatePicker/helpers";
+import InputNumber from "@/components/InputNumber/InputNumber";
 import {SortType} from "@/helpers/sort";
 import {useJourneyPlanner} from "@/hooks/useJourneyPlanner";
 import React, {useCallback} from "react";
@@ -10,7 +11,13 @@ import AirportPicker from "@/components/AirportSelect/AirportPicker";
 import Button, {ButtonType} from "@/components/Button/Button";
 import Card from "@/components/Card/Card";
 import DatePicker from "@/components/DatePicker/DatePicker";
-import {PiAirplaneInFlightLight, PiAirplaneTakeoffLight, PiCalendarBlankThin, PiXCircleLight} from "react-icons/pi";
+import {
+  PiAirplaneInFlightLight,
+  PiAirplaneTakeoffLight,
+  PiCalendarBlankThin,
+  PiUsersThreeThin,
+  PiXCircleLight
+} from "react-icons/pi";
 import {Airport} from "../../../common/airports";
 
 import styles from './MultiCityForm.module.scss';
@@ -70,7 +77,7 @@ function JourneyRow({index, possibleLocations, locations, dates, handleChange, h
 }
 
 export default function MultiCityForm({airports, initialLocationCodes, initialDates, sortType, maxLocations = 5}: MultiCityFormProps) {
-  const {locations, dates, possibleLocations, handleChange, searchUrl} = useJourneyPlanner({
+  const {locations, dates, possibleLocations, passengersCount, handleChange, searchUrl} = useJourneyPlanner({
     initialLocationCodes,
     initialDates,
     airports,
@@ -128,6 +135,16 @@ export default function MultiCityForm({airports, initialLocationCodes, initialDa
             Add City
           </Button>
         )}
+
+        <hr/>
+        <InputNumber
+          label="Number of Passengers"
+          placeholder="1"
+          name="passengersCount"
+          value={passengersCount}
+          onChange={handleChange}
+          icon={<PiUsersThreeThin/>}
+        />
       </Card>
 
 
