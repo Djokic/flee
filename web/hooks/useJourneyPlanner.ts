@@ -10,6 +10,7 @@ export type UseJourneyPlannerInput = {
   initialDates?: Date[][];
   onlyDirect: boolean;
   sortType: SortType;
+  passengersCount: number;
   baseUrl: string;
 }
 
@@ -48,7 +49,7 @@ function getPossibleDestinationsFromAirports(airports: Airport[], onlyDirect: bo
  * @param sortType
  * @param baseUrl
  */
-export function useJourneyPlanner({ airports, initialLocationCodes, initialDates, onlyDirect, sortType, baseUrl }: UseJourneyPlannerInput): UseJourneyPlannerOutput {
+export function useJourneyPlanner({ airports, initialLocationCodes, initialDates, onlyDirect, sortType, passengersCount: count, baseUrl }: UseJourneyPlannerInput): UseJourneyPlannerOutput {
   // Create a map of airports for faster access later
   const airportsMap = useMemo(() => {
     return airports.reduce((acc: Record<string, Airport>, airport: Airport) => {
@@ -67,7 +68,7 @@ export function useJourneyPlanner({ airports, initialLocationCodes, initialDates
             .filter(Boolean)
         ) || [[]],
       dates: initialDates || [[]],
-      passengersCount: 1
+      passengersCount: count,
     }
   })
 
@@ -107,9 +108,10 @@ export function useJourneyPlanner({ airports, initialLocationCodes, initialDates
       baseUrl,
       sortType,
       dates,
-      locations: locations.map((group) => group.map((airport) => airport.code))
+      locations: locations.map((group) => group.map((airport) => airport.code)),
+      count: passengersCount
     });
-  }, [locations, dates, baseUrl]);
+  }, [baseUrl, sortType, dates, locations, passengersCount]);
 
 
   return {

@@ -9,6 +9,7 @@ enum Separator {
 
 const DATE_FORMAT = 'yyyy-MM-dd';
 const SORT_DELIMITER = 'sort';
+const COUNT_DELIMITER = 'count';
 
 type ParseLocationsAndDatesOutput = {
   locations: string[][];
@@ -73,6 +74,7 @@ export function formatLocationsAndDates({ locations, dates }: FormatLocationsAnd
 
 type ParseRouteParamsOutput = ParseLocationsAndDatesOutput & {
   sortType: SortType;
+  count: number;
 }
 
 export function parseRouteParams(params: string[] = [], defaultSortBy: SortType = SortType.DATE): ParseRouteParamsOutput {
@@ -80,21 +82,27 @@ export function parseRouteParams(params: string[] = [], defaultSortBy: SortType 
   const potentialSortBy = sortDelimiterIndex > -1 ? params[sortDelimiterIndex + 1] : undefined;
   const sortBy = potentialSortBy && [SortType.DATE, SortType.PRICE].includes(potentialSortBy as SortType) ? potentialSortBy as SortType : defaultSortBy;
 
+  const countDelimiterIndex = params.indexOf(COUNT_DELIMITER);
+  const potentialCount = countDelimiterIndex > -1 ? params[countDelimiterIndex + 1] : undefined;
+  const count = potentialCount && !isNaN(Number(potentialCount)) ? Number(potentialCount) : 1;
+
   const partBeforeSortDelimiter = params.slice(0, sortDelimiterIndex > -1 ? sortDelimiterIndex : params.length);
   const [locations, dates] = partBeforeSortDelimiter;
 
   return {
     ...parseLocationsAndDates(locations, dates),
     sortType: sortBy,
+    count,
   }
 }
 
 type CreateRouteUrlInput = FormatLocationsAndDatesInput & {
   baseUrl: string;
   sortType: SortType;
+  count: number;
 }
 
-export function createRouteUrl({ baseUrl, locations, dates, sortType }: CreateRouteUrlInput): string {
+export function createRouteUrl({ baseUrl, locations, dates, sortType, count }: CreateRouteUrlInput): string {
   const { locations: formattedLocations, dates: formattedDates } = formatLocationsAndDates({ locations, dates });
   let url = `${baseUrl}/${formattedLocations}`;
 
@@ -105,6 +113,11 @@ export function createRouteUrl({ baseUrl, locations, dates, sortType }: CreateRo
   if (sortType) {
     url += `/${SORT_DELIMITER}/${sortType}`;
   }
+
+  if (count) {
+    url += `/${COUNT_DELIMITER}/${count}`;
+  }
+
   return url;
 }
 

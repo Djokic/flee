@@ -20,6 +20,7 @@ type SearchLayoutProps = {
   locations: string[][];
   dates: Date[][];
   sortType: SortType;
+  passengersCount: number;
 }
 
 export default function SearchLayout(props: SearchLayoutProps) {
@@ -30,6 +31,7 @@ export default function SearchLayout(props: SearchLayoutProps) {
     locations,
     dates,
     sortType = SortType.DATE,
+    passengersCount,
     className
   } = props;
   const pathname = usePathname();
@@ -45,7 +47,8 @@ export default function SearchLayout(props: SearchLayoutProps) {
                 baseUrl: Routes.RETURN,
                 locations: locations.slice(0, 2),
                 dates: dates.slice(0, 2),
-                sortType
+                sortType,
+                count: passengersCount
               })}
               aria-selected={pathname?.includes(Routes.RETURN)}
             >
@@ -56,7 +59,8 @@ export default function SearchLayout(props: SearchLayoutProps) {
                 baseUrl: Routes.ONE_WAY,
                 locations: locations.slice(0, 2),
                 dates: dates.slice(0, 1),
-                sortType
+                sortType,
+                count: passengersCount
               })}
               aria-selected={pathname?.includes(Routes.ONE_WAY)}
             >
@@ -67,7 +71,8 @@ export default function SearchLayout(props: SearchLayoutProps) {
                 baseUrl: Routes.MULTI_CITY,
                 locations: locations,
                 dates: dates,
-                sortType
+                sortType,
+                count: passengersCount
               })}
               aria-selected={pathname?.includes(Routes.MULTI_CITY)}
             >
@@ -85,6 +90,7 @@ export default function SearchLayout(props: SearchLayoutProps) {
             locations={locations}
             dates={dates}
             sortType={sortType}
+            passengersCount={passengersCount}
           />
 
           {children[1]}

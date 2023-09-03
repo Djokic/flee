@@ -10,9 +10,10 @@ type SortControlProps = {
   locations: string[][];
   dates: Date[][];
   sortType: SortType;
+  passengersCount: number;
 }
 
-export default function SortControl({faresCount, baseUrl, locations, dates, sortType}: SortControlProps) {
+export default function SortControl({faresCount, baseUrl, locations, dates, sortType, passengersCount }: SortControlProps) {
   if (!faresCount) {
     return null;
   }
@@ -37,7 +38,8 @@ export default function SortControl({faresCount, baseUrl, locations, dates, sort
             baseUrl,
             locations,
             dates,
-            sortType: SortType.DATE
+            sortType: SortType.DATE,
+            count: passengersCount
           })}>
           By Date
         </Link>
@@ -49,7 +51,8 @@ export default function SortControl({faresCount, baseUrl, locations, dates, sort
             baseUrl,
             locations,
             dates,
-            sortType: SortType.PRICE
+            sortType: SortType.PRICE,
+            count: passengersCount
           })}
         >
           By Price

@@ -30,11 +30,18 @@ export const metadata: Metadata = {
 export const revalidate = 3600;
 
 export default async function Page({params: {routeParams}}: PageParams) {
-  const {locations, dates, sortType} = parseRouteParams(routeParams);
+  const {locations, dates, sortType, count} = parseRouteParams(routeParams);
   const {airports, fares, airportCount, fareCount} = await getData({locations, dates, sortType});
 
   return (
-    <SearchLayout baseUrl={Routes.MULTI_CITY} locations={locations} dates={dates} sortType={sortType} faresCount={fares.length}>
+    <SearchLayout
+      baseUrl={Routes.MULTI_CITY}
+      locations={locations}
+      dates={dates}
+      sortType={sortType}
+      faresCount={fares.length}
+      passengersCount={count}
+    >
       <>
         <MultiCityForm
           airports={airports}
@@ -42,6 +49,7 @@ export default async function Page({params: {routeParams}}: PageParams) {
           initialDates={dates}
           sortType={sortType}
           maxLocations={5}
+          passengersCount={count}
         />
         <StatusView airportCount={airportCount} fareCount={fareCount}/>
       </>

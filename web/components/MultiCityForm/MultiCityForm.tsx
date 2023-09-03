@@ -28,6 +28,7 @@ type MultiCityFormProps = {
   initialLocationCodes?: string[][];
   initialDates?: Date[][];
   sortType: SortType;
+  passengersCount?: number;
   maxLocations?: number;
 }
 
@@ -76,7 +77,7 @@ function JourneyRow({index, possibleLocations, locations, dates, handleChange, h
   )
 }
 
-export default function MultiCityForm({airports, initialLocationCodes, initialDates, sortType, maxLocations = 5}: MultiCityFormProps) {
+export default function MultiCityForm({airports, initialLocationCodes, initialDates, sortType, passengersCount: count, maxLocations = 5}: MultiCityFormProps) {
   const {locations, dates, possibleLocations, passengersCount, handleChange, searchUrl} = useJourneyPlanner({
     initialLocationCodes,
     initialDates,
@@ -84,6 +85,7 @@ export default function MultiCityForm({airports, initialLocationCodes, initialDa
     baseUrl: Routes.MULTI_CITY,
     onlyDirect: true,
     sortType,
+    passengersCount: count || 1,
   });
 
   const handleRemove = useCallback((index: number) => {

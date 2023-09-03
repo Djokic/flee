@@ -28,7 +28,7 @@ export const metadata: Metadata = {
 export const revalidate = 3600;
 
 export default async function Page({params: {routeParams}}: PageParams) {
-  const {locations, dates, sortType} = parseRouteParams(routeParams);
+  const {locations, dates, sortType, count} = parseRouteParams(routeParams);
   const [origins = [], destinations = []] = locations;
   const [departures = []] = dates;
   const {airports, fares, airportCount, fareCount} = await getData({origins, destinations, departures, sortType});
@@ -40,6 +40,7 @@ export default async function Page({params: {routeParams}}: PageParams) {
       dates={dates}
       sortType={sortType}
       faresCount={fares.length}
+      passengersCount={count}
     >
       <>
         <OneWayForm
@@ -47,6 +48,7 @@ export default async function Page({params: {routeParams}}: PageParams) {
           initialLocationCodes={locations}
           initialDates={dates}
           sortType={sortType}
+          passengersCount={count}
         />
         <StatusView airportCount={airportCount} fareCount={fareCount}/>
       </>

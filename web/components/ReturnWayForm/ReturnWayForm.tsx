@@ -20,11 +20,12 @@ type OneWayFormProps = {
   initialLocationCodes?: string[][];
   initialDates?: Date[][];
   sortType: SortType;
+  passengersCount?: number;
 }
 
 const today = new Date();
 
-export default function ReturnWayForm({ airports, initialLocationCodes, initialDates, sortType }: OneWayFormProps) {
+export default function ReturnWayForm({ airports, initialLocationCodes, initialDates, sortType, passengersCount: count }: OneWayFormProps) {
   const { locations, dates, passengersCount, possibleLocations, handleChange, searchUrl } = useJourneyPlanner({
     initialLocationCodes,
     initialDates,
@@ -32,6 +33,7 @@ export default function ReturnWayForm({ airports, initialLocationCodes, initialD
     baseUrl: Routes.RETURN,
     onlyDirect: false,
     sortType,
+    passengersCount: count || 1,
   });
 
   return (
