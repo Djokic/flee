@@ -21,11 +21,7 @@ export default function SortControl({faresCount, baseUrl, locations, dates, sort
   return (
     <div className={styles.SortControl}>
       <header>
-        {
-          faresCount % 100 === 0
-            ? `Showing ${faresCount} results`
-            : `${faresCount} results found`
-        }
+        {faresCount}{faresCount % 100 === 0 ? '+' : ''} results
       </header>
 
       <div>
@@ -56,6 +52,20 @@ export default function SortControl({faresCount, baseUrl, locations, dates, sort
           })}
         >
           By Price
+        </Link>
+
+        <Link
+          data-active={sortType === SortType.DURATION}
+          tabIndex={0}
+          href={createRouteUrl({
+            baseUrl,
+            locations,
+            dates,
+            sortType: SortType.DURATION,
+            count: passengersCount
+          })}
+        >
+          By Duration
         </Link>
       </div>
     </div>

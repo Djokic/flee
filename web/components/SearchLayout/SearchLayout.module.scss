@@ -30,7 +30,12 @@
     }
   }
 
-
+  @media screen and (max-width: 800px) {
+    [role="tablist"] {
+      margin: 0 auto;
+    }
+  }
+  
   &__Results {
     display: flex;
     flex-direction: column;
