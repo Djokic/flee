@@ -54,7 +54,11 @@ export default async function Page({params: {routeParams}}: PageParams) {
         <StatusView airportCount={airportCount} fareCount={fareCount}/>
       </>
 
-      <JourneyList data={fares} showNotFoundPlaceholder={Boolean(locations.length + dates.length)}/>
+      <JourneyList
+        data={fares}
+        showNotFoundPlaceholder={Boolean(locations.length + dates.length)}
+        passengersCount={count}
+      />
     </SearchLayout>
 
   )

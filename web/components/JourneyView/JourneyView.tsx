@@ -6,10 +6,12 @@ import styles from './JourneyView.module.scss';
 
 type JourneyViewProps = {
   fares: FareData[];
+  passengersCount: number;
 }
 
-export function JourneyView({fares}: JourneyViewProps) {
+export function JourneyView({fares, passengersCount}: JourneyViewProps) {
   const isMultiFare = Array.isArray(fares) && fares.length > 1;
+  const isMultiPassengers = passengersCount > 1;
   const totalPrice = isMultiFare ? fares.reduce((total, fare) => total + fare.price, 0) : fares[0]?.price;
   return (
     <div className={styles.JourneyView}>
@@ -18,10 +20,18 @@ export function JourneyView({fares}: JourneyViewProps) {
       )) : (
         fares[0] && <FareView fare={fares[0]}/>
       )}
-      {isMultiFare && (
+      {(isMultiFare || isMultiPassengers) && (
         <div className={styles.JourneyView__TotalPrice}>
-          <span>Total</span>
-          <span>€{totalPrice.toFixed(2)}</span>
+          {isMultiPassengers && (
+            <div>
+              <span>Total for <strong>{passengersCount}</strong> people</span>
+              <span>€{(totalPrice * passengersCount).toFixed(2)}</span>
+            </div>
+          )}
+          <div>
+            <span>Total {passengersCount > 1 ? 'per person' : ''}</span>
+            <span>€{totalPrice.toFixed(2)}</span>
+          </div>
         </div>
       )}
     </div>

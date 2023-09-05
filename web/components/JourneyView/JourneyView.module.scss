@@ -29,17 +29,26 @@
   &__TotalPrice {
     display: flex;
     padding: 0.5rem 1rem;
-    flex-direction: column;
     align-items: flex-end;
+    justify-content: space-between;
     background: var(--card-background);
     border: 1px solid var(--border-primary);
     border-top: 1px dashed var(--border-primary);
     border-bottom-left-radius: var(--radius);
     border-bottom-right-radius: var(--radius);
 
+    div {
+      display: flex;
+      flex-direction: column;
+
+      &:last-child {
+        align-items: flex-end;
+      }
+    }
+
     span:first-child {
       color: var(--text-muted);
-      font-size: var(--text-s);
+      font-size: var(--text-xs);
     }
 
     span:last-child {

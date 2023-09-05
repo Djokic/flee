@@ -1,7 +1,5 @@
 import {Routes} from "@/app/routes";
 import JourneyList from "@/components/JourneyList/JourneyList";
-import {JourneyView} from "@/components/JourneyView/JourneyView";
-import SortControl from "@/components/SortControl/SortControl";
 import StatusView from "@/components/StatusView/StatusView";
 
 import {parseRouteParams} from "@/helpers/urlHelper";
@@ -10,7 +8,6 @@ import React from "react";
 
 import OneWayForm from "@/components/OneWayForm/OneWayForm";
 import SearchLayout from "@/components/SearchLayout/SearchLayout";
-import {FareData} from "../../../../common/fares";
 
 import {getData} from "./data";
 
@@ -53,7 +50,11 @@ export default async function Page({params: {routeParams}}: PageParams) {
         <StatusView airportCount={airportCount} fareCount={fareCount}/>
       </>
 
-      <JourneyList data={fares} showNotFoundPlaceholder={Boolean(locations.length + dates.length)}/>
+      <JourneyList
+        data={fares}
+        showNotFoundPlaceholder={Boolean(locations.length + dates.length)}
+        passengersCount={count}
+      />
     </SearchLayout>
   )
 }

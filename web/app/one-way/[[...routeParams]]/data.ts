@@ -1,7 +1,7 @@
 import {SortType} from "@/helpers/sort";
-import {Airport, getAllAirports} from "../../../../common/airports";
+import { getAllAirports} from "../../../../common/airports";
 import {getDbSession} from "../../../../common/dbSession";
-import {FareData, getFares} from "../../../../common/fares";
+import { getFares} from "../../../../common/fares";
 import {getStatus} from "../../../../common/status";
 
 type GetDataParams = {
