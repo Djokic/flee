@@ -52,6 +52,20 @@ async function getFaresWithStops(params: GetFaresInput): Promise<FareData[][]> {
   const minDelayBetweenFares = params.delayBetweenFaresInHours || 0;
   const maxDelayBetweenFares = 24 + minDelayBetweenFares;
 
+  let orderByClause = '';
+  switch (params.sortType) {
+    case SortType.PRICE:
+      orderByClause = 'reduce(totalPrice = 0, r in relationships(p) | totalPrice + r.price), head(relationships(p)).date';
+      break;
+    case SortType.DATE:
+    default:
+      orderByClause = 'head(relationships(p)).date, reduce(totalDuration = duration.between(datetime(head(relationships(p)).date), datetime(last(relationships(p)).arrivalDate)), r in relationships(p) | totalDuration)';
+      break;
+    case SortType.DURATION:
+      orderByClause = 'reduce(totalDuration = duration.between(datetime(head(relationships(p)).date), datetime(last(relationships(p)).arrivalDate)), r in relationships(p) | totalDuration), head(relationships(p)).date';
+      break;
+  }
+
   const query = `
     MATCH (start:Airport) WHERE start.code IN $origins
     MATCH (end:Airport) WHERE end.code IN $destinations
@@ -63,13 +77,13 @@ async function getFaresWithStops(params: GetFaresInput): Promise<FareData[][]> {
         AND datetime(rels[0].date) >= datetime($startDate)
         AND datetime(rels[-1].date) <= datetime($endDate) + duration('PT${minDelayBetweenFares}H')
     RETURN p AS path
-    ORDER BY ${params.sortType === 'price' ? 'reduce(totalPrice = 0, r in relationships(p) | totalPrice + r.price), head(relationships(p)).date' : 'head(relationships(p)).date, reduce(totalPrice = 0, r in relationships(p) | totalPrice + r.price)'} ASC
+    ORDER BY ${orderByClause} ASC
     LIMIT ${params.limit}
   `;
 
   const {startDate, endDate} = getQueryDates(params.dates);
 
-  const result =  await params.session.run(query, {
+  const result = await params.session.run(query, {
     origins: params.origins,
     destinations: params.destinations,
     startDate: startDate.toISOString(),
@@ -91,6 +105,7 @@ async function getFaresWithStops(params: GetFaresInput): Promise<FareData[][]> {
     });
   });
 }
+
 
 export async function getFaresFromOrigin(params: GetFaresInput): Promise<FareData[][]> {
   const query = `

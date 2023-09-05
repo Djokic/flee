@@ -80,7 +80,7 @@ type ParseRouteParamsOutput = ParseLocationsAndDatesOutput & {
 export function parseRouteParams(params: string[] = [], defaultSortBy: SortType = SortType.DATE): ParseRouteParamsOutput {
   const sortDelimiterIndex = params.indexOf(SORT_DELIMITER);
   const potentialSortBy = sortDelimiterIndex > -1 ? params[sortDelimiterIndex + 1] : undefined;
-  const sortBy = potentialSortBy && [SortType.DATE, SortType.PRICE].includes(potentialSortBy as SortType) ? potentialSortBy as SortType : defaultSortBy;
+  const sortBy = potentialSortBy && [SortType.DATE, SortType.PRICE, SortType.DURATION].includes(potentialSortBy as SortType) ? potentialSortBy as SortType : defaultSortBy;
 
   const countDelimiterIndex = params.indexOf(COUNT_DELIMITER);
   const potentialCount = countDelimiterIndex > -1 ? params[countDelimiterIndex + 1] : undefined;
