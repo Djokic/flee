@@ -106,15 +106,28 @@ async function getFaresWithStops(params: GetFaresInput): Promise<FareData[][]> {
   });
 }
 
-
 export async function getFaresFromOrigin(params: GetFaresInput): Promise<FareData[][]> {
+  let orderByClause = '';
+  switch (params.sortType) {
+    case SortType.PRICE:
+      orderByClause = 'r.price, r.date';
+      break;
+    case SortType.DATE:
+    default:
+      orderByClause = 'r.date, r.price';
+      break;
+    case SortType.DURATION:
+      orderByClause = 'r.duration, r.date';
+      break;
+  }
+
   const query = `
     MATCH (start:Airport)-[r]->(end:Airport)
     WHERE start.code IN $origins
       AND datetime(r.date) >= datetime($startDate)
       AND datetime(r.date) <= datetime($endDate)
     RETURN start AS origin, end AS destination, r AS fare
-    ORDER BY ${params.sortType === 'price' ? 'r.price, r.date' : 'r.date, r.price'} ASC
+    ORDER BY ${orderByClause} ASC
     LIMIT ${params.limit}
   `;
 
